@@ -126,7 +126,9 @@ export default function ForgotPasswordPage(): React.ReactElement {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (error) setError(undefined);
+                  if (error) {
+                    setError(undefined);
+                  }
                 }}
                 disabled={isSubmitting}
                 className={error ? 'border-discord-red focus-visible:ring-discord-red' : ''}

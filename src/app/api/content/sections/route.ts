@@ -101,7 +101,7 @@ export const POST = withSuperAdmin<CreateContentResponse>(async (request: NextRe
     let filePath: string = '';
     let existingItems: Array<{ id: string }> = [];
     // indexData değişkeni dosya okuma sonrası atanacak
-    let indexData: { items: unknown[]; lastUpdated: string; version: string };
+    const indexData: { items: unknown[]; lastUpdated: string; version: string } = { items: [], lastUpdated: '', version: '' };
 
     switch (type) {
       case 'guide':
@@ -144,7 +144,10 @@ export const POST = withSuperAdmin<CreateContentResponse>(async (request: NextRe
 
     // Mevcut dosyayı oku
     const fileContent = fs.readFileSync(filePath, 'utf-8');
-    indexData = JSON.parse(fileContent);
+    const parsedData = JSON.parse(fileContent);
+    indexData.items = parsedData.items;
+    indexData.lastUpdated = parsedData.lastUpdated;
+    indexData.version = parsedData.version;
 
     // Yeni içeriği ekle
     indexData.items.push(data);

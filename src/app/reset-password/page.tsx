@@ -172,7 +172,9 @@ function ResetPasswordContent(): React.ReactElement {
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+                    if (errors.password) {
+                      setErrors(prev => ({ ...prev, password: undefined }));
+                    }
                   }}
                   disabled={isSubmitting}
                   className={`pr-10 ${errors.password ? 'border-discord-red' : ''}`}
@@ -199,7 +201,9 @@ function ResetPasswordContent(): React.ReactElement {
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
-                  if (errors.confirm) setErrors(prev => ({ ...prev, confirm: undefined }));
+                  if (errors.confirm) {
+                    setErrors(prev => ({ ...prev, confirm: undefined }));
+                  }
                 }}
                 disabled={isSubmitting}
                 className={errors.confirm ? 'border-discord-red' : ''}
