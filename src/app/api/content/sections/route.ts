@@ -100,7 +100,8 @@ export const POST = withSuperAdmin<CreateContentResponse>(async (request: NextRe
     // İçerik dosyası yolunu belirle
     let filePath: string = '';
     let existingItems: Array<{ id: string }> = [];
-    let indexData: { items: unknown[]; lastUpdated: string; version: string } = { items: [], lastUpdated: '', version: '' };
+    // indexData değişkeni dosya okuma sonrası atanacak
+    let indexData: { items: unknown[]; lastUpdated: string; version: string };
 
     switch (type) {
       case 'guide':

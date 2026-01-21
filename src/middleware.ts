@@ -81,7 +81,7 @@ function getUserFromJWT(token: string): MiddlewareUser | null {
     // Edge runtime'da jsonwebtoken çalışmıyor, bu yüzden manuel decode
     const parts = token.split('.');
     if (parts.length !== 3 || !parts[1]) {
-      console.log('[Middleware] Invalid JWT format');
+      // Invalid JWT format - silently fail
       return null;
     }
     
@@ -98,7 +98,7 @@ function getUserFromJWT(token: string): MiddlewareUser | null {
     
     // Token süresi dolmuş mu kontrol et
     if (payload.exp && payload.exp * 1000 < Date.now()) {
-      console.log('[Middleware] Token expired');
+      // Token expired - silently fail
       return null;
     }
 
@@ -108,10 +108,9 @@ function getUserFromJWT(token: string): MiddlewareUser | null {
       status: (payload.status || 'pending') as UserStatus,
     };
     
-    console.log('[Middleware] Decoded user:', user);
     return user;
-  } catch (error) {
-    console.log('[Middleware] JWT decode error:', error);
+  } catch {
+    // JWT decode error - silently fail
     return null;
   }
 }
@@ -273,23 +272,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // Token'ı al
   const token = request.cookies.get('auth_token')?.value;
   
-  // Debug: Token ve cookie bilgisi
-  console.log('[Middleware Debug]', {
-    pathname,
-    hasToken: !!token,
-    tokenPreview: token ? token.substring(0, 50) + '...' : 'none',
-  });
-  
   // Kullanıcı bilgisini JWT'den çıkar
   let user: MiddlewareUser | null = null;
   if (token) {
     user = getUserFromJWT(token);
-    console.log('[Middleware Debug] User from JWT:', user);
   }
 
   // Erişim kontrolü
   const access = checkAccess(pathname, user);
-  console.log('[Middleware Debug] Access result:', access);
 
   // Log verisi hazırla
   const logData: LogData = {

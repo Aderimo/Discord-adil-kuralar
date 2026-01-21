@@ -10,13 +10,29 @@ import { loadGuideContent } from '@/lib/content';
 import { useAuth } from '@/hooks/useAuth';
 import { hasRole } from '@/lib/rbac';
 import { Button } from '@/components/ui/button';
-import { Plus, Book, ChevronRight } from 'lucide-react';
+import { Plus, Book, ChevronRight, Trash2, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import type { GuideContent, PenaltyDefinition, CommandDefinition, ProcedureDefinition } from '@/types/content';
 
 export default function GuidePage(): React.ReactElement {
-  const guideContent = useMemo(() => loadGuideContent(), []);
+  const allGuideContent = useMemo(() => loadGuideContent(), []);
   const { user } = useAuth();
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Arama filtresi
+  const guideContent = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return allGuideContent;
+    }
+    const query = searchQuery.toLowerCase();
+    return allGuideContent.filter(guide =>
+      guide.title.toLowerCase().includes(query) ||
+      guide.content.toLowerCase().includes(query) ||
+      (guide.keywords || []).some(k => k.toLowerCase().includes(query))
+    );
+  }, [allGuideContent, searchQuery]);
 
   // Sadece ust_yetkili rolü düzenleme yapabilir
   const canEdit = user?.role && hasRole(user.role, 'ust_yetkili');
@@ -37,7 +53,7 @@ export default function GuidePage(): React.ReactElement {
         id: newId,
         category: 'kilavuz',
         relatedArticles: [],
-        order: guideContent.length + 1,
+        order: allGuideContent.length + 1,
       };
 
       const response = await fetch('/api/content/sections', {
@@ -61,10 +77,38 @@ export default function GuidePage(): React.ReactElement {
       console.error('Ekleme hatası:', error);
       throw error;
     }
-  }, [guideContent.length]);
+  }, [allGuideContent.length]);
 
   const handleCancel = useCallback(() => {
     setIsAddingNew(false);
+  }, []);
+
+  // İçerik silme
+  const handleDelete = useCallback(async (guideId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!confirm('Bu kılavuz bölümünü silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+    
+    setDeletingId(guideId);
+    try {
+      const response = await fetch(`/api/content/sections/${guideId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('İçerik silinemedi');
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error('Silme hatası:', error);
+      alert('Silme işlemi başarısız oldu');
+    } finally {
+      setDeletingId(null);
+    }
   }, []);
 
   return (
@@ -104,31 +148,64 @@ export default function GuidePage(): React.ReactElement {
           />
         )}
 
+        {/* Arama kutusu */}
+        {!isAddingNew && (
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-discord-muted" />
+            <Input
+              type="text"
+              placeholder="Kılavuz ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-discord-dark border-discord-light"
+            />
+          </div>
+        )}
+
         {!isAddingNew && (
           <div className="space-y-3">
+            {guideContent.length === 0 && searchQuery && (
+              <div className="text-center py-8 text-discord-muted">
+                &quot;{searchQuery}&quot; için sonuç bulunamadı.
+              </div>
+            )}
             {guideContent.map((guide) => (
-              <Link
-                key={guide.id}
-                href={`/guide/${guide.slug}` as never}
-                className="block bg-discord-dark border border-discord-light rounded-lg p-4 hover:border-discord-accent/50 transition-colors group"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-discord-accent/10 rounded-lg">
-                      <Book className="h-5 w-5 text-discord-accent" />
+              <div key={guide.id} className="relative group">
+                <Link
+                  href={`/guide/${guide.slug}` as never}
+                  className="block bg-discord-dark border border-discord-light rounded-lg p-4 hover:border-discord-accent/50 transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-discord-accent/10 rounded-lg">
+                        <Book className="h-5 w-5 text-discord-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-discord-text group-hover:text-discord-accent transition-colors">
+                          {guide.title}
+                        </h3>
+                        <p className="text-sm text-discord-muted line-clamp-1">
+                          {guide.content.substring(0, 100)}...
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-discord-text group-hover:text-discord-accent transition-colors">
-                        {guide.title}
-                      </h3>
-                      <p className="text-sm text-discord-muted line-clamp-1">
-                        {guide.content.substring(0, 100)}...
-                      </p>
-                    </div>
+                    <ChevronRight className="h-5 w-5 text-discord-muted group-hover:text-discord-accent transition-colors" />
                   </div>
-                  <ChevronRight className="h-5 w-5 text-discord-muted group-hover:text-discord-accent transition-colors" />
-                </div>
-              </Link>
+                </Link>
+                {/* Silme butonu - sadece ust_yetkili için */}
+                {canEdit && (
+                  <Button
+                    onClick={(e) => handleDelete(guide.id, e)}
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 text-discord-red hover:bg-discord-red/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Sil"
+                    disabled={deletingId === guide.id}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             ))}
           </div>
         )}

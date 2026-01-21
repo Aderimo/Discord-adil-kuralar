@@ -9,14 +9,30 @@ import { loadCommands } from '@/lib/content';
 import { useAuth } from '@/hooks/useAuth';
 import { hasRole } from '@/lib/rbac';
 import { Button } from '@/components/ui/button';
-import { Edit3, Plus } from 'lucide-react';
+import { Edit3, Plus, Trash2, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import type { CommandDefinition, GuideContent, PenaltyDefinition, ProcedureDefinition } from '@/types/content';
 
 export default function CommandsPage(): React.ReactElement {
-  const commands = useMemo(() => loadCommands(), []);
+  const allCommands = useMemo(() => loadCommands(), []);
   const { user } = useAuth();
   const [editingCommand, setEditingCommand] = useState<CommandDefinition | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Arama filtresi
+  const commands = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return allCommands;
+    }
+    const query = searchQuery.toLowerCase();
+    return allCommands.filter(cmd =>
+      cmd.command.toLowerCase().includes(query) ||
+      cmd.description.toLowerCase().includes(query) ||
+      (cmd.keywords || []).some(k => k.toLowerCase().includes(query))
+    );
+  }, [allCommands, searchQuery]);
 
   // Sadece ust_yetkili rolü düzenleme yapabilir
   const canEdit = user?.role && hasRole(user.role, 'ust_yetkili');
@@ -93,6 +109,31 @@ export default function CommandsPage(): React.ReactElement {
     setIsAddingNew(false);
   }, []);
 
+  // İçerik silme
+  const handleDelete = useCallback(async (commandId: string) => {
+    if (!confirm('Bu komutu silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+    
+    setDeletingId(commandId);
+    try {
+      const response = await fetch(`/api/content/sections/${commandId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('İçerik silinemedi');
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error('Silme hatası:', error);
+      alert('Silme işlemi başarısız oldu');
+    } finally {
+      setDeletingId(null);
+    }
+  }, []);
+
   return (
     <MainLayout>
       <div className="max-w-4xl mx-auto space-y-6">
@@ -147,9 +188,28 @@ export default function CommandsPage(): React.ReactElement {
           </div>
         )}
 
+        {/* Arama kutusu */}
+        {!editingCommand && !isAddingNew && (
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-discord-muted" />
+            <Input
+              type="text"
+              placeholder="Komut ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-discord-dark border-discord-light"
+            />
+          </div>
+        )}
+
         {/* Komut listesi */}
         {!editingCommand && !isAddingNew && (
           <div className="space-y-4">
+            {commands.length === 0 && searchQuery && (
+              <div className="text-center py-8 text-discord-muted">
+                &quot;{searchQuery}&quot; için sonuç bulunamadı.
+              </div>
+            )}
             {commands.map((cmd) => (
               <div
                 key={cmd.id}
@@ -171,17 +231,29 @@ export default function CommandsPage(): React.ReactElement {
                         </span>
                       ))}
                     </div>
-                    {/* Düzenleme butonu - sadece ust_yetkili için */}
+                    {/* Düzenleme ve silme butonları - sadece ust_yetkili için */}
                     {canEdit && (
-                      <Button
-                        onClick={() => setEditingCommand(cmd)}
-                        variant="ghost"
-                        size="sm"
-                        className="text-discord-accent hover:bg-discord-accent/10"
-                        title="Düzenle"
-                      >
-                        <Edit3 className="h-4 w-4" />
-                      </Button>
+                      <>
+                        <Button
+                          onClick={() => setEditingCommand(cmd)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-discord-accent hover:bg-discord-accent/10"
+                          title="Düzenle"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(cmd.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-discord-red hover:bg-discord-red/10"
+                          title="Sil"
+                          disabled={deletingId === cmd.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>

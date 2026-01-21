@@ -10,7 +10,8 @@ import { loadPenalties } from '@/lib/content';
 import { useAuth } from '@/hooks/useAuth';
 import { hasRole } from '@/lib/rbac';
 import { Button } from '@/components/ui/button';
-import { Edit3, Plus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Edit3, Plus, Trash2, Search } from 'lucide-react';
 import type { PenaltyCategory, PenaltyDefinition, GuideContent, CommandDefinition, ProcedureDefinition } from '@/types/content';
 
 const categoryLabels: Record<PenaltyCategory, string> = {
@@ -35,6 +36,8 @@ export default function PenaltyCategoryPage(): React.ReactElement {
   const { user } = useAuth();
   const [editingPenalty, setEditingPenalty] = useState<PenaltyDefinition | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const validCategories: PenaltyCategory[] = ['yazili', 'sesli', 'ekstra', 'marked', 'blacklist'];
   
@@ -43,10 +46,22 @@ export default function PenaltyCategoryPage(): React.ReactElement {
   }
 
   const allPenalties = useMemo(() => loadPenalties(), []);
-  const penalties = useMemo(() => 
-    allPenalties.filter(p => p.category === category),
-    [allPenalties, category]
-  );
+  const penalties = useMemo(() => {
+    let filtered = allPenalties.filter(p => p.category === category);
+    
+    // Arama filtresi
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(query) ||
+        p.code.toLowerCase().includes(query) ||
+        p.description.toLowerCase().includes(query) ||
+        (p.keywords || []).some(k => k.toLowerCase().includes(query))
+      );
+    }
+    
+    return filtered;
+  }, [allPenalties, category, searchQuery]);
 
   // Sadece ust_yetkili rolü düzenleme yapabilir
   const canEdit = user?.role && hasRole(user.role, 'ust_yetkili');
@@ -57,6 +72,31 @@ export default function PenaltyCategoryPage(): React.ReactElement {
     { label: 'Cezalar', href: '/penalties' },
     { label: categoryLabels[category] || category, href: `/penalties/${category}` },
   ], [category]);
+
+  // İçerik silme
+  const handleDelete = useCallback(async (penaltyId: string) => {
+    if (!confirm('Bu cezayı silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+    
+    setDeletingId(penaltyId);
+    try {
+      const response = await fetch(`/api/content/sections/${penaltyId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('İçerik silinemedi');
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error('Silme hatası:', error);
+      alert('Silme işlemi başarısız oldu');
+    } finally {
+      setDeletingId(null);
+    }
+  }, []);
 
   // İçerik kaydetme (düzenleme)
   const handleSave = useCallback(async (content: GuideContent | PenaltyDefinition | CommandDefinition | ProcedureDefinition) => {
@@ -180,9 +220,28 @@ export default function PenaltyCategoryPage(): React.ReactElement {
           </div>
         )}
 
+        {/* Arama kutusu */}
+        {!editingPenalty && !isAddingNew && (
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-discord-muted" />
+            <Input
+              type="text"
+              placeholder="Ceza ara (isim, kod, açıklama)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-discord-dark border-discord-light"
+            />
+          </div>
+        )}
+
         {/* Ceza listesi */}
         {!editingPenalty && !isAddingNew && (
           <div className="space-y-4">
+            {penalties.length === 0 && searchQuery && (
+              <div className="text-center py-8 text-discord-muted">
+                &quot;{searchQuery}&quot; için sonuç bulunamadı.
+              </div>
+            )}
             {penalties.map((penalty) => (
               <div
                 key={penalty.id}
@@ -201,17 +260,29 @@ export default function PenaltyCategoryPage(): React.ReactElement {
                     <span className="px-3 py-1 bg-discord-red/20 text-discord-red text-sm rounded-full">
                       {penalty.duration}
                     </span>
-                    {/* Düzenleme butonu - sadece ust_yetkili için */}
+                    {/* Düzenleme ve silme butonları - sadece ust_yetkili için */}
                     {canEdit && (
-                      <Button
-                        onClick={() => setEditingPenalty(penalty)}
-                        variant="ghost"
-                        size="sm"
-                        className="text-discord-accent hover:bg-discord-accent/10"
-                        title="Düzenle"
-                      >
-                        <Edit3 className="h-4 w-4" />
-                      </Button>
+                      <>
+                        <Button
+                          onClick={() => setEditingPenalty(penalty)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-discord-accent hover:bg-discord-accent/10"
+                          title="Düzenle"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(penalty.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-discord-red hover:bg-discord-red/10"
+                          title="Sil"
+                          disabled={deletingId === penalty.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
