@@ -1,0 +1,203 @@
+{
+  "items": [
+    {
+      "id": "cmd-001",
+      "command": "s!mute",
+      "description": "Kullanıcıyı belirli bir süre için susturur (mute).",
+      "usage": "s!mute [id] [süre]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "s!mute 1208226241002606644 3d",
+        "s!mute 1208226241002606644 7d",
+        "s!mute @User 14d"
+      ],
+      "keywords": ["mute", "sustur", "susturma", "ceza"],
+      "order": 1
+    },
+    {
+      "id": "cmd-002",
+      "command": "s!unmute",
+      "description": "Kullanıcının susturmasını kaldırır.",
+      "usage": "s!unmute [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "s!unmute 1208226241002606644",
+        "s!unmute @User"
+      ],
+      "keywords": ["unmute", "susturmayı kaldır", "aç"],
+      "order": 2
+    },
+    {
+      "id": "cmd-003",
+      "command": "h!timeout",
+      "description": "Kullanıcıya timeout verir.",
+      "usage": "h!timeout [id] [süre]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "h!timeout 1208226241002606644 1h",
+        "h!timeout 1208226241002606644 1d",
+        "h!timeout @User 3d"
+      ],
+      "keywords": ["timeout", "zaman aşımı", "ceza"],
+      "order": 3
+    },
+    {
+      "id": "cmd-004",
+      "command": "s!temprole add",
+      "description": "Kullanıcıya geçici rol ekler.",
+      "usage": "s!temprole add [id] [süre] [rol]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "s!temprole add 1208226241002606644 3d uyarılmış",
+        "s!temprole add 1208226241002606644 7d susturulmuş",
+        "s!temprole add @User 2d noroompls"
+      ],
+      "keywords": ["temprole", "geçici rol", "rol ekle", "add"],
+      "order": 4
+    },
+    {
+      "id": "cmd-005",
+      "command": "s!temprole remove",
+      "description": "Kullanıcıdan geçici rolü kaldırır.",
+      "usage": "s!temprole remove [id] [süre] [rol]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "s!temprole remove 1208226241002606644 0s uyarılmış",
+        "s!temprole remove @User 0s susturulmuş"
+      ],
+      "keywords": ["temprole", "geçici rol", "rol kaldır", "remove"],
+      "order": 5
+    },
+    {
+      "id": "cmd-006",
+      "command": "s!role5ever",
+      "description": "Kullanıcıya kalıcı rol verir.",
+      "usage": "s!role5ever [id] [rol]",
+      "permissions": ["admin", "ust_yetkili"],
+      "examples": [
+        "s!role5ever 1208226241002606644 marked",
+        "s!role5ever @User VIP"
+      ],
+      "keywords": ["role5ever", "kalıcı rol", "forever"],
+      "order": 6
+    },
+    {
+      "id": "cmd-007",
+      "command": "h!i",
+      "description": "Kullanıcı hakkında genel bilgi gösterir.",
+      "usage": "h!i [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "h!i 1208226241002606644",
+        "h!i @User"
+      ],
+      "keywords": ["info", "bilgi", "kullanıcı bilgisi"],
+      "order": 7
+    },
+    {
+      "id": "cmd-008",
+      "command": "h!n",
+      "description": "Kullanıcının isim geçmişini gösterir.",
+      "usage": "h!n [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "h!n 1208226241002606644",
+        "h!n @User"
+      ],
+      "keywords": ["names", "isim", "isim geçmişi", "nickname"],
+      "order": 8
+    },
+    {
+      "id": "cmd-009",
+      "command": "h!s",
+      "description": "Kullanıcının sunucu bilgilerini gösterir.",
+      "usage": "h!s [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "h!s 1208226241002606644",
+        "h!s @User"
+      ],
+      "keywords": ["server", "sunucu", "sunucu bilgisi"],
+      "order": 9
+    },
+    {
+      "id": "cmd-010",
+      "command": "h!joins",
+      "description": "Kullanıcının sunucuya katılım geçmişini gösterir.",
+      "usage": "h!joins [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "h!joins 1208226241002606644",
+        "h!joins @User"
+      ],
+      "keywords": ["joins", "katılım", "katılım geçmişi"],
+      "order": 10
+    },
+    {
+      "id": "cmd-011",
+      "command": "h!c",
+      "description": "Kullanıcının ceza geçmişini gösterir.",
+      "usage": "h!c [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "h!c 1208226241002606644",
+        "h!c @User"
+      ],
+      "keywords": ["cases", "ceza", "ceza geçmişi", "sicil"],
+      "order": 11
+    },
+    {
+      "id": "cmd-012",
+      "command": "h!j",
+      "description": "Kullanıcıyı sesli kanala çeker.",
+      "usage": "h!j [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "h!j 1208226241002606644",
+        "h!j @User"
+      ],
+      "keywords": ["join", "çek", "sesli kanal", "voice"],
+      "order": 12
+    },
+    {
+      "id": "cmd-013",
+      "command": "h!pull",
+      "description": "Kullanıcıyı bulunduğunuz sesli kanala çeker.",
+      "usage": "h!pull [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "h!pull 1208226241002606644",
+        "h!pull @User"
+      ],
+      "keywords": ["pull", "çek", "sesli kanal", "voice"],
+      "order": 13
+    },
+    {
+      "id": "cmd-014",
+      "command": "/ticket-create",
+      "description": "Yeni bir destek talebi (ticket) oluşturur.",
+      "usage": "/ticket-create",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "/ticket-create"
+      ],
+      "keywords": ["ticket", "destek", "talep", "oluştur"],
+      "order": 14
+    },
+    {
+      "id": "cmd-015",
+      "command": "h!avatar",
+      "description": "Kullanıcının profil fotoğrafını gösterir.",
+      "usage": "h!avatar [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "examples": [
+        "h!avatar 1208226241002606644",
+        "h!avatar @User"
+      ],
+      "keywords": ["avatar", "profil", "fotoğraf", "pp"],
+      "order": 15
+    }
+  ],
+  "lastUpdated": "2026-01-20T00:00:00.000Z",
+  "version": "2.0.0"
+}

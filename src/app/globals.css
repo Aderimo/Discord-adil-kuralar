@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Discord koyu tema renkleri */
+    --discord-dark: #1e1f22;
+    --discord-darker: #111214;
+    --discord-light: #2b2d31;
+    --discord-lighter: #313338;
+    --discord-text: #dbdee1;
+    --discord-muted: #949ba4;
+    --discord-accent: #5865f2;
+    --discord-green: #23a559;
+    --discord-red: #f23f43;
+    --discord-yellow: #f0b232;
+
+    /* Shadcn/ui CSS değişkenleri - Discord temasına uyarlanmış */
+    --background: 220 8% 7%;
+    --foreground: 220 9% 87%;
+    --card: 225 6% 17%;
+    --card-foreground: 220 9% 87%;
+    --popover: 220 8% 7%;
+    --popover-foreground: 220 9% 87%;
+    --primary: 235 86% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 225 6% 17%;
+    --secondary-foreground: 220 9% 87%;
+    --muted: 223 6% 20%;
+    --muted-foreground: 220 6% 63%;
+    --accent: 235 86% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 358 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 225 6% 17%;
+    --input: 225 6% 17%;
+    --ring: 235 86% 65%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-discord-light;
+  }
+
+  body {
+    @apply bg-discord-darker text-discord-text antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Scrollbar styling for Discord-like appearance */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-discord-darker;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-discord-light rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-discord-lighter;
+  }
+}
+
+@layer utilities {
+  /* Animasyonlar */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-discord-accent hover:bg-discord-accent/90 text-white font-medium py-2 px-4 rounded-md transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-discord-light hover:bg-discord-lighter text-discord-text font-medium py-2 px-4 rounded-md transition-colors;
+  }
+
+  .input-field {
+    @apply bg-discord-dark border border-discord-light rounded-md px-3 py-2 text-discord-text placeholder:text-discord-muted focus:outline-none focus:ring-2 focus:ring-discord-accent;
+  }
+
+  .card {
+    @apply bg-discord-light rounded-lg p-4;
+  }
+}

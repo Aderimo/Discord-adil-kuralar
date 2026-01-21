@@ -1,0 +1,36 @@
+{
+  "items": [
+    {
+      "id": "guide-001",
+      "title": "Yetkili Kılavuzu Giriş",
+      "slug": "giris",
+      "category": "kilavuz",
+      "content": "# Yetkili Kılavuzu v2\n\nBu kılavuz, SANIYE MODLARI Discord sunucusunda görev yapan yetkililerin uyması gereken kuralları ve prosedürleri içermektedir.\n\n## Amaç\n\nBu kılavuzun amacı, yetkililerin tutarlı ve adil kararlar vermesini sağlamaktır.\n\n## Kapsam\n\n- Ceza prosedürleri\n- Kayıt tutma standartları\n- Yetkili etik kuralları\n- Komut kullanımı",
+      "keywords": ["kılavuz", "giriş", "yetkili", "kurallar"],
+      "relatedArticles": ["guide-002", "guide-003"],
+      "order": 1
+    },
+    {
+      "id": "guide-002",
+      "title": "Yetkili Etik Kuralları",
+      "slug": "etik-kurallari",
+      "category": "kilavuz",
+      "content": "# Yetkili Etik Kuralları\n\n## Temel İlkeler\n\n1. **Tarafsızlık**: Tüm kullanıcılara eşit davranılmalıdır.\n2. **Şeffaflık**: Kararlar gerekçeli olmalıdır.\n3. **Tutarlılık**: Benzer ihlallere benzer cezalar verilmelidir.\n4. **Gizlilik**: Kullanıcı bilgileri korunmalıdır.\n\n## Yasak Davranışlar\n\n- Kişisel husumet nedeniyle ceza vermek\n- Yetkiyi kötüye kullanmak\n- Gizli bilgileri paylaşmak",
+      "keywords": ["etik", "kurallar", "tarafsızlık", "şeffaflık"],
+      "relatedArticles": ["guide-001"],
+      "order": 2
+    },
+    {
+      "id": "guide-003",
+      "title": "Kayıt Tutma Standartları",
+      "slug": "kayit-tutma",
+      "category": "kilavuz",
+      "content": "# Kayıt Tutma Standartları\n\n## Ceza Kaydı Formatı\n\nHer ceza kaydı aşağıdaki bilgileri içermelidir:\n\n1. **İhlal Türü**: Hangi kural ihlal edildi\n2. **Ceza Süresi**: Ne kadar süreyle ceza verildi\n3. **Madde Numarası**: İlgili kılavuz maddesi\n4. **Gerekçe**: Cezanın neden verildiği\n\n## Örnek Kayıt\n\n```\nİhlal: Hakaret\nCeza: 7 gün mute\nMadde: ADK-001\nGerekçe: Kullanıcı, başka bir üyeye hakaret içeren mesaj gönderdi.\n```",
+      "keywords": ["kayıt", "format", "standart", "ceza kaydı"],
+      "relatedArticles": ["guide-001", "guide-002"],
+      "order": 3
+    }
+  ],
+  "lastUpdated": "2024-01-01T00:00:00.000Z",
+  "version": "2.0.0"
+}

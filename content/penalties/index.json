@@ -1,0 +1,343 @@
+{
+  "items": [
+    {
+      "id": "penalty-001",
+      "code": "YZL-001",
+      "name": "Hakaret",
+      "category": "yazili",
+      "duration": "3 gün uyarılmış / 3-7 gün susturulmuş",
+      "description": "Diğer kullanıcılara yönelik hakaret içeren mesajlar için uygulanan ceza.",
+      "conditions": [
+        "Mesaj içeriğinde açık hakaret bulunması",
+        "Hedef kullanıcının şikayetçi olması veya moderatörün tespit etmesi"
+      ],
+      "alternatives": [
+        "Hafif hakaret: 3 gün uyarılmış",
+        "Ağır hakaret: 3-7 gün susturulmuş"
+      ],
+      "examples": [
+        "Kullanıcı A, Kullanıcı B'ye hakaret etti",
+        "Kullanıcı küfürlü mesaj gönderdi"
+      ],
+      "keywords": ["hakaret", "küfür", "aşağılama", "sözlü saldırı"],
+      "order": 1
+    },
+    {
+      "id": "penalty-002",
+      "code": "YZL-002",
+      "name": "Reklam",
+      "category": "yazili",
+      "duration": "30 gün susturulmuş",
+      "description": "İzinsiz reklam yapmak için uygulanan ceza.",
+      "conditions": [
+        "Discord sunucu daveti paylaşma",
+        "Ticari ürün/hizmet reklamı",
+        "Sosyal medya hesabı reklamı"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı başka sunucu daveti paylaştı",
+        "Kullanıcı satış linki gönderdi"
+      ],
+      "keywords": ["reklam", "tanıtım", "link", "davet", "promosyon"],
+      "order": 2
+    },
+    {
+      "id": "penalty-003",
+      "code": "YZL-003",
+      "name": "Troll",
+      "category": "yazili",
+      "duration": "3-5 gün susturulmuş",
+      "description": "Diğer kullanıcıları kışkırtmak veya trollemek için uygulanan ceza.",
+      "conditions": [
+        "Kasıtlı olarak tartışma çıkarma",
+        "Diğer kullanıcıları provoke etme",
+        "Troll davranışı sergileme"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı sürekli tartışma çıkarmaya çalıştı",
+        "Kullanıcı diğerlerini kışkırtan mesajlar attı"
+      ],
+      "keywords": ["troll", "kışkırtma", "provokasyon", "tartışma"],
+      "order": 3
+    },
+    {
+      "id": "penalty-004",
+      "code": "YZL-004",
+      "name": "Spam",
+      "category": "yazili",
+      "duration": "4 gün uyarılmış",
+      "description": "Tekrarlayan veya anlamsız mesajlar göndermek için uygulanan ceza.",
+      "conditions": [
+        "Aynı mesajın tekrar tekrar gönderilmesi",
+        "Anlamsız karakter dizileri gönderilmesi",
+        "Emoji spam yapılması"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı aynı mesajı defalarca gönderdi",
+        "Kullanıcı anlamsız mesajlar gönderdi"
+      ],
+      "keywords": ["spam", "tekrar", "flood", "anlamsız mesaj"],
+      "order": 4
+    },
+    {
+      "id": "penalty-005",
+      "code": "YZL-005",
+      "name": "Ayrımcılık",
+      "category": "yazili",
+      "duration": "14 gün susturulmuş + marked",
+      "description": "Irk, din, cinsiyet vb. konularda ayrımcılık yapmak için uygulanan ceza.",
+      "conditions": [
+        "Irkçı, cinsiyetçi veya ayrımcı içerik paylaşma",
+        "Nefret söylemi"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı ayrımcı içerik paylaştı",
+        "Kullanıcı nefret söylemi kullandı"
+      ],
+      "keywords": ["ayrımcılık", "ırkçılık", "nefret", "cinsiyetçilik"],
+      "order": 5
+    },
+    {
+      "id": "penalty-006",
+      "code": "SES-001",
+      "name": "VC Troll",
+      "category": "sesli",
+      "duration": "3-5 gün susturulmuş",
+      "description": "Sesli kanallarda troll davranışlar için uygulanan ceza.",
+      "conditions": [
+        "Sesli kanalda rahatsız edici davranış",
+        "Kasıtlı olarak ortamı bozma"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı sesli kanalda troll yaptı",
+        "Kullanıcı ortamı bozucu davranışlar sergiledi"
+      ],
+      "keywords": ["vc troll", "sesli troll", "voice troll"],
+      "order": 6
+    },
+    {
+      "id": "penalty-007",
+      "code": "SES-002",
+      "name": "Sesli Küfür",
+      "category": "sesli",
+      "duration": "3-7 gün susturulmuş",
+      "description": "Sesli kanalda küfür etmek için uygulanan ceza.",
+      "conditions": [
+        "Sesli kanalda küfür/hakaret",
+        "Diğer kullanıcılara sözlü saldırı"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı sesli kanalda küfür etti",
+        "Kullanıcı sesli kanalda hakaret içeren konuşma yaptı"
+      ],
+      "keywords": ["sesli küfür", "vc küfür", "voice hakaret"],
+      "order": 7
+    },
+    {
+      "id": "penalty-008",
+      "code": "SES-003",
+      "name": "Bullyleme",
+      "category": "sesli",
+      "duration": "5-7 gün susturulmuş",
+      "description": "Sesli kanalda zorbalık yapmak için uygulanan ceza.",
+      "conditions": [
+        "Sesli kanalda zorbalık",
+        "Sürekli alay etme veya aşağılama"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı başka birini sürekli aşağıladı",
+        "Kullanıcı zorbalık yaptı"
+      ],
+      "keywords": ["bully", "zorbalık", "alay", "aşağılama"],
+      "order": 8
+    },
+    {
+      "id": "penalty-009",
+      "code": "SES-004",
+      "name": "XP Abuse (Sesli)",
+      "category": "sesli",
+      "duration": "1 gün uyarılmış + 2 gün noroompls",
+      "description": "Sesli kanalda XP sistemini kötüye kullanmak için uygulanan ceza.",
+      "conditions": [
+        "Sesli kanalda AFK kalarak XP kasma",
+        "XP sistemini manipüle etme"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı sesli kanalda AFK kalarak XP kastı",
+        "Kullanıcı XP abuse yaptı"
+      ],
+      "keywords": ["xp abuse", "xp kasma", "afk xp"],
+      "order": 9
+    },
+    {
+      "id": "penalty-010",
+      "code": "EKS-001",
+      "name": "Saniyetagram İhlali",
+      "category": "ekstra",
+      "duration": "Duruma göre değişir",
+      "description": "Saniyetagram kurallarını ihlal etmek için uygulanan ceza.",
+      "conditions": [
+        "Saniyetagram kurallarına aykırı davranış"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı saniyetagram kurallarını ihlal etti"
+      ],
+      "keywords": ["saniyetagram", "ihlal"],
+      "order": 10
+    },
+    {
+      "id": "penalty-011",
+      "code": "EKS-002",
+      "name": "İsteyerek Susturulma",
+      "category": "ekstra",
+      "duration": "Duruma göre değişir",
+      "description": "Kasıtlı olarak ceza almaya çalışmak için uygulanan ceza.",
+      "conditions": [
+        "Kasıtlı olarak kural ihlali yapma",
+        "Ceza almak için provokasyon"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı kasıtlı olarak ceza almaya çalıştı"
+      ],
+      "keywords": ["isteyerek", "kasıtlı", "provokasyon"],
+      "order": 11
+    },
+    {
+      "id": "penalty-012",
+      "code": "EKS-003",
+      "name": "Taciz",
+      "category": "ekstra",
+      "duration": "14-30 gün susturulmuş + marked",
+      "description": "Diğer kullanıcıları taciz etmek için uygulanan ceza.",
+      "conditions": [
+        "Sürekli rahatsız edici mesajlar",
+        "Israrla iletişim kurma",
+        "Cinsel taciz"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı başka birini taciz etti",
+        "Kullanıcı ısrarla rahatsız edici mesajlar attı"
+      ],
+      "keywords": ["taciz", "rahatsız etme", "harassment"],
+      "order": 12
+    },
+    {
+      "id": "penalty-013",
+      "code": "BLK-001",
+      "name": "Dini Küfür",
+      "category": "blacklist",
+      "duration": "Kalıcı ban + Blacklist",
+      "description": "Dini değerlere küfür etmek için uygulanan en ağır ceza.",
+      "conditions": [
+        "Dini değerlere hakaret",
+        "Dini küfür"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı dini değerlere küfür etti"
+      ],
+      "keywords": ["dini küfür", "din", "hakaret", "blacklist"],
+      "order": 13
+    },
+    {
+      "id": "penalty-014",
+      "code": "BLK-002",
+      "name": "NSFW İçerik",
+      "category": "blacklist",
+      "duration": "Kalıcı ban + Blacklist",
+      "description": "NSFW (yetişkin) içerik paylaşımı için uygulanan en ağır ceza.",
+      "conditions": [
+        "NSFW görsel/video paylaşımı",
+        "Yetişkin içerik"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı NSFW içerik paylaştı"
+      ],
+      "keywords": ["nsfw", "yetişkin", "uygunsuz", "blacklist"],
+      "order": 14
+    },
+    {
+      "id": "penalty-015",
+      "code": "BLK-003",
+      "name": "Atatürk'e Hakaret",
+      "category": "blacklist",
+      "duration": "Kalıcı ban + Blacklist",
+      "description": "Atatürk'e hakaret için uygulanan en ağır ceza.",
+      "conditions": [
+        "Atatürk'e hakaret içeren mesaj/içerik"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı Atatürk'e hakaret etti"
+      ],
+      "keywords": ["atatürk", "hakaret", "blacklist"],
+      "order": 15
+    },
+    {
+      "id": "penalty-016",
+      "code": "BLK-004",
+      "name": "Pedofili",
+      "category": "blacklist",
+      "duration": "Kalıcı ban + Blacklist",
+      "description": "Pedofili içerik veya davranış için uygulanan en ağır ceza.",
+      "conditions": [
+        "Pedofili içerik paylaşımı",
+        "Reşit olmayanlara yönelik uygunsuz davranış"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı pedofili içerik paylaştı"
+      ],
+      "keywords": ["pedofili", "çocuk istismarı", "blacklist"],
+      "order": 16
+    },
+    {
+      "id": "penalty-017",
+      "code": "MRK-001",
+      "name": "Marked - 30 Gün Kuralı",
+      "category": "marked",
+      "duration": "Süresiz izleme",
+      "description": "30 gün içinde 3 ceza alan kullanıcılar için uygulanan izleme.",
+      "conditions": [
+        "30 gün içinde 3 ceza almak"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı 30 gün içinde 3. cezasını aldı"
+      ],
+      "keywords": ["marked", "30 gün", "3 ceza", "izleme"],
+      "order": 17
+    },
+    {
+      "id": "penalty-018",
+      "code": "MRK-002",
+      "name": "Marked - Toplam Ceza Kuralı",
+      "category": "marked",
+      "duration": "Süresiz izleme",
+      "description": "Toplamda 6 ceza alan kullanıcılar için uygulanan izleme.",
+      "conditions": [
+        "Toplamda 6 ceza almak"
+      ],
+      "alternatives": [],
+      "examples": [
+        "Kullanıcı toplamda 6. cezasını aldı"
+      ],
+      "keywords": ["marked", "6 ceza", "toplam", "izleme"],
+      "order": 18
+    }
+  ],
+  "lastUpdated": "2026-01-20T00:00:00.000Z",
+  "version": "2.0.0"
+}

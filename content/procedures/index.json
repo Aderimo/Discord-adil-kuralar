@@ -1,0 +1,90 @@
+{
+  "items": [
+    {
+      "id": "proc-001",
+      "title": "Ceza Verme Prosedürü",
+      "slug": "ceza-verme",
+      "description": "Bir kullanıcıya ceza verirken izlenmesi gereken standart adımlar.",
+      "steps": "# Ceza Verme Prosedürü\n\n## Adım 1: İhlali Tespit Et\n\n- Mesajı veya davranışı dikkatlice incele\n- Hangi kurala aykırı olduğunu belirle\n- Kanıt olarak ekran görüntüsü al veya mesaj linkini kaydet\n\n## Adım 2: Geçmişi Kontrol Et\n\n- `h!c [id]` komutuyla ceza geçmişini kontrol et\n- Daha önce benzer ihlal var mı bak\n- Marked kullanıcı mı kontrol et\n\n## Adım 3: Uygun Cezayı Belirle\n\n- Kılavuzdaki ceza tablosuna bak\n- İlk ihlal mi, tekrar mı değerlendir\n- Emin değilsen üst yetkililere danış\n\n## Adım 4: Cezayı Uygula\n\n- `s!temprole add [id] [süre] [rol]` komutunu kullan\n- Örnek: `s!temprole add 1208226241002606644 3d uyarılmış`\n- Örnek: `s!temprole add 1208226241002606644 7d susturulmuş`\n\n## Adım 5: Kayıt Tut\n\n- God-Evrak kanalına kayıt gönder\n- Format: `@Yetkili [ID] [ihlal] [süre] [rol] [God-Evrak (Kanıt)]`\n- Örnek: `@Menos 1208226241002606644 vc troll 3 gün susturulmuş [God-Evrak (Kanıt)]`",
+      "requiredPermissions": ["mod", "admin", "ust_yetkili"],
+      "relatedCommands": ["cmd-001", "cmd-004", "cmd-011"],
+      "relatedPenalties": ["penalty-001", "penalty-002", "penalty-003"],
+      "keywords": ["ceza", "prosedür", "adım", "nasıl", "ceza verme"],
+      "order": 1
+    },
+    {
+      "id": "proc-002",
+      "title": "Kayıt Formatı",
+      "slug": "kayit-formati",
+      "description": "Ceza kayıtlarının nasıl yazılacağı.",
+      "steps": "# Kayıt Formatı\n\n## Standart Format\n\n```\n@Yetkili [ID] [ihlal] [süre] [rol] [God-Evrak (Kanıt)]\n```\n\n## Örnek Kayıtlar\n\n### Yazılı İhlaller\n```\n@Menos 1208226241002606644 hakaret 3 gün uyarılmış [God-Evrak (Kanıt)]\n```\n\n```\n@Menos 1208226241002606644 spam 4 gün uyarılmış [God-Evrak (Kanıt)]\n```\n\n### Sesli İhlaller\n```\n@Menos 1208226241002606644 vc troll 3 gün susturulmuş [God-Evrak (Kanıt)]\n```\n\n```\n@Menos 1208226241002606644 xp abuse 1 gün uyarılmış + 2 gün noroompls [God-Evrak (Kanıt)]\n```\n\n### Blacklist Vakaları\n```\n@Menos 1208226241002606644 dini değerlere hakaret banlanana kadar mute [God-Evrak (Kanıt)]\n```\n\n## Önemli Notlar\n\n- Kayıtlar kısa ve net olmalı\n- Gereksiz detaydan kaçınılmalı\n- Kanıt mutlaka eklenmelidir",
+      "requiredPermissions": ["mod", "admin", "ust_yetkili"],
+      "relatedCommands": [],
+      "relatedPenalties": [],
+      "keywords": ["kayıt", "format", "örnek", "nasıl yazılır"],
+      "order": 2
+    },
+    {
+      "id": "proc-003",
+      "title": "Marked Sistemi Prosedürü",
+      "slug": "marked-proseduru",
+      "description": "Marked kullanıcıların belirlenmesi ve yönetimi.",
+      "steps": "# Marked Sistemi Prosedürü\n\n## Marked Alma Şartları\n\n### 30 Gün Kuralı\n- 30 gün içinde 3 ceza alan üye\n- 3. cezasında marked alır\n\n### Toplam Ceza Kuralı\n- Toplamda 6 ceza alan üye\n- 6. cezasında marked alır\n\n## Marked Ekleme\n\n1. Kullanıcının ceza geçmişini kontrol et: `h!c [id]`\n2. Şartları karşılıyorsa marked rolü ver: `s!role5ever [id] marked`\n3. Kayıt tut\n\n## Marked Kullanıcı Politikası\n\n- Tolerans düşüktür\n- Yeni ihlallerde ceza süreleri artırılabilir\n- Sürekli izleme altındadır",
+      "requiredPermissions": ["admin", "ust_yetkili"],
+      "relatedCommands": ["cmd-006", "cmd-011"],
+      "relatedPenalties": ["penalty-017", "penalty-018"],
+      "keywords": ["marked", "izleme", "30 gün", "6 ceza"],
+      "order": 3
+    },
+    {
+      "id": "proc-004",
+      "title": "Kanıt Olmayan Durumlar",
+      "slug": "kanit-olmayan-durumlar",
+      "description": "Kanıt bulunmadığında izlenecek prosedür.",
+      "steps": "# Kanıt Olmayan Durumlar Prosedürü\n\n## Adım 1: Sesli Sorgu\n\n- Tarafı sesli kanala çağır: `h!pull [id]`\n- Bilgi al ve dinle\n\n## Adım 2: İtiraf Durumu\n\n- İtiraf varsa kayıt altına al\n- Sesli uyarı sonrası \"evet\", \"anladım\" gibi onay al\n- Ekran görüntüsüyle kaydet\n\n## Adım 3: İnkâr Durumu\n\n- Logları ve notları incele\n- Diğer kanıtları ara\n\n## Adım 4: Kanıt Yetersizse\n\n- Şikayet eden bilgilendirilir\n- Şüpheli uyarılır\n- Not tutulur (ileride referans için)",
+      "requiredPermissions": ["mod", "admin", "ust_yetkili"],
+      "relatedCommands": ["cmd-013"],
+      "relatedPenalties": [],
+      "keywords": ["kanıt", "sorgu", "itiraf", "inkâr"],
+      "order": 4
+    },
+    {
+      "id": "proc-005",
+      "title": "Blacklist Prosedürü",
+      "slug": "blacklist-proseduru",
+      "description": "Blacklist vakalarında izlenecek prosedür.",
+      "steps": "# Blacklist Prosedürü\n\n## Blacklist Sebepleri\n\n1. **Dini Küfür** - Dini değerlere hakaret\n2. **NSFW** - Yetişkin içerik paylaşımı\n3. **Atatürk'e Hakaret** - Atatürk'e hakaret içeren içerik\n4. **Pedofili** - Pedofili içerik veya davranış\n\n## Prosedür\n\n### Adım 1: Acil Müdahale\n\n- İçeriği hemen sil\n- Kullanıcıyı anında mute: `s!mute [id] 999d`\n- Üst yetkililere bildir\n\n### Adım 2: Kanıt Toplama\n\n- Silmeden önce ekran görüntüsü al\n- God-Evrak'a kanıtı yükle\n- Zaman damgasını not et\n\n### Adım 3: Kayıt\n\n```\n@Yetkili [ID] [ihlal] banlanana kadar mute [God-Evrak (Kanıt)]\n```\n\n### Adım 4: Ban İşlemi\n\n- Üst yetkili onayı ile ban uygulanır\n- Blacklist'e eklenir",
+      "requiredPermissions": ["admin", "ust_yetkili"],
+      "relatedCommands": ["cmd-001"],
+      "relatedPenalties": ["penalty-013", "penalty-014", "penalty-015", "penalty-016"],
+      "keywords": ["blacklist", "ban", "dini küfür", "nsfw", "atatürk", "pedofili"],
+      "order": 5
+    },
+    {
+      "id": "proc-006",
+      "title": "K.K.K - Kayıt Kontrol Kılavuzu",
+      "slug": "kkk",
+      "description": "Kayıtların kontrol edilmesi prosedürü.",
+      "steps": "# K.K.K - Kayıt Kontrol Kılavuzu\n\n## Amaç\n\nTüm ceza kayıtları, oluşturulduktan sonra bir başka yetkili tarafından kontrol edilmelidir.\n\n## Süreç\n\n1. Kayıt oluşturulur\n2. Başka bir yetkili kontrol eder\n3. Hatalar nazikçe bildirilir\n4. Kayıt sahibi güncelleme yapar ve teşekkür eder\n\n## Hata Bildirme\n\n1. Hatalı kayıt tespit edilir\n2. Mesaj bağlantısı alınarak mod-chat'te bildirilir\n3. İlgili yetkili kaydını günceller\n\n## Kayıt Düzeltme\n\n- Yanlış kayıtlar silinmemeli\n- Üzerine çizgi çekilip yenisi eklenmelidir\n- Zorunlu silme durumunda üst yetkili bilgilendirilmelidir",
+      "requiredPermissions": ["mod", "admin", "ust_yetkili"],
+      "relatedCommands": [],
+      "relatedPenalties": [],
+      "keywords": ["kkk", "kontrol", "kayıt", "düzeltme"],
+      "order": 6
+    },
+    {
+      "id": "proc-007",
+      "title": "Üst Yetkililere Danışma",
+      "slug": "ust-yetkiliye-danisma",
+      "description": "Karmaşık durumlarda üst yetkililere nasıl danışılacağı.",
+      "steps": "# Üst Yetkililere Danışma Prosedürü\n\n## Ne Zaman Danışılmalı?\n\n- Kılavuzda net olmayan durumlar\n- Potansiyel blacklist vakaları\n- Kendi kararınızdan emin olmadığınız durumlar\n- Yetkili yakınlarını ilgilendiren vakalar\n- Çoklu/karmaşık ihlaller\n\n## Nasıl Danışılmalı?\n\n### Mod-Chat'te\n- Durumu kısaca özetle\n- Kanıtları paylaş\n- Kendi önerini belirt\n\n### Acil Durumlarda\n- Üst yetkiliyi etiketle (@)\n- Gerekirse DM at\n\n## Dikkat Edilecekler\n\n- Basit vakalar için gereksiz danışma yapma\n- Tüm bilgileri eksiksiz paylaş\n- Profesyonel dil kullan",
+      "requiredPermissions": ["mod"],
+      "relatedCommands": [],
+      "relatedPenalties": [],
+      "keywords": ["danışma", "üst yetkili", "yardım", "soru"],
+      "order": 7
+    }
+  ],
+  "lastUpdated": "2026-01-20T00:00:00.000Z",
+  "version": "2.0.0"
+}

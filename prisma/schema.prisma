@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User Model - Kullanıcı bilgileri ve yetkilendirme
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String
+  status       String    @default("pending") // pending, approved, rejected
+  role         String    @default("none") // none, mod, admin, ust_yetkili
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastLoginAt  DateTime?
+
+  // İlişkiler
+  sessions     Session[]
+  activityLogs ActivityLog[]
+
+  @@map("users")
+}
+
+// Session Model - Oturum yönetimi
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // İlişkiler
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+// ActivityLog Model - Aktivite logları
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String // login, logout, view_content, search, ai_query, role_change, user_approve, user_reject
+  details   String   @default("{}") // JSON string olarak saklanır
+  ipAddress String
+  timestamp DateTime @default(now())
+
+  // İlişkiler
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
+  @@map("activity_logs")
+}
