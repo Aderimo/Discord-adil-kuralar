@@ -27,10 +27,10 @@ export interface BackButtonProps {
 export function BackButton({ 
   fallbackUrl = "/", 
   label = "Geri" 
-}: BackButtonProps) {
+}: BackButtonProps): React.ReactElement {
   const router = useRouter();
 
-  const handleBack = useCallback(() => {
+  const handleBack = useCallback((): void => {
     // Tarayıcı history'sinde önceki sayfa var mı kontrol et
     // window.history.length > 1 ise history var demektir
     if (typeof window !== "undefined" && window.history.length > 1) {

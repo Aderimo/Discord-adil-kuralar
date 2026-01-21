@@ -10,7 +10,7 @@ import { loadPenalties } from '@/lib/content';
 import { useAuth } from '@/hooks/useAuth';
 import { hasRole } from '@/lib/rbac';
 import { Button } from '@/components/ui/button';
-import { Edit3 } from 'lucide-react';
+import { Edit3, Plus } from 'lucide-react';
 import type { PenaltyCategory, PenaltyDefinition, GuideContent, CommandDefinition, ProcedureDefinition } from '@/types/content';
 
 const categoryLabels: Record<PenaltyCategory, string> = {
@@ -34,6 +34,7 @@ export default function PenaltyCategoryPage(): React.ReactElement {
   const category = params.category as PenaltyCategory;
   const { user } = useAuth();
   const [editingPenalty, setEditingPenalty] = useState<PenaltyDefinition | null>(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
 
   const validCategories: PenaltyCategory[] = ['yazili', 'sesli', 'ekstra', 'marked', 'blacklist'];
   
@@ -57,7 +58,7 @@ export default function PenaltyCategoryPage(): React.ReactElement {
     { label: categoryLabels[category] || category, href: `/penalties/${category}` },
   ], [category]);
 
-  // İçerik kaydetme
+  // İçerik kaydetme (düzenleme)
   const handleSave = useCallback(async (content: GuideContent | PenaltyDefinition | CommandDefinition | ProcedureDefinition) => {
     try {
       const response = await fetch(`/api/content/sections/${editingPenalty?.id}`, {
@@ -83,9 +84,46 @@ export default function PenaltyCategoryPage(): React.ReactElement {
     }
   }, [editingPenalty?.id]);
 
+  // Yeni içerik ekleme
+  const handleAddNew = useCallback(async (content: GuideContent | PenaltyDefinition | CommandDefinition | ProcedureDefinition) => {
+    try {
+      // Yeni ID oluştur
+      const penaltyContent = content as PenaltyDefinition;
+      const newId = `penalty-${Date.now()}`;
+      const newContent = {
+        ...penaltyContent,
+        id: newId,
+        category: category, // Mevcut kategoriyi kullan
+      };
+
+      const response = await fetch('/api/content/sections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'penalty',
+          data: newContent,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'İçerik eklenemedi');
+      }
+
+      // Sayfayı yenile
+      window.location.reload();
+    } catch (error) {
+      console.error('Ekleme hatası:', error);
+      throw error;
+    }
+  }, [category]);
+
   // Düzenlemeyi iptal et
   const handleCancel = useCallback(() => {
     setEditingPenalty(null);
+    setIsAddingNew(false);
   }, []);
 
   return (
@@ -97,17 +135,41 @@ export default function PenaltyCategoryPage(): React.ReactElement {
           <Breadcrumb items={breadcrumbItems} />
         </div>
 
-        <div>
-          <h1 className="text-2xl font-bold text-discord-text mb-2">
-            {categoryLabels[category]}
-          </h1>
-          <p className="text-discord-muted">
-            {categoryDescriptions[category]}
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-discord-text mb-2">
+              {categoryLabels[category]}
+            </h1>
+            <p className="text-discord-muted">
+              {categoryDescriptions[category]}
+            </p>
+          </div>
+          {/* Yeni Ekle butonu - sadece ust_yetkili için */}
+          {canEdit && !editingPenalty && !isAddingNew && (
+            <Button
+              onClick={() => setIsAddingNew(true)}
+              className="gap-2 bg-discord-green hover:bg-discord-green/90"
+            >
+              <Plus className="h-4 w-4" />
+              Yeni Ceza Ekle
+            </Button>
+          )}
         </div>
 
+        {/* Yeni ekleme modu */}
+        {isAddingNew && (
+          <div className="mb-6">
+            <ContentEditor
+              type="penalty"
+              content={null}
+              onSave={handleAddNew}
+              onCancel={handleCancel}
+            />
+          </div>
+        )}
+
         {/* Düzenleme modu */}
-        {editingPenalty && (
+        {editingPenalty && !isAddingNew && (
           <div className="mb-6">
             <ContentEditor
               type="penalty"
@@ -119,7 +181,7 @@ export default function PenaltyCategoryPage(): React.ReactElement {
         )}
 
         {/* Ceza listesi */}
-        {!editingPenalty && (
+        {!editingPenalty && !isAddingNew && (
           <div className="space-y-4">
             {penalties.map((penalty) => (
               <div

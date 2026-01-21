@@ -29,7 +29,7 @@ export interface BreadcrumbProps {
  *   { label: "Yazılı Cezalar", href: "/penalties/yazili" }
  * ]} />
  */
-export function Breadcrumb({ items, showHomeIcon = true }: BreadcrumbProps) {
+export function Breadcrumb({ items, showHomeIcon = true }: BreadcrumbProps): React.ReactElement | null {
   if (!items || items.length === 0) {
     return null;
   }
@@ -63,7 +63,7 @@ export function Breadcrumb({ items, showHomeIcon = true }: BreadcrumbProps) {
                   </span>
                 ) : (
                   <Link
-                    href={item.href as any}
+                    href={item.href as Parameters<typeof Link>[0]['href']}
                     className="text-discord-muted hover:text-discord-accent transition-colors"
                   >
                     {showHomeIcon && isFirst ? (

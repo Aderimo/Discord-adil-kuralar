@@ -126,7 +126,7 @@ function GuideEditor({
 }: {
   content: Partial<GuideContent>;
   onChange: (content: Partial<GuideContent>) => void;
-}) {
+}): React.ReactElement {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -184,7 +184,7 @@ function PenaltyEditor({
 }: {
   content: Partial<PenaltyDefinition>;
   onChange: (content: Partial<PenaltyDefinition>) => void;
-}) {
+}): React.ReactElement {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-3">
@@ -311,7 +311,7 @@ function CommandEditor({
 }: {
   content: Partial<CommandDefinition>;
   onChange: (content: Partial<CommandDefinition>) => void;
-}) {
+}): React.ReactElement {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -396,7 +396,7 @@ function ProcedureEditor({
 }: {
   content: Partial<ProcedureDefinition>;
   onChange: (content: Partial<ProcedureDefinition>) => void;
-}) {
+}): React.ReactElement {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -653,27 +653,45 @@ export function ContentEditor({
     switch (type) {
       case 'guide': {
         const guide = formData as Partial<GuideContent>;
-        if (!guide.title?.trim()) return 'Başlık gereklidir';
-        if (!guide.content?.trim()) return 'İçerik gereklidir';
+        if (!guide.title?.trim()) {
+          return 'Başlık gereklidir';
+        }
+        if (!guide.content?.trim()) {
+          return 'İçerik gereklidir';
+        }
         break;
       }
       case 'penalty': {
         const penalty = formData as Partial<PenaltyDefinition>;
-        if (!penalty.code?.trim()) return 'Ceza kodu gereklidir';
-        if (!penalty.name?.trim()) return 'Ceza adı gereklidir';
-        if (!penalty.duration?.trim()) return 'Süre gereklidir';
+        if (!penalty.code?.trim()) {
+          return 'Ceza kodu gereklidir';
+        }
+        if (!penalty.name?.trim()) {
+          return 'Ceza adı gereklidir';
+        }
+        if (!penalty.duration?.trim()) {
+          return 'Süre gereklidir';
+        }
         break;
       }
       case 'command': {
         const cmd = formData as Partial<CommandDefinition>;
-        if (!cmd.command?.trim()) return 'Komut gereklidir';
-        if (!cmd.description?.trim()) return 'Açıklama gereklidir';
+        if (!cmd.command?.trim()) {
+          return 'Komut gereklidir';
+        }
+        if (!cmd.description?.trim()) {
+          return 'Açıklama gereklidir';
+        }
         break;
       }
       case 'procedure': {
         const proc = formData as Partial<ProcedureDefinition>;
-        if (!proc.title?.trim()) return 'Başlık gereklidir';
-        if (!proc.steps?.trim()) return 'Adımlar gereklidir';
+        if (!proc.title?.trim()) {
+          return 'Başlık gereklidir';
+        }
+        if (!proc.steps?.trim()) {
+          return 'Adımlar gereklidir';
+        }
         break;
       }
     }

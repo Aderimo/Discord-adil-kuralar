@@ -9,13 +9,14 @@ import { loadCommands } from '@/lib/content';
 import { useAuth } from '@/hooks/useAuth';
 import { hasRole } from '@/lib/rbac';
 import { Button } from '@/components/ui/button';
-import { Edit3 } from 'lucide-react';
+import { Edit3, Plus } from 'lucide-react';
 import type { CommandDefinition, GuideContent, PenaltyDefinition, ProcedureDefinition } from '@/types/content';
 
 export default function CommandsPage(): React.ReactElement {
   const commands = useMemo(() => loadCommands(), []);
   const { user } = useAuth();
   const [editingCommand, setEditingCommand] = useState<CommandDefinition | null>(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
 
   // Sadece ust_yetkili rolü düzenleme yapabilir
   const canEdit = user?.role && hasRole(user.role, 'ust_yetkili');
@@ -26,7 +27,7 @@ export default function CommandsPage(): React.ReactElement {
     { label: 'Komutlar', href: '/commands' },
   ], []);
 
-  // İçerik kaydetme
+  // İçerik kaydetme (düzenleme)
   const handleSave = useCallback(async (content: GuideContent | PenaltyDefinition | CommandDefinition | ProcedureDefinition) => {
     try {
       const response = await fetch(`/api/content/sections/${editingCommand?.id}`, {
@@ -52,9 +53,44 @@ export default function CommandsPage(): React.ReactElement {
     }
   }, [editingCommand?.id]);
 
+  // Yeni içerik ekleme
+  const handleAddNew = useCallback(async (content: GuideContent | PenaltyDefinition | CommandDefinition | ProcedureDefinition) => {
+    try {
+      const commandContent = content as CommandDefinition;
+      const newId = `cmd-${Date.now()}`;
+      const newContent = {
+        ...commandContent,
+        id: newId,
+      };
+
+      const response = await fetch('/api/content/sections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'command',
+          data: newContent,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'İçerik eklenemedi');
+      }
+
+      // Sayfayı yenile
+      window.location.reload();
+    } catch (error) {
+      console.error('Ekleme hatası:', error);
+      throw error;
+    }
+  }, []);
+
   // Düzenlemeyi iptal et
   const handleCancel = useCallback(() => {
     setEditingCommand(null);
+    setIsAddingNew(false);
   }, []);
 
   return (
@@ -66,17 +102,41 @@ export default function CommandsPage(): React.ReactElement {
           <Breadcrumb items={breadcrumbItems} />
         </div>
 
-        <div>
-          <h1 className="text-2xl font-bold text-discord-text mb-2">
-            Moderasyon Komutları
-          </h1>
-          <p className="text-discord-muted">
-            Tüm moderasyon komutları ve kullanım örnekleri.
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-discord-text mb-2">
+              Moderasyon Komutları
+            </h1>
+            <p className="text-discord-muted">
+              Tüm moderasyon komutları ve kullanım örnekleri.
+            </p>
+          </div>
+          {/* Yeni Ekle butonu - sadece ust_yetkili için */}
+          {canEdit && !editingCommand && !isAddingNew && (
+            <Button
+              onClick={() => setIsAddingNew(true)}
+              className="gap-2 bg-discord-green hover:bg-discord-green/90"
+            >
+              <Plus className="h-4 w-4" />
+              Yeni Komut Ekle
+            </Button>
+          )}
         </div>
 
+        {/* Yeni ekleme modu */}
+        {isAddingNew && (
+          <div className="mb-6">
+            <ContentEditor
+              type="command"
+              content={null}
+              onSave={handleAddNew}
+              onCancel={handleCancel}
+            />
+          </div>
+        )}
+
         {/* Düzenleme modu */}
-        {editingCommand && (
+        {editingCommand && !isAddingNew && (
           <div className="mb-6">
             <ContentEditor
               type="command"
@@ -88,7 +148,7 @@ export default function CommandsPage(): React.ReactElement {
         )}
 
         {/* Komut listesi */}
-        {!editingCommand && (
+        {!editingCommand && !isAddingNew && (
           <div className="space-y-4">
             {commands.map((cmd) => (
               <div
