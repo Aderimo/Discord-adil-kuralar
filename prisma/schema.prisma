@@ -12,15 +12,17 @@ datasource db {
 
 // User Model - Kullanıcı bilgileri ve yetkilendirme
 model User {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  email        String    @unique
-  passwordHash String
-  status       String    @default("pending") // pending, approved, rejected
-  role         String    @default("none") // none, mod, admin, ust_yetkili
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  lastLoginAt  DateTime?
+  id               String    @id @default(cuid())
+  username         String    @unique
+  email            String    @unique
+  passwordHash     String
+  status           String    @default("pending") // pending, approved, rejected
+  role             String    @default("none") // none, mod, admin, ust_yetkili
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  lastLoginAt      DateTime?
+  resetToken       String?   // Şifre sıfırlama token'ı
+  resetTokenExpiry DateTime? // Token geçerlilik süresi
 
   // İlişkiler
   sessions     Session[]

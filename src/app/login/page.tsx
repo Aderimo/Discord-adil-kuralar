@@ -269,15 +269,23 @@ export default function LoginPage(): React.ReactElement {
               )}
             </Button>
 
-            <p className="text-sm text-discord-muted text-center">
-              Hesabınız yok mu?{' '}
+            <div className="flex flex-col items-center gap-2">
               <Link
-                href={'/register' as Route}
-                className="text-discord-accent hover:underline font-medium"
+                href={'/forgot-password' as Route}
+                className="text-sm text-discord-muted hover:text-discord-accent transition-colors"
               >
-                Kayıt Ol
+                Şifremi Unuttum
               </Link>
-            </p>
+              <p className="text-sm text-discord-muted">
+                Hesabınız yok mu?{' '}
+                <Link
+                  href={'/register' as Route}
+                  className="text-discord-accent hover:underline font-medium"
+                >
+                  Kayıt Ol
+                </Link>
+              </p>
+            </div>
           </CardFooter>
         </form>
       </Card>
