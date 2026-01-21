@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { ContentViewer } from '@/components/content/ContentViewer';
 import { ContentEditor } from '@/components/content/ContentEditor';
 import { BackButton } from '@/components/navigation/BackButton';
@@ -72,7 +73,7 @@ export default function ProcedurePage(): React.ReactElement {
   }
 
   return (
-    <MainLayout>
+    <MainLayout sidebar={<Sidebar />}>
       <div className="max-w-4xl mx-auto">
         {/* Navigasyon bileşenleri */}
         <div className="mb-6 space-y-3">

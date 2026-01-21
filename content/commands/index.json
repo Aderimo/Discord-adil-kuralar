@@ -6,6 +6,7 @@
       "description": "Kullanıcıyı belirli bir süre için susturur (mute).",
       "usage": "s!mute [id] [süre]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "ceza",
       "examples": [
         "s!mute 1208226241002606644 3d",
         "s!mute 1208226241002606644 7d",
@@ -20,6 +21,7 @@
       "description": "Kullanıcının susturmasını kaldırır.",
       "usage": "s!unmute [id]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "ceza",
       "examples": [
         "s!unmute 1208226241002606644",
         "s!unmute @User"
@@ -33,6 +35,7 @@
       "description": "Kullanıcıya timeout verir.",
       "usage": "h!timeout [id] [süre]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "ceza",
       "examples": [
         "h!timeout 1208226241002606644 1h",
         "h!timeout 1208226241002606644 1d",
@@ -44,26 +47,28 @@
     {
       "id": "cmd-004",
       "command": "s!temprole add",
-      "description": "Kullanıcıya geçici rol ekler.",
-      "usage": "s!temprole add [id] [süre] [rol]",
+      "description": "Kullanıcıya geçici rol ekler (susturulmuş, uyarılmış vb.).",
+      "usage": "s!temprole add [id] [süre] [rol-kısaltması]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "ceza",
       "examples": [
-        "s!temprole add 1208226241002606644 3d uyarılmış",
-        "s!temprole add 1208226241002606644 7d susturulmuş",
+        "s!temprole add 1208226241002606644 3d uya",
+        "s!temprole add 1208226241002606644 7d sus",
         "s!temprole add @User 2d noroompls"
       ],
-      "keywords": ["temprole", "geçici rol", "rol ekle", "add"],
+      "keywords": ["temprole", "geçici rol", "rol ekle", "add", "susturulmuş", "uyarılmış"],
       "order": 4
     },
     {
       "id": "cmd-005",
       "command": "s!temprole remove",
       "description": "Kullanıcıdan geçici rolü kaldırır.",
-      "usage": "s!temprole remove [id] [süre] [rol]",
+      "usage": "s!temprole remove [id] [süre] [rol-kısaltması]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "ceza",
       "examples": [
-        "s!temprole remove 1208226241002606644 0s uyarılmış",
-        "s!temprole remove @User 0s susturulmuş"
+        "s!temprole remove 1208226241002606644 0s uya",
+        "s!temprole remove @User 0s sus"
       ],
       "keywords": ["temprole", "geçici rol", "rol kaldır", "remove"],
       "order": 5
@@ -71,133 +76,196 @@
     {
       "id": "cmd-006",
       "command": "s!role5ever",
-      "description": "Kullanıcıya kalıcı rol verir.",
-      "usage": "s!role5ever [id] [rol]",
+      "description": "Kullanıcıya kalıcı rol verir (marked, unselfie gibi roller için).",
+      "usage": "s!role5ever [id] [rol-kısaltması]",
       "permissions": ["admin", "ust_yetkili"],
+      "category": "ceza",
       "examples": [
         "s!role5ever 1208226241002606644 marked",
-        "s!role5ever @User VIP"
+        "s!role5ever @User unselfie"
       ],
-      "keywords": ["role5ever", "kalıcı rol", "forever"],
+      "keywords": ["role5ever", "kalıcı rol", "forever", "marked"],
       "order": 6
     },
     {
       "id": "cmd-007",
       "command": "h!i",
-      "description": "Kullanıcı hakkında genel bilgi gösterir.",
+      "description": "Kullanıcı hakkında genel bilgi gösterir (anlık durum).",
       "usage": "h!i [id]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "bilgi",
       "examples": [
         "h!i 1208226241002606644",
         "h!i @User"
       ],
-      "keywords": ["info", "bilgi", "kullanıcı bilgisi"],
+      "keywords": ["info", "bilgi", "kullanıcı bilgisi", "durum"],
       "order": 7
     },
     {
       "id": "cmd-008",
       "command": "h!n",
-      "description": "Kullanıcının isim geçmişini gösterir.",
+      "description": "Kullanıcının notlarını kontrol etmenizi sağlar.",
       "usage": "h!n [id]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "bilgi",
       "examples": [
         "h!n 1208226241002606644",
         "h!n @User"
       ],
-      "keywords": ["names", "isim", "isim geçmişi", "nickname"],
+      "keywords": ["notes", "notlar", "kullanıcı notları"],
       "order": 8
     },
     {
       "id": "cmd-009",
       "command": "h!s",
-      "description": "Kullanıcının sunucu bilgilerini gösterir.",
+      "description": "Kullanıcının ceza kayıtlarını kontrol etmenizi sağlar.",
       "usage": "h!s [id]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "bilgi",
       "examples": [
         "h!s 1208226241002606644",
         "h!s @User"
       ],
-      "keywords": ["server", "sunucu", "sunucu bilgisi"],
+      "keywords": ["sicil", "ceza kayıtları", "geçmiş"],
       "order": 9
     },
     {
       "id": "cmd-010",
       "command": "h!joins",
-      "description": "Kullanıcının sunucuya katılım geçmişini gösterir.",
+      "description": "Kullanıcının sunucuya giriş çıkış geçmişini gösterir.",
       "usage": "h!joins [id]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "bilgi",
       "examples": [
         "h!joins 1208226241002606644",
         "h!joins @User"
       ],
-      "keywords": ["joins", "katılım", "katılım geçmişi"],
+      "keywords": ["joins", "giriş çıkış", "katılım geçmişi"],
       "order": 10
     },
     {
       "id": "cmd-011",
       "command": "h!c",
-      "description": "Kullanıcının ceza geçmişini gösterir.",
+      "description": "Kullanıcının sunucudan banlı olup olmadığını kontrol eder.",
       "usage": "h!c [id]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "bilgi",
       "examples": [
         "h!c 1208226241002606644",
         "h!c @User"
       ],
-      "keywords": ["cases", "ceza", "ceza geçmişi", "sicil"],
+      "keywords": ["check", "ban kontrol", "banlı mı"],
       "order": 11
     },
     {
       "id": "cmd-012",
-      "command": "h!j",
-      "description": "Kullanıcıyı sesli kanala çeker.",
-      "usage": "h!j [id]",
-      "permissions": ["mod", "admin", "ust_yetkili"],
-      "examples": [
-        "h!j 1208226241002606644",
-        "h!j @User"
-      ],
-      "keywords": ["join", "çek", "sesli kanal", "voice"],
-      "order": 12
-    },
-    {
-      "id": "cmd-013",
-      "command": "h!pull",
-      "description": "Kullanıcıyı bulunduğunuz sesli kanala çeker.",
-      "usage": "h!pull [id]",
-      "permissions": ["mod", "admin", "ust_yetkili"],
-      "examples": [
-        "h!pull 1208226241002606644",
-        "h!pull @User"
-      ],
-      "keywords": ["pull", "çek", "sesli kanal", "voice"],
-      "order": 13
-    },
-    {
-      "id": "cmd-014",
-      "command": "/ticket-create",
-      "description": "Yeni bir destek talebi (ticket) oluşturur.",
-      "usage": "/ticket-create",
-      "permissions": ["mod", "admin", "ust_yetkili"],
-      "examples": [
-        "/ticket-create"
-      ],
-      "keywords": ["ticket", "destek", "talep", "oluştur"],
-      "order": 14
-    },
-    {
-      "id": "cmd-015",
       "command": "h!avatar",
-      "description": "Kullanıcının profil fotoğrafını gösterir.",
+      "description": "Kullanıcının profil fotoğrafının linkini gösterir.",
       "usage": "h!avatar [id]",
       "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "bilgi",
       "examples": [
         "h!avatar 1208226241002606644",
         "h!avatar @User"
       ],
       "keywords": ["avatar", "profil", "fotoğraf", "pp"],
+      "order": 12
+    },
+    {
+      "id": "cmd-013",
+      "command": "h!j",
+      "description": "Kullanıcının bulunduğu sesli odaya giriş yapmanızı sağlar.",
+      "usage": "h!j [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "sesli",
+      "examples": [
+        "h!j 1208226241002606644",
+        "h!j @User"
+      ],
+      "keywords": ["join", "katıl", "sesli kanal", "voice"],
+      "order": 13
+    },
+    {
+      "id": "cmd-014",
+      "command": "h!pull",
+      "description": "Kullanıcıyı bulunduğunuz sesli odaya çeker.",
+      "usage": "h!pull [id]",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "sesli",
+      "examples": [
+        "h!pull 1208226241002606644",
+        "h!pull @User"
+      ],
+      "keywords": ["pull", "çek", "sesli kanal", "voice"],
+      "order": 14
+    },
+    {
+      "id": "cmd-015",
+      "command": "/ticket-create",
+      "description": "Yeni bir destek talebi (ticket) oluşturur.",
+      "usage": "/ticket-create",
+      "permissions": ["mod", "admin", "ust_yetkili"],
+      "category": "bilgi",
+      "examples": [
+        "/ticket-create"
+      ],
+      "keywords": ["ticket", "destek", "talep", "oluştur"],
       "order": 15
+    },
+    {
+      "id": "cmd-016",
+      "command": "h!ban",
+      "description": "Kullanıcıyı sunucudan kalıcı olarak yasaklar.",
+      "usage": "h!ban [id] [sebep]",
+      "permissions": ["admin", "ust_yetkili"],
+      "category": "gk-plus",
+      "examples": [
+        "h!ban 1208226241002606644 Kural ihlali",
+        "h!ban @User NSFW içerik paylaşımı"
+      ],
+      "keywords": ["ban", "yasakla", "kalıcı ban"],
+      "order": 16
+    },
+    {
+      "id": "cmd-017",
+      "command": "h!unban",
+      "description": "Kullanıcının yasağını kaldırır.",
+      "usage": "h!unban [id]",
+      "permissions": ["admin", "ust_yetkili"],
+      "category": "gk-plus",
+      "examples": [
+        "h!unban 1208226241002606644"
+      ],
+      "keywords": ["unban", "yasak kaldır", "ban aç"],
+      "order": 17
+    },
+    {
+      "id": "cmd-018",
+      "command": "/allow",
+      "description": "Yan hesap banı yemiş kullanıcının hesabının girmesine izin verir.",
+      "usage": "/allow [id]",
+      "permissions": ["admin", "ust_yetkili"],
+      "category": "gk-plus",
+      "examples": [
+        "/allow 1208226241002606644"
+      ],
+      "keywords": ["allow", "izin ver", "yan hesap", "alt hesap"],
+      "order": 18
+    },
+    {
+      "id": "cmd-019",
+      "command": "/deny",
+      "description": "Yan hesap başvurusu reddedildiğinde kayıtlara geçirir.",
+      "usage": "/deny [id]",
+      "permissions": ["admin", "ust_yetkili"],
+      "category": "gk-plus",
+      "examples": [
+        "/deny 1208226241002606644"
+      ],
+      "keywords": ["deny", "reddet", "yan hesap", "alt hesap"],
+      "order": 19
     }
   ],
-  "lastUpdated": "2026-01-20T00:00:00.000Z",
-  "version": "2.0.0"
+  "lastUpdated": "2026-01-21T00:00:00.000Z",
+  "version": "2.1.0"
 }

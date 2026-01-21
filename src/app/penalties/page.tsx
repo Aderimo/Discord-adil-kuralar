@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { BackButton } from '@/components/navigation/BackButton';
 import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 import { loadPenalties } from '@/lib/content';
@@ -75,7 +76,7 @@ export default function PenaltiesPage(): React.ReactElement {
   const categories: PenaltyCategory[] = ['yazili', 'sesli', 'ekstra', 'marked', 'blacklist'];
 
   return (
-    <MainLayout>
+    <MainLayout sidebar={<Sidebar />}>
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="space-y-3">
           <BackButton fallbackUrl="/" label="Geri" />

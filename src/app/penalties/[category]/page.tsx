@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { ContentEditor } from '@/components/content/ContentEditor';
 import { BackButton } from '@/components/navigation/BackButton';
 import { Breadcrumb } from '@/components/navigation/Breadcrumb';
@@ -167,7 +168,7 @@ export default function PenaltyCategoryPage(): React.ReactElement {
   }, []);
 
   return (
-    <MainLayout>
+    <MainLayout sidebar={<Sidebar />}>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Navigasyon bileşenleri */}
         <div className="space-y-3">

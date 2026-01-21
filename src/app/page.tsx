@@ -45,14 +45,14 @@ function WelcomeCard(): React.ReactElement {
           icon={<Book className="h-6 w-6" />}
           title="Yetkili Kılavuzu"
           description="Moderasyon kuralları ve prosedürler"
-          href="/guide/giris"
+          href="/guide"
           color="accent"
         />
         <QuickAccessCard
           icon={<Gavel className="h-6 w-6" />}
           title="Cezalar"
           description="Ceza türleri ve süreleri"
-          href="/penalties/yazili"
+          href="/penalties"
           color="red"
         />
         <QuickAccessCard
@@ -66,7 +66,7 @@ function WelcomeCard(): React.ReactElement {
           icon={<FileText className="h-6 w-6" />}
           title="Prosedürler"
           description="İşlem adımları ve yönergeler"
-          href="/procedures/kayit-proseduru"
+          href="/procedures"
           color="yellow"
         />
         <QuickAccessCard

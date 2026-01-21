@@ -11,6 +11,9 @@ export type ContentCategory = 'kilavuz' | 'ceza' | 'komut' | 'prosedur';
 // Ceza alt kategorileri
 export type PenaltyCategory = 'yazili' | 'sesli' | 'ekstra' | 'marked' | 'blacklist';
 
+// Komut kategorileri
+export type CommandCategory = 'ceza' | 'bilgi' | 'sesli' | 'gk-plus';
+
 /**
  * Yetkili Kılavuzu İçerik Yapısı
  * Requirement 4.1: Yetkili Kılavuzu içeriğini bölümlere ayrılmış şekilde sunmalı
@@ -84,6 +87,8 @@ export interface CommandDefinition {
   usage: string;
   /** Gerekli yetkiler */
   permissions: string[];
+  /** Komut kategorisi */
+  category?: CommandCategory;
   /** Kullanım örnekleri */
   examples: string[];
   /** Arama için anahtar kelimeler */
