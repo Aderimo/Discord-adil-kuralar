@@ -173,7 +173,7 @@ function ResetPasswordContent(): React.ReactElement {
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (errors.password) {
-                      setErrors(prev => ({ ...prev, password: undefined }));
+                      setErrors({ ...errors, password: '' });
                     }
                   }}
                   disabled={isSubmitting}
@@ -202,7 +202,7 @@ function ResetPasswordContent(): React.ReactElement {
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
                   if (errors.confirm) {
-                    setErrors(prev => ({ ...prev, confirm: undefined }));
+                    setErrors({ ...errors, confirm: '' });
                   }
                 }}
                 disabled={isSubmitting}
