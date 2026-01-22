@@ -311,6 +311,20 @@ export default function HomePage(): React.ReactElement {
               Kayıt Ol
             </a>
           </div>
+          
+          {/* Aderimo imzası */}
+          <p className="mt-12 text-xs text-discord-muted/70">
+            Bu siteyi yapan kişi{' '}
+            <a 
+              href="https://discord.gg/wMmtaG7UCx" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-discord-accent hover:underline font-medium"
+            >
+              Aderimo
+            </a>
+            &apos;dur
+          </p>
         </div>
       </main>
     );

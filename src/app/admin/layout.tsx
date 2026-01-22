@@ -10,6 +10,11 @@ import { Users, ScrollText, Settings, Shield, LogOut, Home } from 'lucide-react'
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
+// Rol bazlı erişim kontrolleri
+const OWNER_ROLES = ['owner', 'ust_yetkili'];
+const LOG_ROLES = ['gm', 'gm_plus', 'owner', 'ust_yetkili'];
+const ADMIN_ROLES = ['owner', 'admin', 'ust_yetkili', 'gk', 'council', 'gm', 'gm_plus'];
+
 export default function AdminLayout({
   children,
 }: {
@@ -33,8 +38,7 @@ export default function AdminLayout({
 
   // Yetkisiz erişim kontrolü - owner, admin ve ust_yetkili erişebilir
   // Ayrıca yeni rol sistemindeki gk, council, gm, gm_plus rolleri de erişebilir
-  const allowedRoles = ['owner', 'admin', 'ust_yetkili', 'gk', 'council', 'gm', 'gm_plus'];
-  if (!user || !allowedRoles.includes(user.role || '')) {
+  if (!user || !ADMIN_ROLES.includes(user.role || '')) {
     return (
       <div className="flex h-screen items-center justify-center bg-discord-darker">
         <div className="text-center">
@@ -48,6 +52,10 @@ export default function AdminLayout({
       </div>
     );
   }
+
+  // Rol bazlı menü görünürlüğü
+  const canViewLogs = LOG_ROLES.includes(user.role || '');
+  const canViewSettings = OWNER_ROLES.includes(user.role || '');
 
   const handleLogout = async (): Promise<void> => {
     await logout();
@@ -88,30 +96,38 @@ export default function AdminLayout({
               <Users className="h-5 w-5" />
               Kullanıcılar
             </button>
-            <button
-              onClick={() => navigateTo('/admin/logs')}
-              className={cn(
-                'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
-                pathname === '/admin/logs'
-                  ? 'bg-discord-accent/20 text-discord-accent'
-                  : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
-              )}
-            >
-              <ScrollText className="h-5 w-5" />
-              Aktivite Logları
-            </button>
-            <button
-              onClick={() => navigateTo('/admin/settings')}
-              className={cn(
-                'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
-                pathname === '/admin/settings'
-                  ? 'bg-discord-accent/20 text-discord-accent'
-                  : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
-              )}
-            >
-              <Settings className="h-5 w-5" />
-              Ayarlar
-            </button>
+            
+            {/* Aktivite Logları - sadece gm ve üstü */}
+            {canViewLogs && (
+              <button
+                onClick={() => navigateTo('/admin/logs')}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
+                  pathname === '/admin/logs'
+                    ? 'bg-discord-accent/20 text-discord-accent'
+                    : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
+                )}
+              >
+                <ScrollText className="h-5 w-5" />
+                Aktivite Logları
+              </button>
+            )}
+            
+            {/* Ayarlar (Rol Yönetimi) - sadece owner */}
+            {canViewSettings && (
+              <button
+                onClick={() => navigateTo('/admin/settings')}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
+                  pathname === '/admin/settings'
+                    ? 'bg-discord-accent/20 text-discord-accent'
+                    : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
+                )}
+              >
+                <Settings className="h-5 w-5" />
+                Ayarlar
+              </button>
+            )}
           </nav>
 
           {/* Footer */}
