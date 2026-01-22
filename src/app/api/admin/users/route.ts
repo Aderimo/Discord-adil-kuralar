@@ -10,7 +10,7 @@ interface UserListItem {
   username: string;
   email: string;
   status: UserStatus;
-  role: UserRole;
+  role: UserRole | null;
   createdAt: Date;
   updatedAt: Date;
   lastLoginAt: Date | null;
@@ -37,8 +37,8 @@ interface UserListResponse {
 // Geçerli status değerleri
 const VALID_STATUSES: UserStatus[] = ['pending', 'approved', 'rejected'];
 
-// Geçerli rol değerleri (filtreleme için)
-const VALID_ROLES: UserRole[] = ['mod', 'admin', 'ust_yetkili'];
+// Geçerli rol değerleri (filtreleme için) - dinamik rol sistemi
+const VALID_ROLES: UserRole[] = ['reg', 'op', 'gk', 'council', 'gm', 'gm_plus', 'owner', 'mod', 'admin', 'ust_yetkili'];
 
 /**
  * GET /api/admin/users
@@ -110,7 +110,9 @@ export const GET = withAdmin<UserListResponse>(async (request: NextRequest) => {
     // Role filtresi
     // Requirement 5.3: Rol filtresi
     if (role) {
-      whereConditions.role = role;
+      whereConditions.role = {
+        code: role,
+      };
     }
     
     // Toplam kayıt sayısını al (pagination için)
@@ -126,7 +128,12 @@ export const GET = withAdmin<UserListResponse>(async (request: NextRequest) => {
         username: true,
         email: true,
         status: true,
-        role: true,
+        roleId: true,
+        role: {
+          select: {
+            code: true,
+          },
+        },
         createdAt: true,
         updatedAt: true,
         lastLoginAt: true,
@@ -137,6 +144,18 @@ export const GET = withAdmin<UserListResponse>(async (request: NextRequest) => {
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
+    
+    // Kullanıcı verisini dönüştür - role objesinden code'u çıkar
+    const transformedUsers = users.map(user => ({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      status: user.status as UserStatus,
+      role: user.role?.code || null, // Role objesinden code'u al
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      lastLoginAt: user.lastLoginAt,
+    }));
     
     // İstatistikleri hesapla
     // Requirement 5.7: Kullanıcı sayısı istatistikleri
@@ -152,7 +171,7 @@ export const GET = withAdmin<UserListResponse>(async (request: NextRequest) => {
     return NextResponse.json(
       {
         success: true,
-        users: users as UserListItem[],
+        users: transformedUsers,
         pagination: {
           page,
           pageSize,

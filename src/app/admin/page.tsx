@@ -51,7 +51,7 @@ interface User {
   username: string;
   email: string;
   status: UserStatus;
-  role: UserRole;
+  role: UserRole | null;
   createdAt: string;
   updatedAt: string;
   lastLoginAt: string | null;
@@ -720,7 +720,7 @@ export default function AdminPage(): React.ReactElement {
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs text-discord-muted mb-3">
-                      <span>Yetki: {roleLabels[user.role] || user.role || 'Yok'}</span>
+                      <span>Yetki: {user.role ? (roleLabels[user.role] || user.role) : 'Yok'}</span>
                       <span>Kayıt: {formatDate(user.createdAt)}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -826,7 +826,7 @@ export default function AdminPage(): React.ReactElement {
                             {STATUS_LABELS[user.status]}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-discord-muted">{roleLabels[user.role] || user.role || 'Yok'}</td>
+                        <td className="px-4 py-3 text-discord-muted">{user.role ? (roleLabels[user.role] || user.role) : 'Yok'}</td>
                         <td className="px-4 py-3 text-discord-muted">{formatDate(user.createdAt)}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-2">
@@ -977,7 +977,7 @@ export default function AdminPage(): React.ReactElement {
             <DialogTitle>Yetki Değiştir</DialogTitle>
             <DialogDescription>
               <strong>{selectedUser?.username}</strong> kullanıcısının yetkisini değiştirmek üzeresiniz.
-              Mevcut yetki: <strong>{selectedUser ? (roleLabels[selectedUser.role] || selectedUser.role || 'Yok') : ''}</strong>
+              Mevcut yetki: <strong>{selectedUser?.role ? (roleLabels[selectedUser.role] || selectedUser.role) : 'Yok'}</strong>
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">

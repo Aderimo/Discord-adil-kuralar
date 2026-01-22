@@ -39,14 +39,22 @@ export async function GET(request: NextRequest) {
         // Rolleri getir
         const roles = await getAllRoles();
 
+        // Date objelerini ISO string'e çevir (JSON serialization için)
+        const serializedRoles = roles.map(role => ({
+            ...role,
+            createdAt: role.createdAt instanceof Date ? role.createdAt.toISOString() : role.createdAt,
+            updatedAt: role.updatedAt instanceof Date ? role.updatedAt.toISOString() : role.updatedAt,
+        }));
+
         return NextResponse.json({
             success: true,
-            roles,
+            roles: serializedRoles,
         });
     } catch (error) {
         console.error('Rol listesi hatası:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
         return NextResponse.json(
-            { success: false, error: 'Roller yüklenirken bir hata oluştu' },
+            { success: false, error: `Roller yüklenirken bir hata oluştu: ${errorMessage}` },
             { status: 500 }
         );
     }
