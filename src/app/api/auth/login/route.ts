@@ -54,8 +54,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     }
 
     // Kullanıcıyı bul - role relation ile birlikte
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const user = await (prisma.user.findUnique as any)({
+    const user = await prisma.user.findUnique({
       where: { email },
       include: {
         role: true,
