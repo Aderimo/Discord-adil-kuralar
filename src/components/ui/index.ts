@@ -58,3 +58,24 @@ export {
 } from "./collapsible";
 export { Textarea } from "./textarea";
 export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
+export { Checkbox } from "./checkbox";
+export {
+  AlertDialog,
+  AlertDialogPortal,
+  AlertDialogOverlay,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "./alert-dialog";
+export { ScrollArea, ScrollBar } from "./scroll-area";
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor,
+} from "./popover";

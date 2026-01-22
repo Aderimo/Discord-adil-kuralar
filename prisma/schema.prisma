@@ -10,6 +10,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Role Model - Dinamik rol tanımları
+// Requirement: Dinamik rol yönetim sistemi
+model Role {
+  id          String   @id @default(cuid())
+  code        String   @unique // reg, op, gk, council, gm, gm_plus, owner
+  name        String   // Regülatör, Operatör, etc.
+  shortName   String   // REG, OP, GK, etc.
+  description String   @db.Text
+  hierarchy   Int      // 1-7 (daha yüksek = daha yetkili)
+  color       String   @default("#5865F2") // Discord rengi
+  permissions String   @default("[]") // JSON array of permission codes
+  isSystem    Boolean  @default(false) // Sistem rolleri silinemez
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users User[]
+
+  @@map("roles")
+}
+
 // User Model - Kullanıcı bilgileri ve yetkilendirme
 model User {
   id               String    @id @default(cuid())
@@ -17,7 +37,7 @@ model User {
   email            String    @unique
   passwordHash     String
   status           String    @default("pending") // pending, approved, rejected
-  role             String    @default("none") // none, mod, admin, ust_yetkili
+  roleId           String?   // Dinamik rol ilişkisi
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   lastLoginAt      DateTime?
@@ -25,8 +45,10 @@ model User {
   resetTokenExpiry DateTime? // Token geçerlilik süresi
 
   // İlişkiler
-  sessions     Session[]
-  activityLogs ActivityLog[]
+  role          Role?          @relation(fields: [roleId], references: [id])
+  sessions      Session[]
+  activityLogs  ActivityLog[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -51,7 +73,7 @@ model Session {
 model ActivityLog {
   id        String   @id @default(cuid())
   userId    String
-  action    String // login, logout, view_content, search, ai_query, role_change, user_approve, user_reject
+  action    String // login, logout, view_content, search, ai_query, role_change, user_approve, user_reject, copy_content, copy_template, edit_content, delete_content, create_role, edit_role, delete_role, view_logs, export_logs
   details   String   @default("{}") // JSON string olarak saklanır
   ipAddress String
   timestamp DateTime @default(now())
@@ -63,4 +85,25 @@ model ActivityLog {
   @@index([action])
   @@index([timestamp])
   @@map("activity_logs")
+}
+
+// Notification Model - Bildirim sistemi
+// Requirement 9: Bildirim Sistemi
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // new_registration, content_change, role_change, system
+  title     String
+  message   String
+  data      String   @default("{}") // JSON string olarak saklanır
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // İlişkiler
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@map("notifications")
 }

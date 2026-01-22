@@ -1,8 +1,10 @@
 // POST /api/auth/register - Kullanıcı kaydı
 // Requirement 1.1: Kullanıcıyı "Beklemede" durumunda veritabanına kaydetmeli
+// Sadece onaylı kullanıcılar (saniye modları) siteye erişebilir
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import { hashPassword, isValidEmail, isValidPassword } from '@/lib/auth';
+import { notifyNewUserRegistration } from '@/lib/notifications';
 
 interface RegisterRequest {
   username: string;
@@ -89,20 +91,34 @@ export async function POST(request: NextRequest): Promise<NextResponse<RegisterR
 
     // Kullanıcıyı "pending" (Beklemede) durumunda oluştur
     // Requirement 1.1: Varsayılan durum "Beklemede"
+    // Yeni kullanıcılar onaylanana kadar siteye erişemez
+    // roleId null olarak başlar - admin onayladıktan sonra rol atanır
     const user = await prisma.user.create({
       data: {
         username,
         email,
         passwordHash,
-        status: 'pending', // Varsayılan "Beklemede" durumu
-        role: 'none', // Varsayılan yetki yok
+        status: 'pending', // Varsayılan "Beklemede" durumu - admin onayı gerekli
+        roleId: null, // Rol atanmamış - admin onayladıktan sonra atanacak
       },
     });
+
+    // Üst yetkililere bildirim gönder
+    try {
+      await notifyNewUserRegistration({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      });
+    } catch (notificationError) {
+      // Bildirim hatası kritik değil, log'la ve devam et
+      console.error('Notification error:', notificationError);
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Kayıt başarılı. Hesabınız onay bekliyor.',
+        message: 'Kayıt başarılı. Hesabınız yetkili onayı bekliyor.',
         userId: user.id,
       },
       { status: 201 }

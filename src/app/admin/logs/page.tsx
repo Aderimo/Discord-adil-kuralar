@@ -31,6 +31,9 @@ import {
   Search,
   Bot,
   AlertTriangle,
+  Download,
+  FileJson,
+  FileSpreadsheet,
 } from 'lucide-react';
 import type { ActivityAction } from '@/types';
 
@@ -95,6 +98,7 @@ export default function LogsPage(): React.ReactElement {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [actionFilter, setActionFilter] = useState<string>('all');
@@ -148,6 +152,65 @@ export default function LogsPage(): React.ReactElement {
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
+
+  // Logları export et
+  const handleExport = async (format: 'csv' | 'json') => {
+    setIsExporting(true);
+    
+    try {
+      const params = new URLSearchParams({
+        format,
+      });
+      
+      if (actionFilter !== 'all') {
+        params.append('action', actionFilter);
+      }
+
+      const response = await fetch(`/api/admin/logs/export?${params}`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Export başarısız');
+      }
+
+      // Dosyayı indir
+      const blob = await response.blob();
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `logs-export.${format}`;
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: 'Export Başarılı',
+        description: `Loglar ${format.toUpperCase()} formatında indirildi`,
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: 'Export Hatası',
+        description: error instanceof Error ? error.message : 'Loglar export edilemedi',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Tarih formatla
   const formatDate = (dateString: string): string => {
@@ -261,6 +324,44 @@ export default function LogsPage(): React.ReactElement {
             <RefreshCw className={`h-4 w-4 sm:mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Yenile</span>
           </Button>
+
+          {/* Export Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                disabled={isExporting || logs.length === 0}
+                className="text-xs sm:text-sm"
+              >
+                {isExporting ? (
+                  <RefreshCw className="h-4 w-4 animate-spin sm:mr-2" />
+                ) : (
+                  <Download className="h-4 w-4 sm:mr-2" />
+                )}
+                <span className="hidden sm:inline">Export</span>
+                <ChevronDown className="h-4 w-4 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Format Seçin</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => handleExport('csv')}
+                disabled={isExporting}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2 text-discord-green" />
+                CSV olarak indir
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleExport('json')}
+                disabled={isExporting}
+              >
+                <FileJson className="h-4 w-4 mr-2 text-discord-yellow" />
+                JSON olarak indir
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

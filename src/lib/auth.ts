@@ -49,8 +49,8 @@ export function verifyToken(token: string): { userId: string } | null {
 
 // Oturum oluşturma - kullanıcı bilgileriyle birlikte token oluşturur
 export async function createSession(
-  userId: string, 
-  role: UserRole = 'none', 
+  userId: string,
+  role: UserRole = 'none',
   status: UserStatus = 'pending'
 ): Promise<Session> {
   const token = generateToken(userId, role, status);
@@ -119,17 +119,11 @@ export async function getUserFromToken(token: string): Promise<User | null> {
     return null;
   }
 
-  const user = await prisma.user.findUnique({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const user = await (prisma.user.findUnique as any)({
     where: { id: session.userId },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      status: true,
+    include: {
       role: true,
-      createdAt: true,
-      updatedAt: true,
-      lastLoginAt: true,
     },
   });
 
@@ -137,12 +131,31 @@ export async function getUserFromToken(token: string): Promise<User | null> {
     return null;
   }
 
+  // Handle both old schema (role as string) and new schema (role as relation)
+  let roleCode: string | null = null;
+  let roleId: string | null = null;
+
+  if (typeof user.role === 'string') {
+    // Old schema - role is a string directly
+    roleCode = user.role;
+  } else if (user.role && typeof user.role === 'object') {
+    // New schema - role is a relation object
+    roleCode = user.role.code;
+    roleId = user.role.id;
+  }
+
+  // If roleId exists on user directly, use that
+  if (user.roleId) {
+    roleId = user.roleId;
+  }
+
   return {
     id: user.id,
     username: user.username,
     email: user.email,
     status: user.status as UserStatus,
-    role: user.role as UserRole,
+    role: roleCode,
+    roleId: roleId,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     lastLoginAt: user.lastLoginAt ?? undefined,

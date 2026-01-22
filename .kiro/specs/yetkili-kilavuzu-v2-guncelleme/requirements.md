@@ -10,9 +10,13 @@ Bu doküman, "Yetkili Kılavuzu v2" Discord moderasyon panelinin kapsamlı günc
 - **Sidebar**: Sol taraftaki navigasyon menüsü
 - **AI_Danışman**: RAG tabanlı yapay zeka ceza danışmanlık sistemi
 - **RBAC**: Role-Based Access Control - Rol tabanlı erişim kontrolü
-- **Üst_Yetkili**: En yüksek yetki seviyesine sahip kullanıcı rolü (ust_yetkili)
-- **Admin**: Orta seviye yetki sahibi kullanıcı rolü
-- **Mod**: Temel moderatör yetkisine sahip kullanıcı rolü
+- **Owner**: Site kurucusu ve yardımcıları - en yüksek yetki seviyesi (hierarchy: 7)
+- **GM+**: Owner'dan sonraki en yüksek yetkili rol (hierarchy: 6)
+- **GM**: Sunucunun genel yönetimiyle ilgilenen rol (hierarchy: 5)
+- **Council**: GateKeeper ve Operatörlerin gözetmeni (hierarchy: 4)
+- **GK (GateKeeper)**: Yasaklama yetkisine sahip moderatör (hierarchy: 3)
+- **OP (Operatör)**: Sesli ve yazılı kanalları denetleyen yetkili (hierarchy: 2)
+- **REG (Regülatör)**: Temel moderatör rolü (hierarchy: 1)
 - **Log_Sistemi**: Kullanıcı aktivitelerini kaydeden sistem
 - **Ceza_Şablonu**: Hazır ban/ceza mesaj şablonları
 - **Bildirim_Sistemi**: Önemli olayları bildiren sistem
@@ -143,4 +147,56 @@ Bu doküman, "Yetkili Kılavuzu v2" Discord moderasyon panelinin kapsamlı günc
 4. THE System SHALL add /deny command with usage: `/deny id`
 5. THE System SHALL categorize these commands under "GK+ Komutları" category
 6. WHEN displaying GK+ commands THEN THE System SHALL indicate they require GK or higher permission
+
+### Requirement 11: Dinamik Rol Yönetim Sistemi
+
+**User Story:** As an owner, I want to manage roles dynamically, so that I can create, edit, and delete roles with custom permissions.
+
+#### Acceptance Criteria
+
+1. THE System SHALL support the following roles with hierarchy (1-7):
+   - **reg** (Regülatör, hierarchy: 1): Stajyerlik sürecini tamamlayarak kadroya geçmiş ana regülatör rolü. Sesli kanallar ve genel sunucuyu gözlemleyip denetler. Olumsuzlukları ve gelen şikayetleri güvenilir, kanıtlı ve işlem uygulanabilir şekilde üst moderatör ekibine iletir.
+   - **op** (Operatör, hierarchy: 2): Ana operatör rolü. Sunucudaki sesli ve yazılı kanalları denetleyen, gerektiğinde işlem uygulayabilen yetkililer. Sunucu hakkındaki konularda danışılabilecek, genel sunucu düzenini sağlamak ve şikayetleri değerlendirmekle sorumlu kişiler.
+   - **gk** (GateKeeper, hierarchy: 3): Operatörlerin bir üstü olup sunucudan yasaklama yetkisine sahip. Operatörlerin ilettiği kullanıcıları uzaklaştırır ve genel moderasyon işlemlerinin doğruluğunu denetleyerek düzenin korunmasına yardımcı olur.
+   - **council** (Council, hierarchy: 4): GateKeeper ve Operatörlerin Supervisor'ı/gözetmeni. Kararsız kalınan işlemlerde sunucu kurallarına göre doğru işlemi ve süreyi belirlemede yardımcı olur.
+   - **gm** (GM, hierarchy: 5): GM+'dan tek farkı yönetici yetkisi yoktur. Sunucunun genel yönetimiyle ilgilenir.
+   - **gm_plus** (🔖 GM+, hierarchy: 6): Owner'dan sonraki en yüksek yetkili rol. Sunucunun genel yönetimiyle ilgilenir.
+   - **owner** (Owner, hierarchy: 7): Site kurucusu ve yardımcılarına verilir. En yüksek yetki seviyesi.
+2. THE System SHALL store roles in the database with: code, name, shortName, description, hierarchy, color, permissions, isSystem
+3. WHEN an owner visits `/admin/settings` THEN THE System SHALL display role management interface
+4. THE System SHALL allow owners to create new roles with custom permissions
+5. THE System SHALL allow owners to edit existing roles (except system roles' code)
+6. THE System SHALL allow owners to delete non-system roles
+7. WHEN assigning roles to users THEN THE System SHALL show all available roles from database
+8. THE System SHALL prevent non-owner users from assigning the owner role
+9. THE System SHALL set esenyurtcocg65@gmail.com (username: Aderimo) as the initial owner
+
+### Requirement 12: Gelişmiş Log Sistemi
+
+**User Story:** As an owner/GM+, I want comprehensive activity logging, so that I can audit all user actions including AI queries and content operations.
+
+#### Acceptance Criteria
+
+1. THE Log_Sistemi SHALL log the following additional actions:
+   - copy_content: İçerik kopyalama
+   - copy_template: Şablon kopyalama
+   - edit_content: İçerik düzenleme
+   - delete_content: İçerik silme
+   - create_role: Rol oluşturma
+   - edit_role: Rol düzenleme
+   - delete_role: Rol silme
+   - view_logs: Log görüntüleme
+   - export_logs: Log dışa aktarma
+2. WHEN a user queries the AI assistant THEN THE System SHALL log the query with full message content
+3. WHEN a user copies a template or content THEN THE System SHALL log the copy action with content details
+
+### Requirement 13: Kimlik Doğrulama Düzeltmeleri
+
+**User Story:** As a user, I want to be able to login without errors, so that I can access the system reliably.
+
+#### Acceptance Criteria
+
+1. THE System SHALL handle login requests without errors
+2. THE System SHALL properly validate credentials and create sessions
+3. THE System SHALL redirect authenticated users to the appropriate page based on their status
 

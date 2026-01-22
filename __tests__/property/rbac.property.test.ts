@@ -583,3 +583,398 @@ describe('Property Tests: RBAC - Public Rotalar', () => {
     30000
   );
 });
+
+
+/**
+ * Property 6: RBAC Permission Enforcement
+ * Feature: yetkili-kilavuzu-v2-guncelleme
+ *
+ * *For any* user with a given role (mod, admin, ust_yetkili), the system SHALL grant
+ * exactly the permissions defined for that role:
+ * - mod gets view-only (VIEW_CONTENT only)
+ * - admin gets view+edit (VIEW_CONTENT, VIEW_USERS, EDIT_CONTENT, EDIT_USERS)
+ * - ust_yetkili gets view+edit+delete (ALL permissions)
+ *
+ * UI elements for unauthorized actions SHALL be hidden.
+ *
+ * **Validates: Requirements 6.1, 6.2, 6.3, 6.4, 6.6**
+ */
+import { hasPermission, PERMISSIONS, type Permission } from '@/lib/rbac';
+
+// Tüm izinlerin listesi
+const ALL_PERMISSIONS: Permission[] = Object.keys(PERMISSIONS) as Permission[];
+
+// Rol bazlı beklenen izinler
+const MOD_EXPECTED_PERMISSIONS: Permission[] = ['VIEW_CONTENT'];
+const ADMIN_EXPECTED_PERMISSIONS: Permission[] = [
+  'VIEW_CONTENT',
+  'VIEW_USERS',
+  'EDIT_CONTENT',
+  'EDIT_USERS',
+];
+const UST_YETKILI_EXPECTED_PERMISSIONS: Permission[] = ALL_PERMISSIONS;
+
+// Rol bazlı yasaklı izinler
+const MOD_FORBIDDEN_PERMISSIONS: Permission[] = ALL_PERMISSIONS.filter(
+  (p) => !MOD_EXPECTED_PERMISSIONS.includes(p)
+);
+const ADMIN_FORBIDDEN_PERMISSIONS: Permission[] = ALL_PERMISSIONS.filter(
+  (p) => !ADMIN_EXPECTED_PERMISSIONS.includes(p)
+);
+
+describe('Property Tests: Property 6 - RBAC Permission Enforcement', () => {
+  /**
+   * Property 6.1: Mod rolü sadece VIEW_CONTENT iznine sahip olmalı
+   *
+   * *For any* mod user, the system SHALL grant only VIEW_CONTENT permission.
+   * All other permissions (VIEW_USERS, VIEW_LOGS, VIEW_NOTIFICATIONS, EDIT_*, DELETE_*)
+   * SHALL be denied.
+   *
+   * **Validates: Requirements 6.3**
+   */
+  it(
+    'Property 6.1: Mod rolü sadece VIEW_CONTENT iznine sahip olmalı',
+    async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(...ALL_PERMISSIONS),
+          (permission) => {
+            const hasAccess = hasPermission('mod', permission);
+            const shouldHaveAccess = MOD_EXPECTED_PERMISSIONS.includes(permission);
+
+            // Property: Mod sadece VIEW_CONTENT iznine sahip olmalı
+            expect(hasAccess).toBe(shouldHaveAccess);
+
+            return true;
+          }
+        ),
+        {
+          numRuns: 100,
+          verbose: false,
+        }
+      );
+    },
+    30000
+  );
+
+  /**
+   * Property 6.2: Mod rolünün yasaklı izinleri olmamalı
+   *
+   * *For any* permission in the forbidden list for mod role,
+   * hasPermission SHALL return false.
+   *
+   * **Validates: Requirements 6.3, 6.6**
+   */
+  it(
+    'Property 6.2: Mod rolünün yasaklı izinleri (VIEW_LOGS, VIEW_NOTIFICATIONS, VIEW_USERS, EDIT_*, DELETE_*) olmamalı',
+    async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(...MOD_FORBIDDEN_PERMISSIONS),
+          (permission) => {
+            const hasAccess = hasPermission('mod', permission);
+
+            // Property: Mod bu izinlere sahip olmamalı
+            expect(hasAccess).toBe(false);
+
+            return true;
+          }
+        ),
+        {
+          numRuns: 100,
+          verbose: false,
+        }
+      );
+    },
+    30000
+  );
+
+  /**
+   * Property 6.3: Admin rolü VIEW_* ve EDIT_* izinlerine sahip olmalı (bazı istisnalar hariç)
+   *
+   * *For any* admin user, the system SHALL grant:
+   * - VIEW_CONTENT, VIEW_USERS
+   * - EDIT_CONTENT, EDIT_USERS
+   *
+   * But NOT:
+   * - VIEW_LOGS, VIEW_NOTIFICATIONS (only ust_yetkili)
+   * - EDIT_TEMPLATES (only ust_yetkili)
+   * - DELETE_* (only ust_yetkili)
+   *
+   * **Validates: Requirements 6.2**
+   */
+  it(
+    'Property 6.3: Admin rolü VIEW_* ve EDIT_* izinlerine sahip olmalı (DELETE_*, VIEW_LOGS, VIEW_NOTIFICATIONS, EDIT_TEMPLATES hariç)',
+    async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(...ALL_PERMISSIONS),
+          (permission) => {
+            const hasAccess = hasPermission('admin', permission);
+            const shouldHaveAccess = ADMIN_EXPECTED_PERMISSIONS.includes(permission);
+
+            // Property: Admin beklenen izinlere sahip olmalı
+            expect(hasAccess).toBe(shouldHaveAccess);
+
+            return true;
+          }
+        ),
+        {
+          numRuns: 100,
+          verbose: false,
+        }
+      );
+    },
+    30000
+  );
+
+  /**
+   * Property 6.4: Admin rolünün yasaklı izinleri olmamalı
+   *
+   * *For any* permission in the forbidden list for admin role,
+   * hasPermission SHALL return false.
+   *
+   * **Validates: Requirements 6.2, 6.6**
+   */
+  it(
+    'Property 6.4: Admin rolünün yasaklı izinleri (DELETE_*, VIEW_LOGS, VIEW_NOTIFICATIONS, EDIT_TEMPLATES) olmamalı',
+    async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(...ADMIN_FORBIDDEN_PERMISSIONS),
+          (permission) => {
+            const hasAccess = hasPermission('admin', permission);
+
+            // Property: Admin bu izinlere sahip olmamalı
+            expect(hasAccess).toBe(false);
+
+            return true;
+          }
+        ),
+        {
+          numRuns: 100,
+          verbose: false,
+        }
+      );
+    },
+    30000
+  );
+
+  /**
+   * Property 6.5: Üst yetkili rolü TÜM izinlere sahip olmalı
+   *
+   * *For any* ust_yetkili user, the system SHALL grant ALL permissions
+   * including view, edit, and delete.
+   *
+   * **Validates: Requirements 6.1**
+   */
+  it(
+    'Property 6.5: Üst yetkili rolü TÜM izinlere sahip olmalı',
+    async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(...ALL_PERMISSIONS),
+          (permission) => {
+            const hasAccess = hasPermission('ust_yetkili', permission);
+
+            // Property: Üst yetkili tüm izinlere sahip olmalı
+            expect(hasAccess).toBe(true);
+
+            return true;
+          }
+        ),
+        {
+          numRuns: 100,
+          verbose: false,
+        }
+      );
+    },
+    30000
+  );
+
+  /**
+   * Property 6.6: İzin hiyerarşisi tutarlı olmalı - üst roller alt rollerin tüm izinlerine sahip
+   *
+   * *For any* permission that a lower role has, all higher roles SHALL also have that permission.
+   * Hierarchy: mod < admin < ust_yetkili
+   *
+   * **Validates: Requirements 6.1, 6.2, 6.3, 6.4**
+   */
+  it(
+    'Property 6.6: İzin hiyerarşisi tutarlı olmalı - üst roller alt rollerin tüm izinlerine sahip',
+    async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(...ALL_PERMISSIONS),
+          (permission) => {
+            const modHas = hasPermission('mod', permission);
+            const adminHas = hasPermission('admin', permission);
+            const ustYetkiliHas = hasPermission('ust_yetkili', permission);
+
+            // Property: Eğer mod bir izne sahipse, admin ve ust_yetkili de sahip olmalı
+            if (modHas) {
+              expect(adminHas).toBe(true);
+              expect(ustYetkiliHas).toBe(true);
+            }
+
+            // Property: Eğer admin bir izne sahipse, ust_yetkili de sahip olmalı
+            if (adminHas) {
+              expect(ustYetkiliHas).toBe(true);
+            }
+
+            // Property: ust_yetkili her zaman tüm izinlere sahip
+            expect(ustYetkiliHas).toBe(true);
+
+            return true;
+          }
+        ),
+        {
+          numRuns: 100,
+          verbose: false,
+        }
+      );
+    },
+    30000
+  );
+
+  /**
+   * Property 6.7: 'none' rolü hiçbir izne sahip olmamalı
+   *
+   * *For any* user with 'none' role, the system SHALL deny ALL permissions.
+   *
+   * **Validates: Requirements 6.4, 6.6**
+   */
+  it(
+    'Property 6.7: "none" rolü hiçbir izne sahip olmamalı',
+    async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(...ALL_PERMISSIONS),
+          (permission) => {
+            const hasAccess = hasPermission('none', permission);
+
+            // Property: 'none' rolü hiçbir izne sahip olmamalı
+            expect(hasAccess).toBe(false);
+
+            return true;
+          }
+        ),
+        {
+          numRuns: 100,
+          verbose: false,
+        }
+      );
+    },
+    30000
+  );
+
+  /**
+   * Property 6.8: Silme izinleri sadece üst yetkililere ait olmalı
+   *
+   * *For any* DELETE_* permission, only ust_yetkili role SHALL have access.
+   * mod and admin roles SHALL NOT have delete permissions.
+   *
+   * **Validates: Requirements 6.1, 6.2, 6.3**
+   */
+  it(
+    'Property 6.8: Silme izinleri (DELETE_*) sadece üst yetkililere ait olmalı',
+    async () => {
+      const deletePermissions: Permission[] = ['DELETE_CONTENT', 'DELETE_USERS'];
+
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(...deletePermissions),
+          (permission) => {
+            const modHas = hasPermission('mod', permission);
+            const adminHas = hasPermission('admin', permission);
+            const ustYetkiliHas = hasPermission('ust_yetkili', permission);
+
+            // Property: Mod silme iznine sahip olmamalı
+            expect(modHas).toBe(false);
+
+            // Property: Admin silme iznine sahip olmamalı
+            expect(adminHas).toBe(false);
+
+            // Property: Üst yetkili silme iznine sahip olmalı
+            expect(ustYetkiliHas).toBe(true);
+
+            return true;
+          }
+        ),
+        {
+          numRuns: 100,
+          verbose: false,
+        }
+      );
+    },
+    30000
+  );
+
+  /**
+   * Property 6.9: Özel izinler (VIEW_LOGS, VIEW_NOTIFICATIONS) sadece üst yetkililere ait olmalı
+   *
+   * *For any* special permission (VIEW_LOGS, VIEW_NOTIFICATIONS), only ust_yetkili role
+   * SHALL have access.
+   *
+   * **Validates: Requirements 6.1, 6.2, 6.3**
+   */
+  it(
+    'Property 6.9: Özel izinler (VIEW_LOGS, VIEW_NOTIFICATIONS) sadece üst yetkililere ait olmalı',
+    async () => {
+      const specialPermissions: Permission[] = ['VIEW_LOGS', 'VIEW_NOTIFICATIONS'];
+
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(...specialPermissions),
+          (permission) => {
+            const modHas = hasPermission('mod', permission);
+            const adminHas = hasPermission('admin', permission);
+            const ustYetkiliHas = hasPermission('ust_yetkili', permission);
+
+            // Property: Mod bu izinlere sahip olmamalı
+            expect(modHas).toBe(false);
+
+            // Property: Admin bu izinlere sahip olmamalı
+            expect(adminHas).toBe(false);
+
+            // Property: Üst yetkili bu izinlere sahip olmalı
+            expect(ustYetkiliHas).toBe(true);
+
+            return true;
+          }
+        ),
+        {
+          numRuns: 100,
+          verbose: false,
+        }
+      );
+    },
+    30000
+  );
+
+  /**
+   * Property 6.10: EDIT_TEMPLATES izni sadece üst yetkililere ait olmalı
+   *
+   * *For any* user, only ust_yetkili role SHALL have EDIT_TEMPLATES permission.
+   *
+   * **Validates: Requirements 6.1, 6.2**
+   */
+  it(
+    'Property 6.10: EDIT_TEMPLATES izni sadece üst yetkililere ait olmalı',
+    async () => {
+      const modHas = hasPermission('mod', 'EDIT_TEMPLATES');
+      const adminHas = hasPermission('admin', 'EDIT_TEMPLATES');
+      const ustYetkiliHas = hasPermission('ust_yetkili', 'EDIT_TEMPLATES');
+
+      // Property: Mod EDIT_TEMPLATES iznine sahip olmamalı
+      expect(modHas).toBe(false);
+
+      // Property: Admin EDIT_TEMPLATES iznine sahip olmamalı
+      expect(adminHas).toBe(false);
+
+      // Property: Üst yetkili EDIT_TEMPLATES iznine sahip olmalı
+      expect(ustYetkiliHas).toBe(true);
+    },
+    30000
+  );
+});

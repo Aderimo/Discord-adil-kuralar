@@ -2,12 +2,12 @@
  * AI Chat API Endpoint
  * RAG tabanlı ceza danışmanlığı sohbet endpoint'i
  *
- * Requirements: 6.1, 6.2, 6.3, 6.4, 6.5
- * - 6.1: AI ceza sorusu için site içeriğinden doğru ceza süresini bulup yanıtlamalı
- * - 6.2: Olay anlatımı için ihlali analiz etmeli, uygun cezayı belirtmeli
- * - 6.3: Ceza maddesini, süreyi, gerekçeyi ve alternatif durumları belirtmeli
- * - 6.4: Sadece "Yetkili Kılavuzu v2" içeriğine dayalı yanıtlar vermeli
- * - 6.5: Emin değilse "Bu durumda üst yetkililere danışılmalıdır." yanıtını vermeli
+ * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
+ * - 4.1: OPENAI_API_KEY yoksa fallback mock yanıtlar kullan
+ * - 4.2: API hatası olduğunda kullanıcı dostu hata mesajı göster
+ * - 4.3: API key kontrolü yap
+ * - 4.4: Mock modda keyword bazlı yanıtlar ver
+ * - 4.5: AI servisi kullanılamıyorsa kullanıcıyı bilgilendir
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,6 +18,7 @@ import {
   type AIResponse,
   type PenaltyRecord,
   isAIServiceAvailable,
+  generateEnhancedMockResponse,
 } from '@/lib/ai-assistant';
 
 /**
@@ -54,6 +55,7 @@ interface ChatResponseBody {
 /**
  * POST /api/ai/chat
  * AI sohbet endpoint'i
+ * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
  */
 export const POST = withAuth<ChatResponseBody>(
   async (request: NextRequest, { user: _user }) => {
@@ -120,14 +122,36 @@ export const POST = withAuth<ChatResponseBody>(
       }
 
       // AI servisinin kullanılabilirliğini kontrol et
-      const useMock = !isAIServiceAvailable();
+      const aiAvailable = isAIServiceAvailable();
+      const useMock = !aiAvailable;
+
+      // Mock modda olduğumuzu logla (debug için)
+      if (useMock) {
+        console.log('AI Chat: Mock mod aktif (OPENAI_API_KEY yapılandırılmamış)');
+      }
 
       // AI yanıtı oluştur
-      const aiResponse: AIResponse = await chat({
-        message,
-        conversationHistory,
-        useMock,
-      });
+      let aiResponse: AIResponse;
+      
+      try {
+        aiResponse = await chat({
+          message,
+          conversationHistory,
+          useMock,
+        });
+      } catch (chatError) {
+        // Chat fonksiyonu hata verirse, fallback olarak enhanced mock yanıt kullan
+        console.error('AI Chat error, falling back to mock:', chatError);
+        
+        const mockResponse = generateEnhancedMockResponse(message);
+        return NextResponse.json({
+          success: true,
+          response: mockResponse,
+          sources: [],
+          confidence: 'medium' as const,
+          _mockMode: true,
+        });
+      }
 
       // Başarılı yanıt
       return NextResponse.json({
@@ -142,20 +166,47 @@ export const POST = withAuth<ChatResponseBody>(
           relevanceScore: source.relevanceScore,
         })),
         confidence: aiResponse.confidence,
+        _mockMode: useMock,
       });
     } catch (error) {
       console.error('AI Chat error:', error);
 
-      // OpenAI API hatası
-      if (error instanceof Error && error.message.includes('AI servisi')) {
+      // JSON parse hatası
+      if (error instanceof SyntaxError) {
         return NextResponse.json(
           {
             success: false,
-            error: 'AI servisi şu anda kullanılamıyor, lütfen daha sonra tekrar deneyin',
-            code: 'AI_SERVICE_ERROR',
+            error: 'Geçersiz istek formatı',
+            code: 'INVALID_JSON',
           },
-          { status: 503 }
+          { status: 400 }
         );
+      }
+
+      // OpenAI API hatası
+      if (error instanceof Error && error.message.includes('AI servisi')) {
+        // Fallback: Mock yanıt döndür
+        try {
+          const body = await request.clone().json();
+          const mockResponse = generateEnhancedMockResponse(body.message || '');
+          return NextResponse.json({
+            success: true,
+            response: mockResponse,
+            sources: [],
+            confidence: 'medium' as const,
+            _mockMode: true,
+            _fallback: true,
+          });
+        } catch {
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'AI servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin veya kılavuzu manuel olarak inceleyin.',
+              code: 'AI_SERVICE_ERROR',
+            },
+            { status: 503 }
+          );
+        }
       }
 
       // Rate limit hatası
@@ -163,18 +214,35 @@ export const POST = withAuth<ChatResponseBody>(
         return NextResponse.json(
           {
             success: false,
-            error: 'Çok fazla istek gönderildi, lütfen bekleyin',
+            error: 'Çok fazla istek gönderildi, lütfen birkaç saniye bekleyin',
             code: 'RATE_LIMIT',
           },
           { status: 429 }
         );
       }
 
-      // Genel hata
+      // Genel hata - fallback olarak mock yanıt dene
+      try {
+        const body = await request.clone().json();
+        if (body.message) {
+          const mockResponse = generateEnhancedMockResponse(body.message);
+          return NextResponse.json({
+            success: true,
+            response: mockResponse,
+            sources: [],
+            confidence: 'low' as const,
+            _mockMode: true,
+            _fallback: true,
+          });
+        }
+      } catch {
+        // Fallback da başarısız oldu
+      }
+
       return NextResponse.json(
         {
           success: false,
-          error: 'Bir hata oluştu, lütfen tekrar deneyin',
+          error: 'Bir hata oluştu. Lütfen sorunuzu farklı şekilde sormayı deneyin.',
           code: 'INTERNAL_ERROR',
         },
         { status: 500 }
@@ -187,16 +255,18 @@ export const POST = withAuth<ChatResponseBody>(
 /**
  * GET /api/ai/chat
  * AI servis durumu kontrolü
+ * Requirements: 4.3, 4.5
  */
-export const GET = withAuth<{ available: boolean; message: string }>(
+export const GET = withAuth<{ available: boolean; message: string; mockMode: boolean }>(
   async () => {
     const available = isAIServiceAvailable();
 
     return NextResponse.json({
       available,
+      mockMode: !available,
       message: available
-        ? 'AI servisi kullanılabilir'
-        : 'AI servisi yapılandırılmamış (OPENAI_API_KEY eksik)',
+        ? 'AI servisi kullanılabilir (OpenAI API aktif)'
+        : 'AI servisi mock modda çalışıyor (OPENAI_API_KEY yapılandırılmamış). Temel sorulara yanıt verebilir.',
     });
   },
   { requiredRole: 'mod' }

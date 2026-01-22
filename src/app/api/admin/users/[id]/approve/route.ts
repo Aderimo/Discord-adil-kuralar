@@ -1,12 +1,13 @@
 // POST /api/admin/users/:id/approve - Kullanıcı onaylama
 // Requirement 3.2: Admin bir kullanıcıyı onaylar, durum "Onaylı" olur ve yetki seviyesi atanır
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import { withAdmin, type AuthenticatedApiHandler } from '@/lib/api-auth';
-import type { UserRole } from '@/types';
+import { canManageOwnerRole } from '@/lib/founder';
+import { notifyRoleChange } from '@/lib/notifications';
 
 interface ApproveRequest {
-  role: 'mod' | 'admin' | 'ust_yetkili';
+  role: string; // Dinamik rol kodu (reg, op, gk, council, gm, gm_plus, owner)
 }
 
 interface ApproveResponse {
@@ -17,13 +18,13 @@ interface ApproveResponse {
     username: string;
     email: string;
     status: string;
-    role: string;
+    role: string | null;
   };
   error?: string;
 }
 
-// Geçerli roller
-const VALID_ROLES: UserRole[] = ['mod', 'admin', 'ust_yetkili'];
+// Geçerli roller - dinamik rol sistemi
+const VALID_ROLES = ['reg', 'op', 'gk', 'council', 'gm', 'gm_plus', 'owner', 'mod', 'admin', 'ust_yetkili'];
 
 const handler: AuthenticatedApiHandler<ApproveResponse> = async (
   request: NextRequest,
@@ -64,7 +65,33 @@ const handler: AuthenticatedApiHandler<ApproveResponse> = async (
       return NextResponse.json(
         {
           success: false,
-          error: 'Geçerli bir yetki seviyesi belirtilmelidir (mod, admin, ust_yetkili)',
+          error: 'Geçerli bir yetki seviyesi belirtilmelidir',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Owner rolü kontrolü - sadece founder atayabilir
+    if (!canManageOwnerRole(adminUser.email, role)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Owner rolünü sadece site kurucusu atayabilir',
+        },
+        { status: 403 }
+      );
+    }
+
+    // Rol ID'sini bul
+    const targetRole = await prisma.role.findUnique({
+      where: { code: role },
+    });
+
+    if (!targetRole) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `"${role}" rolü bulunamadı`,
         },
         { status: 400 }
       );
@@ -101,7 +128,7 @@ const handler: AuthenticatedApiHandler<ApproveResponse> = async (
       where: { id: userId },
       data: {
         status: 'approved',
-        role: role,
+        roleId: targetRole.id,
         updatedAt: new Date(),
       },
       select: {
@@ -109,7 +136,7 @@ const handler: AuthenticatedApiHandler<ApproveResponse> = async (
         username: true,
         email: true,
         status: true,
-        role: true,
+        roleId: true,
       },
     });
 
@@ -124,17 +151,34 @@ const handler: AuthenticatedApiHandler<ApproveResponse> = async (
           assignedRole: role,
           previousStatus: targetUser.status,
         }),
-        ipAddress: request.headers.get('x-forwarded-for') || 
-                   request.headers.get('x-real-ip') || 
-                   'unknown',
+        ipAddress: request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          'unknown',
       },
     });
+
+    // Bildirim gönder
+    try {
+      await notifyRoleChange({
+        id: targetUser.id,
+        username: targetUser.username,
+        email: targetUser.email,
+      }, null, role, adminUser.username);
+    } catch {
+      // Bildirim hatası kritik değil
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: `${targetUser.username} kullanıcısı ${role} yetkisiyle onaylandı`,
-        user: updatedUser,
+        message: `${targetUser.username} kullanıcısı ${targetRole.name} yetkisiyle onaylandı`,
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          status: updatedUser.status,
+          role: role,
+        },
       },
       { status: 200 }
     );

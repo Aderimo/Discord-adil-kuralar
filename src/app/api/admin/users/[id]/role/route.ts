@@ -1,12 +1,14 @@
 // PUT /api/admin/users/:id/role - Yetki seviyesi değiştirme
 // Requirement 3.4: Admin yetki seviyesi değiştirir, değişiklik kaydedilir ve log oluşturulur
+// Requirement 11.7: Dinamik rol atama
+// Requirement 11.8: Owner rolü koruması
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { withAdmin, type AuthenticatedApiHandler } from '@/lib/api-auth';
-import type { UserRole } from '@/types';
+import { notifyRoleChange } from '@/lib/notifications';
 
 interface RoleChangeRequest {
-  role: 'mod' | 'admin' | 'ust_yetkili';
+  role: string; // Dinamik rol kodu
 }
 
 interface RoleChangeResponse {
@@ -17,13 +19,10 @@ interface RoleChangeResponse {
     username: string;
     email: string;
     status: string;
-    role: string;
+    role: string | null;
   };
   error?: string;
 }
-
-// Geçerli roller
-const VALID_ROLES: UserRole[] = ['mod', 'admin', 'ust_yetkili'];
 
 const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
   request: NextRequest,
@@ -57,22 +56,56 @@ const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
       );
     }
 
-    const { role: newRole } = body;
+    const { role: newRoleCode } = body;
 
-    // Rol validasyonu
-    if (!newRole || !VALID_ROLES.includes(newRole)) {
+    // Rol kodu validasyonu
+    if (!newRoleCode) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Geçerli bir yetki seviyesi belirtilmelidir (mod, admin, ust_yetkili)',
+          error: 'Rol kodu belirtilmelidir',
         },
         { status: 400 }
       );
     }
 
+    // Yeni rolü veritabanından bul
+    const newRole = await prisma.role.findUnique({
+      where: { code: newRoleCode },
+    });
+
+    if (!newRole) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Geçersiz rol kodu',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Owner rolü koruması - Requirement 11.8
+    // Sadece mevcut owner'lar owner rolü atayabilir
+    if (newRoleCode === 'owner') {
+      const adminRole = await prisma.role.findFirst({
+        where: { id: adminUser.roleId || '' },
+      });
+
+      if (!adminRole || adminRole.code !== 'owner') {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Owner rolü sadece mevcut owner\'lar tarafından atanabilir',
+          },
+          { status: 403 }
+        );
+      }
+    }
+
     // Kullanıcıyı bul
     const targetUser = await prisma.user.findUnique({
       where: { id: userId },
+      include: { role: true },
     });
 
     if (!targetUser) {
@@ -97,11 +130,11 @@ const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
     }
 
     // Aynı rol mu kontrol et
-    if (targetUser.role === newRole) {
+    if (targetUser.roleId === newRole.id) {
       return NextResponse.json(
         {
           success: false,
-          error: `Kullanıcı zaten ${newRole} yetkisine sahip`,
+          error: `Kullanıcı zaten ${newRole.name} yetkisine sahip`,
         },
         { status: 400 }
       );
@@ -113,7 +146,7 @@ const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        role: newRole,
+        roleId: newRole.id,
         updatedAt: new Date(),
       },
       select: {
@@ -121,7 +154,12 @@ const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
         username: true,
         email: true,
         status: true,
-        role: true,
+        role: {
+          select: {
+            code: true,
+            name: true,
+          },
+        },
       },
     });
 
@@ -133,8 +171,10 @@ const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
         details: JSON.stringify({
           targetUserId: userId,
           targetUsername: targetUser.username,
-          previousRole: previousRole,
-          newRole: newRole,
+          previousRole: previousRole?.code || null,
+          previousRoleName: previousRole?.name || null,
+          newRole: newRole.code,
+          newRoleName: newRole.name,
         }),
         ipAddress: request.headers.get('x-forwarded-for') || 
                    request.headers.get('x-real-ip') || 
@@ -142,11 +182,28 @@ const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
       },
     });
 
+    // Bildirim gönder
+    try {
+      await notifyRoleChange(
+        { id: targetUser.id, username: targetUser.username },
+        { code: newRole.code, name: newRole.name },
+        { id: adminUser.id, username: adminUser.username }
+      );
+    } catch (notificationError) {
+      console.error('Bildirim gönderilemedi:', notificationError);
+    }
+
     return NextResponse.json(
       {
         success: true,
-        message: `${targetUser.username} kullanıcısının yetkisi ${previousRole} -> ${newRole} olarak değiştirildi`,
-        user: updatedUser,
+        message: `${targetUser.username} kullanıcısının yetkisi ${previousRole?.name || 'Yok'} -> ${newRole.name} olarak değiştirildi`,
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          status: updatedUser.status,
+          role: updatedUser.role?.code || null,
+        },
       },
       { status: 200 }
     );

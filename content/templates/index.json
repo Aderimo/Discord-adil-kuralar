@@ -1,0 +1,24 @@
+{
+  "templates": [
+    {
+      "id": "tpl-001",
+      "name": "Çalıntı Hesap",
+      "category": "ban",
+      "message": "çalıntı hesap, hesabın çalındığından dolayı seni sunucudan uzaklaştırmak durumunda kaldık. eğer hesabını geri alırsan, moderatörlerimize ulaşıp banını açtırabilirsin.",
+      "editableBy": ["ust_yetkili"],
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "tpl-002",
+      "name": "Underage",
+      "category": "ban",
+      "message": "underage, discord sözleşmesi nedeniyle 13 altı kullanıcı yasak. 13 yaşına bastığında bir moda kimliğinin tarih kısmını atarak banını kaldırabilirsin.",
+      "editableBy": ["ust_yetkili"],
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    }
+  ],
+  "lastUpdated": "2024-01-15T00:00:00.000Z",
+  "version": "1.0.0"
+}

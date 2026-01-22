@@ -2,12 +2,13 @@
 
 /**
  * MainLayout - Ana layout bileşeni
- * 
+ *
  * Sol sidebar + ana içerik alanı yapısı
  * Responsive tasarım (mobil/tablet/masaüstü)
  * Discord uyumlu koyu tema
- * 
- * Requirements: 8.1, 8.2, 8.3
+ * Bildirim sistemi entegrasyonu
+ *
+ * Requirements: 8.1, 8.2, 8.3, 9.3
  */
 
 import React, { useState, useCallback } from 'react';
@@ -30,6 +31,8 @@ import {
   Shield,
   ChevronDown,
 } from 'lucide-react';
+import { NotificationBell } from '@/components/notifications';
+import { hasPermission } from '@/lib/rbac';
 
 // Props interface
 export interface MainLayoutProps {
@@ -37,17 +40,33 @@ export interface MainLayoutProps {
   sidebar?: React.ReactNode;
 }
 
-// Rol etiketleri
+// Rol etiketleri - dinamik roller dahil
 const roleLabels: Record<string, string> = {
   none: 'Kullanıcı',
+  reg: 'Regülatör',
+  op: 'Operatör',
+  gk: 'GateKeeper',
+  council: 'Council',
+  gm: 'GM',
+  gm_plus: '🔖 GM+',
+  owner: 'Owner',
+  // Eski roller (geriye uyumluluk)
   mod: 'Moderatör',
   admin: 'Admin',
   ust_yetkili: 'Üst Yetkili',
 };
 
-// Rol renkleri
+// Rol renkleri - dinamik roller dahil
 const roleColors: Record<string, string> = {
   none: 'text-discord-muted',
+  reg: 'text-green-400',
+  op: 'text-blue-400',
+  gk: 'text-orange-400',
+  council: 'text-purple-400',
+  gm: 'text-red-400',
+  gm_plus: 'text-yellow-400',
+  owner: 'text-white',
+  // Eski roller (geriye uyumluluk)
   mod: 'text-discord-green',
   admin: 'text-discord-accent',
   ust_yetkili: 'text-discord-yellow',
@@ -56,6 +75,11 @@ const roleColors: Record<string, string> = {
 export function MainLayout({ children, sidebar }: MainLayoutProps): React.ReactElement {
   const { user, logout, isLoading } = useAuthContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Kullanıcının bildirim görüntüleme yetkisi var mı?
+  const canViewNotifications = user?.role
+    ? hasPermission(user.role, 'VIEW_NOTIFICATIONS')
+    : false;
 
   // Sidebar toggle
   const toggleSidebar = useCallback(() => {
@@ -106,9 +130,8 @@ export function MainLayout({ children, sidebar }: MainLayoutProps): React.ReactE
           </Button>
 
           {/* Logo / Başlık - Ana sayfaya link */}
-          {/* Requirement 12.3: Header'da her zaman ana sayfaya dönüş linki içermeli */}
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <Shield className="h-6 w-6 text-discord-accent" />
@@ -118,8 +141,13 @@ export function MainLayout({ children, sidebar }: MainLayoutProps): React.ReactE
           </Link>
         </div>
 
-        {/* Sağ taraf - Kullanıcı bilgisi */}
+        {/* Sağ taraf - Bildirimler ve Kullanıcı bilgisi */}
         <div className="flex items-center gap-2">
+          {/* Bildirim ikonu - sadece yetkili kullanıcılar için */}
+          {user && canViewNotifications && (
+            <NotificationBell className="text-discord-muted hover:text-discord-text" />
+          )}
+
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -134,8 +162,11 @@ export function MainLayout({ children, sidebar }: MainLayoutProps): React.ReactE
                     <span className="text-sm font-medium text-discord-text">
                       {user.username}
                     </span>
-                    <span className={`text-xs ${roleColors[user.role] || 'text-discord-muted'}`}>
-                      {roleLabels[user.role] || 'Kullanıcı'}
+                    <span
+                      className={`text-xs ${roleColors[user.role || ''] || 'text-discord-muted'
+                        }`}
+                    >
+                      {roleLabels[user.role || ''] || user.role || 'Kullanıcı'}
                     </span>
                   </div>
                   <ChevronDown className="h-4 w-4 text-discord-muted" />
@@ -145,14 +176,20 @@ export function MainLayout({ children, sidebar }: MainLayoutProps): React.ReactE
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
                     <span className="font-medium">{user.username}</span>
-                    <span className="text-xs text-discord-muted">{user.email}</span>
+                    <span className="text-xs text-discord-muted">
+                      {user.email}
+                    </span>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="sm:hidden">
                   <User className="mr-2 h-4 w-4" />
-                  <span className={roleColors[user.role] || 'text-discord-muted'}>
-                    {roleLabels[user.role] || 'Kullanıcı'}
+                  <span
+                    className={
+                      roleColors[user.role || ''] || 'text-discord-muted'
+                    }
+                  >
+                    {roleLabels[user.role || ''] || user.role || 'Kullanıcı'}
                   </span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="sm:hidden" />
@@ -200,9 +237,7 @@ export function MainLayout({ children, sidebar }: MainLayoutProps): React.ReactE
 
         {/* Ana içerik */}
         <main className="flex-1 overflow-y-auto bg-discord-darker">
-          <div className="h-full w-full">
-            {children}
-          </div>
+          <div className="h-full w-full">{children}</div>
         </main>
       </div>
     </div>

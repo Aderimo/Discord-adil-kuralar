@@ -78,7 +78,7 @@ const handler: AuthenticatedApiHandler<RejectResponse> = async (
       where: { id: userId },
       data: {
         status: 'rejected',
-        role: 'none', // Rol sıfırla
+        roleId: null, // Rol sıfırla
         updatedAt: new Date(),
       },
       select: {
@@ -101,9 +101,9 @@ const handler: AuthenticatedApiHandler<RejectResponse> = async (
           previousRole: targetUser.role,
           reason: reason || 'Sebep belirtilmedi',
         }),
-        ipAddress: request.headers.get('x-forwarded-for') || 
-                   request.headers.get('x-real-ip') || 
-                   'unknown',
+        ipAddress: request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          'unknown',
       },
     });
 

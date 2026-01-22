@@ -16,6 +16,8 @@ import * as fc from 'fast-check';
 import {
   chat,
   createPenaltyRecord,
+  generateEnhancedMockResponse,
+  MOCK_RESPONSES,
   type ChatRequest,
   type AIResponse,
   type PenaltyRecord,
@@ -1939,4 +1941,302 @@ describe('Property Tests: AI - Ceza Kaydı Discord Uyumluluğu (Property 10 Ek)'
     },
     30000
   );
+});
+
+
+/**
+ * Property 4: AI Mock Response Keyword Matching
+ * Feature: yetkili-kilavuzu-v2-guncelleme, Property 4
+ *
+ * Bu test, mock mod aktifken keyword bazlı yanıt sistemini doğrular:
+ * - Ceza ile ilgili keyword'ler için ilgili yanıt döndürülmeli
+ * - Yanıtlar kullanıcı dostu ve bilgilendirici olmalı
+ *
+ * **Validates: Requirements 4.3, 4.4**
+ */
+
+describe('Property Tests: AI Mock Response Keyword Matching (Property 4)', () => {
+  /**
+   * Property 4a: Her tanımlı keyword için ilgili yanıt döndürülmeli
+   *
+   * *Herhangi bir* MOCK_RESPONSES'ta tanımlı keyword için,
+   * generateEnhancedMockResponse ilgili yanıtı döndürmelidir.
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4a: Her tanımlı keyword için ilgili yanıt döndürülmeli', () => {
+    // Tüm keyword'leri topla
+    const allKeywords: { keyword: string; expectedResponse: string }[] = [];
+    
+    for (const [, config] of Object.entries(MOCK_RESPONSES)) {
+      for (const keyword of config.keywords) {
+        allKeywords.push({
+          keyword,
+          expectedResponse: config.response,
+        });
+      }
+    }
+
+    fc.assert(
+      fc.property(
+        fc.constantFrom(...allKeywords),
+        ({ keyword, expectedResponse }) => {
+          // Keyword'ü içeren bir mesaj oluştur
+          const message = `${keyword} hakkında bilgi ver`;
+          const response = generateEnhancedMockResponse(message);
+
+          // Property: Yanıt beklenen yanıtla eşleşmeli
+          expect(response).toBe(expectedResponse);
+
+          return true;
+        }
+      ),
+      { numRuns: allKeywords.length }
+    );
+  });
+
+  /**
+   * Property 4b: Hakaret keyword'leri için hakaret yanıtı döndürülmeli
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4b: Hakaret keyword\'leri için hakaret yanıtı döndürülmeli', () => {
+    const hakaretKeywords = ['hakaret', 'küfür', 'sövme', 'argo', 'kaba'];
+
+    fc.assert(
+      fc.property(fc.constantFrom(...hakaretKeywords), (keyword) => {
+        const message = `Birisi ${keyword} yaptı ne yapmalıyım?`;
+        const response = generateEnhancedMockResponse(message);
+
+        // Property 1: Yanıt hakaret ile ilgili olmalı
+        expect(response.toLowerCase()).toContain('hakaret');
+
+        // Property 2: Yanıt ceza bilgisi içermeli
+        expect(response).toContain('CEZA KAYDI');
+
+        // Property 3: Yanıt süre bilgisi içermeli
+        expect(response.toLowerCase()).toContain('gün');
+
+        return true;
+      }),
+      { numRuns: hakaretKeywords.length }
+    );
+  });
+
+  /**
+   * Property 4c: Spam keyword'leri için spam yanıtı döndürülmeli
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4c: Spam keyword\'leri için spam yanıtı döndürülmeli', () => {
+    const spamKeywords = ['spam', 'flood', 'tekrar', 'caps'];
+
+    fc.assert(
+      fc.property(fc.constantFrom(...spamKeywords), (keyword) => {
+        const message = `Kullanıcı ${keyword} yapıyor`;
+        const response = generateEnhancedMockResponse(message);
+
+        // Property 1: Yanıt spam ile ilgili olmalı
+        expect(response.toLowerCase()).toContain('spam');
+
+        // Property 2: Yanıt ceza bilgisi içermeli
+        expect(response).toContain('CEZA KAYDI');
+
+        return true;
+      }),
+      { numRuns: spamKeywords.length }
+    );
+  });
+
+  /**
+   * Property 4d: Reklam keyword'leri için reklam yanıtı döndürülmeli
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4d: Reklam keyword\'leri için reklam yanıtı döndürülmeli', () => {
+    const reklamKeywords = ['reklam', 'tanıtım', 'link', 'davet', 'invite'];
+
+    fc.assert(
+      fc.property(fc.constantFrom(...reklamKeywords), (keyword) => {
+        const message = `Birisi ${keyword} paylaştı`;
+        const response = generateEnhancedMockResponse(message);
+
+        // Property 1: Yanıt reklam ile ilgili olmalı
+        expect(response.toLowerCase()).toContain('reklam');
+
+        // Property 2: Yanıt ceza bilgisi içermeli
+        expect(response).toContain('CEZA KAYDI');
+
+        return true;
+      }),
+      { numRuns: reklamKeywords.length }
+    );
+  });
+
+  /**
+   * Property 4e: Underage keyword'leri için underage yanıtı döndürülmeli
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4e: Underage keyword\'leri için underage yanıtı döndürülmeli', () => {
+    const underageKeywords = ['underage', 'yaş', '13', 'küçük'];
+
+    fc.assert(
+      fc.property(fc.constantFrom(...underageKeywords), (keyword) => {
+        const message = `Kullanıcı ${keyword} ile ilgili sorun var`;
+        const response = generateEnhancedMockResponse(message);
+
+        // Property 1: Yanıt underage ile ilgili olmalı
+        expect(response.toLowerCase()).toContain('underage');
+
+        // Property 2: Yanıt ban mesajı şablonu içermeli
+        expect(response.toLowerCase()).toContain('ban mesajı şablonu');
+
+        return true;
+      }),
+      { numRuns: underageKeywords.length }
+    );
+  });
+
+  /**
+   * Property 4f: Çalıntı hesap keyword'leri için çalıntı yanıtı döndürülmeli
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4f: Çalıntı hesap keyword\'leri için çalıntı yanıtı döndürülmeli', () => {
+    const calintiKeywords = ['çalıntı', 'calinti', 'hack', 'ele geçir'];
+
+    fc.assert(
+      fc.property(fc.constantFrom(...calintiKeywords), (keyword) => {
+        const message = `Hesap ${keyword} olmuş olabilir`;
+        const response = generateEnhancedMockResponse(message);
+
+        // Property 1: Yanıt çalıntı hesap ile ilgili olmalı
+        expect(response.toLowerCase()).toContain('çalıntı hesap');
+
+        // Property 2: Yanıt ban mesajı şablonu içermeli
+        expect(response.toLowerCase()).toContain('ban mesajı şablonu');
+
+        return true;
+      }),
+      { numRuns: calintiKeywords.length }
+    );
+  });
+
+  /**
+   * Property 4g: Bilinmeyen keyword'ler için varsayılan yanıt döndürülmeli
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4g: Bilinmeyen keyword\'ler için varsayılan yanıt döndürülmeli', () => {
+    // Bu sorgular hiçbir MOCK_RESPONSES keyword'üne eşleşmemeli
+    // Kaçınılması gereken keyword'ler:
+    // hakaret, küfür, sövme, argo, kaba, spam, flood, tekrar, mesaj, caps,
+    // reklam, tanıtım, link, davet, invite, underage, yaş, 13, küçük, çocuk,
+    // çalıntı, calinti, hack, hesap, ele geçir, mute, sustur, susturma, timeout,
+    // ban, yasakla, banla, uzaklaştır, komut, command, nasıl, kullan
+    const unknownQueries = [
+      'xyz123 nedir',
+      'rastgele soru',
+      'alakasız konu',
+      'bilinmeyen durum',
+      'merhaba selam',
+      'bugün ne yapsam',
+      'genel bilgi istiyorum',
+      'test abc def',
+    ];
+
+    fc.assert(
+      fc.property(fc.constantFrom(...unknownQueries), (query) => {
+        const response = generateEnhancedMockResponse(query);
+
+        // Property 1: Varsayılan yanıt döndürülmeli
+        expect(response).toContain('Bu konuda yeterli bilgi bulunamadı');
+
+        // Property 2: Yardımcı olabileceği konular listelenmeli
+        expect(response).toContain('Yardımcı olabileceğim konular');
+
+        // Property 3: Üst yetkililere danışma önerisi olmalı
+        expect(response).toContain('üst yetkililere danışabilirsiniz');
+
+        return true;
+      }),
+      { numRuns: unknownQueries.length }
+    );
+  });
+
+  /**
+   * Property 4h: Tüm mock yanıtlar boş olmamalı
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4h: Tüm mock yanıtlar boş olmamalı', () => {
+    fc.assert(
+      fc.property(fc.string({ minLength: 1, maxLength: 200 }), (message) => {
+        const response = generateEnhancedMockResponse(message);
+
+        // Property 1: Yanıt tanımlı olmalı
+        expect(response).toBeDefined();
+
+        // Property 2: Yanıt boş olmamalı
+        expect(response.length).toBeGreaterThan(0);
+
+        // Property 3: Yanıt string olmalı
+        expect(typeof response).toBe('string');
+
+        return true;
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  /**
+   * Property 4i: Komut keyword'leri için komut yanıtı döndürülmeli
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4i: Komut keyword\'leri için komut yanıtı döndürülmeli', () => {
+    const komutKeywords = ['komut', 'command', 'nasıl', 'kullan'];
+
+    fc.assert(
+      fc.property(fc.constantFrom(...komutKeywords), (keyword) => {
+        const message = `${keyword} hakkında bilgi`;
+        const response = generateEnhancedMockResponse(message);
+
+        // Property 1: Yanıt komut bilgisi içermeli
+        expect(response.toLowerCase()).toContain('komut');
+
+        // Property 2: Yanıt örnek komutlar içermeli
+        expect(response).toContain('h!');
+
+        return true;
+      }),
+      { numRuns: komutKeywords.length }
+    );
+  });
+
+  /**
+   * Property 4j: Ban keyword'leri için ban yanıtı döndürülmeli
+   *
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  it('Property 4j: Ban keyword\'leri için ban yanıtı döndürülmeli', () => {
+    const banKeywords = ['ban', 'yasakla', 'banla', 'uzaklaştır'];
+
+    fc.assert(
+      fc.property(fc.constantFrom(...banKeywords), (keyword) => {
+        const message = `Kullanıcıyı ${keyword} etmem gerekiyor`;
+        const response = generateEnhancedMockResponse(message);
+
+        // Property 1: Yanıt ban ile ilgili olmalı
+        expect(response.toLowerCase()).toContain('ban');
+
+        // Property 2: Yanıt komut bilgisi içermeli
+        expect(response).toContain('h!ban');
+
+        return true;
+      }),
+      { numRuns: banKeywords.length }
+    );
+  });
 });

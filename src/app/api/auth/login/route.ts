@@ -2,8 +2,8 @@
 // Requirement 1.2: Geçerli kimlik bilgileriyle giriş yapıldığında oturum başlatmalı
 // Requirement 1.3: Geçersiz kimlik bilgileriyle giriş reddedilmeli
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSession, isValidEmail } from '@/lib/auth';
+import prisma from '@/lib/prisma';
 
 interface LoginRequest {
   email: string;
@@ -15,7 +15,7 @@ interface UserInfo {
   username: string;
   email: string;
   status: string;
-  role: string;
+  role: string | null;
 }
 
 interface LoginResponse {
@@ -52,9 +52,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
       );
     }
 
-    // Kullanıcıyı bul
-    const user = await prisma.user.findUnique({
+    // Kullanıcıyı bul - role relation ile birlikte
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const user = await (prisma.user.findUnique as any)({
       where: { email },
+      include: {
+        role: true,
+      },
     });
 
     // Kullanıcı bulunamadı - AUTH_004
@@ -80,10 +84,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
       );
     }
 
+    // Rol kodunu çıkar (yeni şema: role relation, eski şema: role string)
+    let roleCode: string | null = null;
+    if (typeof user.role === 'string') {
+      // Eski şema
+      roleCode = user.role;
+    } else if (user.role && typeof user.role === 'object') {
+      // Yeni şema - role relation
+      roleCode = user.role.code;
+    }
+
     // Oturum oluştur - kullanıcı bilgileriyle birlikte (RBAC middleware için)
     const session = await createSession(
-      user.id, 
-      user.role as 'none' | 'mod' | 'admin' | 'ust_yetkili',
+      user.id,
+      roleCode || 'none',
       user.status as 'pending' | 'approved' | 'rejected'
     );
 
@@ -99,7 +113,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
       username: user.username,
       email: user.email,
       status: user.status,
-      role: user.role,
+      role: roleCode,
     };
 
     // Response oluştur
@@ -115,7 +129,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     // Cookie'yi server-side set et (middleware için gerekli)
     const expires = new Date();
     expires.setDate(expires.getDate() + 7); // 7 gün
-    
+
     response.cookies.set('auth_token', session.token, {
       httpOnly: false, // Client-side erişim için false
       secure: process.env.NODE_ENV === 'production',

@@ -44,6 +44,7 @@ import {
   getIPActivity,
   getLoginLogs,
   getRoleChangeLogs,
+  exportLogs,
 } from '@/lib/logging';
 
 describe('Logging Service', () => {
@@ -633,6 +634,177 @@ describe('Logging Service', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('exportLogs - Requirement 7.4', () => {
+    const mockTimestamp = new Date('2024-01-15T10:30:00.000Z');
+    
+    const mockLogs = [
+      {
+        id: 'log-1',
+        userId: 'user-1',
+        action: 'login',
+        details: '{"event":"user_login"}',
+        ipAddress: '192.168.1.1',
+        timestamp: mockTimestamp,
+      },
+      {
+        id: 'log-2',
+        userId: 'user-2',
+        action: 'logout',
+        details: '{"event":"user_logout"}',
+        ipAddress: '192.168.1.2',
+        timestamp: mockTimestamp,
+      },
+    ];
+
+    beforeEach(() => {
+      mockCount.mockResolvedValue(2);
+      mockFindMany.mockResolvedValue(mockLogs);
+    });
+
+    it('JSON formatında export etmeli', async () => {
+      const result = await exportLogs({}, 'json');
+      
+      const parsed = JSON.parse(result);
+      expect(parsed).toHaveLength(2);
+      expect(parsed[0].id).toBe('log-1');
+      expect(parsed[0].action).toBe('login');
+      expect(parsed[1].id).toBe('log-2');
+    });
+
+    it('CSV formatında export etmeli', async () => {
+      const result = await exportLogs({}, 'csv');
+      
+      const lines = result.split('\n');
+      expect(lines[0]).toBe('ID,Kullanıcı,İşlem,Detay,IP,Tarih');
+      expect(lines.length).toBe(3); // header + 2 data rows
+    });
+
+    it('CSV header doğru olmalı', async () => {
+      const result = await exportLogs({}, 'csv');
+      
+      const header = result.split('\n')[0];
+      expect(header).toContain('ID');
+      expect(header).toContain('Kullanıcı');
+      expect(header).toContain('İşlem');
+      expect(header).toContain('Detay');
+      expect(header).toContain('IP');
+      expect(header).toContain('Tarih');
+    });
+
+    it('CSV virgül içeren değerleri escape etmeli', async () => {
+      const logsWithComma = [
+        {
+          id: 'log-1',
+          userId: 'user-1',
+          action: 'login',
+          details: '{"message":"test, with comma"}',
+          ipAddress: '192.168.1.1',
+          timestamp: mockTimestamp,
+        },
+      ];
+      
+      mockCount.mockResolvedValue(1);
+      mockFindMany.mockResolvedValue(logsWithComma);
+
+      const result = await exportLogs({}, 'csv');
+      
+      // Virgül içeren değer tırnak içinde olmalı
+      expect(result).toContain('"');
+    });
+
+    it('CSV tırnak içeren değerleri escape etmeli', async () => {
+      const logsWithQuote = [
+        {
+          id: 'log-1',
+          userId: 'user-1',
+          action: 'login',
+          details: '{"message":"test \\"quoted\\" value"}',
+          ipAddress: '192.168.1.1',
+          timestamp: mockTimestamp,
+        },
+      ];
+      
+      mockCount.mockResolvedValue(1);
+      mockFindMany.mockResolvedValue(logsWithQuote);
+
+      const result = await exportLogs({}, 'csv');
+      
+      // Tırnak çift tırnak ile escape edilmeli
+      expect(result).toContain('""');
+    });
+
+    it('CSV yeni satır içeren değerleri escape etmeli', async () => {
+      const logsWithNewline = [
+        {
+          id: 'log-1',
+          userId: 'user-1',
+          action: 'login',
+          details: '{"message":"line1\\nline2"}',
+          ipAddress: '192.168.1.1',
+          timestamp: mockTimestamp,
+        },
+      ];
+      
+      mockCount.mockResolvedValue(1);
+      mockFindMany.mockResolvedValue(logsWithNewline);
+
+      const result = await exportLogs({}, 'csv');
+      
+      // Yeni satır içeren değer tırnak içinde olmalı
+      const lines = result.split('\n');
+      expect(lines[0]).toBe('ID,Kullanıcı,İşlem,Detay,IP,Tarih');
+    });
+
+    it('büyük veri setleri için pageSize 10000 kullanmalı', async () => {
+      await exportLogs({ userId: 'user-1' }, 'json');
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: 10000,
+        })
+      );
+    });
+
+    it('filtreleri uygulamalı', async () => {
+      const startDate = new Date('2024-01-01');
+      const endDate = new Date('2024-01-31');
+
+      await exportLogs({
+        userId: 'user-1',
+        action: 'login',
+        startDate,
+        endDate,
+      }, 'json');
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            userId: 'user-1',
+            action: 'login',
+          }),
+        })
+      );
+    });
+
+    it('boş log listesi için boş JSON array döndürmeli', async () => {
+      mockCount.mockResolvedValue(0);
+      mockFindMany.mockResolvedValue([]);
+
+      const result = await exportLogs({}, 'json');
+      
+      expect(JSON.parse(result)).toEqual([]);
+    });
+
+    it('boş log listesi için sadece header döndürmeli (CSV)', async () => {
+      mockCount.mockResolvedValue(0);
+      mockFindMany.mockResolvedValue([]);
+
+      const result = await exportLogs({}, 'csv');
+      
+      expect(result).toBe('ID,Kullanıcı,İşlem,Detay,IP,Tarih');
     });
   });
 });

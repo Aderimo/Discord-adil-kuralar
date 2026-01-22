@@ -1,52 +1,145 @@
-// RBAC (Role-Based Access Control) - Rol tabanlı erişim kontrolü
-// Requirement 2.1: Onaylanmamış veya yetkisiz kullanıcılar sadece engelleme mesajını görmeli
-// Requirement 2.2: Onaylı yetkili yetki seviyesine göre uygun içeriği görmeli
-// Requirement 2.3: "Beklemede" durumundaki kullanıcılar ana içeriğe erişememeli
-// Requirement 2.4: Her sayfa isteğinde kullanıcının yetki durumunu doğrulamalı
+/**
+ * RBAC (Role-Based Access Control) - Dinamik Rol Tabanlı Erişim Kontrolü
+ *
+ * Requirements:
+ * - Requirement 2.1: Onaylanmamış veya yetkisiz kullanıcılar sadece engelleme mesajını görmeli
+ * - Requirement 2.2: Onaylı yetkili yetki seviyesine göre uygun içeriği görmeli
+ * - Requirement 2.3: "Beklemede" durumundaki kullanıcılar ana içeriğe erişememeli
+ * - Requirement 2.4: Her sayfa isteğinde kullanıcının yetki durumunu doğrulamalı
+ * - Requirement 6.x: Dinamik rol yönetimi desteği
+ */
 
-import type { UserRole, UserStatus, User } from '@/types';
+import type { UserStatus, User, Role, Permission } from '@/types';
+import { hasRolePermission, getRoleByCode } from '@/lib/roles';
 
 /**
- * Yetki seviyesi hiyerarşisi
- * Daha yüksek sayı = daha yüksek yetki
+ * Eski tip uyumluluğu için UserRole
+ * Artık dinamik olarak string kabul eder
  */
-export const ROLE_HIERARCHY: Record<UserRole, number> = {
+export type UserRole = string;
+
+/**
+ * Yetki seviyesi hiyerarşisi - Geriye dönük uyumluluk için
+ * Dinamik sistemde veritabanından yüklenir
+ *
+ * @deprecated Dinamik rol sistemi kullanın: getRoleByCode()
+ */
+export const ROLE_HIERARCHY: Record<string, number> = {
   none: 0,
-  mod: 1,
-  admin: 2,
-  ust_yetkili: 3,
+  reg: 1,
+  op: 2,
+  gk: 3,
+  council: 4,
+  gm: 5,
+  gm_plus: 6,
+  owner: 7,
+  // Eski rolleri de destekle (geriye uyumluluk)
+  mod: 2,
+  admin: 5,
+  ust_yetkili: 7,
 } as const;
+
+/**
+ * İzin tanımları - Geriye dönük uyumluluk için
+ * Dinamik sistemde roller kendi izinlerini içerir
+ *
+ * @deprecated Dinamik rol sistemi kullanın: hasRolePermission()
+ */
+export const PERMISSIONS = {
+  // Görüntüleme izinleri
+  VIEW_CONTENT: ['reg', 'op', 'gk', 'council', 'gm', 'gm_plus', 'owner', 'mod', 'admin', 'ust_yetkili'] as const,
+  VIEW_USERS: ['gk', 'council', 'gm', 'gm_plus', 'owner', 'admin', 'ust_yetkili'] as const,
+  VIEW_LOGS: ['gm', 'gm_plus', 'owner', 'ust_yetkili'] as const,
+  VIEW_NOTIFICATIONS: ['gm_plus', 'owner', 'ust_yetkili'] as const,
+
+  // Düzenleme izinleri
+  EDIT_CONTENT: ['op', 'gk', 'council', 'gm', 'gm_plus', 'owner', 'admin', 'ust_yetkili'] as const,
+  EDIT_USERS: ['council', 'gm', 'gm_plus', 'owner', 'admin', 'ust_yetkili'] as const,
+  EDIT_TEMPLATES: ['gm_plus', 'owner', 'ust_yetkili'] as const,
+
+  // Silme izinleri
+  DELETE_CONTENT: ['gm_plus', 'owner', 'ust_yetkili'] as const,
+  DELETE_USERS: ['owner', 'ust_yetkili'] as const,
+
+  // Rol yönetimi
+  MANAGE_ROLES: ['owner', 'ust_yetkili'] as const,
+} as const;
+
+/**
+ * İzin tipi - export
+ */
+export type { Permission };
+
+/**
+ * Kullanıcının belirli bir izne sahip olup olmadığını kontrol eder
+ * Dinamik rol verisini tercih eder, yoksa statik listeye bakar
+ */
+export function hasPermission(
+  userRole: UserRole | null,
+  permission: Permission,
+  roleData?: Role | null
+): boolean {
+  // Rol yoksa izin yok
+  if (!userRole) {
+    return false;
+  }
+
+  // Dinamik rol verisi varsa onu kullan
+  if (roleData) {
+    return hasRolePermission(roleData, permission);
+  }
+
+  // Statik listeye geri dön (geriye uyumluluk)
+  const allowedRoles = PERMISSIONS[permission];
+  if (!allowedRoles) {
+    return false;
+  }
+  return (allowedRoles as readonly string[]).includes(userRole);
+}
+
+/**
+ * Kullanıcının belirli bir izne sahip olup olmadığını async olarak kontrol eder
+ * Rol verisini veritabanından yükler
+ */
+export async function hasPermissionAsync(
+  userRole: UserRole | null,
+  permission: Permission
+): Promise<boolean> {
+  if (!userRole) {
+    return false;
+  }
+
+  try {
+    const role = await getRoleByCode(userRole);
+    return hasRolePermission(role, permission);
+  } catch {
+    // Veritabanı hatası durumunda statik listeye geri dön
+    return hasPermission(userRole, permission);
+  }
+}
 
 /**
  * Kullanıcının belirli bir role sahip olup olmadığını kontrol eder
  * Hiyerarşik kontrol yapar - üst roller alt rollerin yetkilerine sahiptir
- * 
- * @param userRole - Kullanıcının mevcut rolü
- * @param requiredRole - Gerekli minimum rol
- * @returns Kullanıcının gerekli role sahip olup olmadığı
- * 
- * @example
- * hasRole('admin', 'mod') // true - admin, mod yetkisine sahip
- * hasRole('mod', 'admin') // false - mod, admin yetkisine sahip değil
  */
-export function hasRole(userRole: UserRole, requiredRole: UserRole): boolean {
-  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+export function hasRole(userRole: UserRole | null, requiredRole: UserRole): boolean {
+  if (!userRole) {
+    return false;
+  }
+
+  const userHierarchy = ROLE_HIERARCHY[userRole] ?? 0;
+  const requiredHierarchy = ROLE_HIERARCHY[requiredRole] ?? 0;
+
+  return userHierarchy >= requiredHierarchy;
 }
 
 /**
  * Kullanıcının bir kaynağa erişip erişemeyeceğini kontrol eder
  * Hem durum (status) hem de rol kontrolü yapar
- * 
- * @param user - Kullanıcı objesi (null olabilir)
- * @param requiredRole - Gerekli minimum rol (varsayılan: 'mod')
- * @returns Erişim izni sonucu
- * 
- * @example
- * canAccess(user, 'admin') // { allowed: true/false, reason: '...' }
  */
 export function canAccess(
   user: User | null,
-  requiredRole: UserRole = 'mod'
+  requiredRole: UserRole = 'reg'
 ): { allowed: boolean; reason: AccessDeniedReason | null } {
   // Kullanıcı yok - giriş yapılmamış
   if (!user) {
@@ -64,8 +157,8 @@ export function canAccess(
 
   // Onaylı kullanıcı için rol kontrolü
   if (user.status === 'approved') {
-    // Rol 'none' ise erişim yok
-    if (user.role === 'none') {
+    // Rol yoksa erişim yok
+    if (!user.role) {
       return { allowed: false, reason: 'no_role' };
     }
 
@@ -155,24 +248,28 @@ export const DEFAULT_ROUTE_RULES: RouteProtection[] = [
   // Public rotalar - giriş yapmış kullanıcıları ana sayfaya yönlendir
   { pattern: '/login', isPublic: true, redirectIfAuthenticated: '/' },
   { pattern: '/register', isPublic: true, redirectIfAuthenticated: '/' },
-  
+  { pattern: '/forgot-password', isPublic: true },
+  { pattern: '/reset-password', isPublic: true },
+
   // Yetkisiz erişim sayfası - herkese açık
   { pattern: '/unauthorized', isPublic: true },
-  
+
   // Beklemede sayfası - sadece pending kullanıcılar için
   { pattern: '/pending', isPublic: false, allowedStatuses: ['pending'] },
-  
-  // Admin rotaları - sadece admin ve üstü
-  { pattern: /^\/admin(\/.*)?$/, requiredRole: 'admin' },
-  
+
+  // Admin rotaları - gm ve üstü
+  { pattern: /^\/admin\/settings(\/.*)?$/, requiredRole: 'owner' }, // Rol yönetimi sadece owner
+  { pattern: /^\/admin\/logs(\/.*)?$/, requiredRole: 'gm' }, // Log görüntüleme gm+
+  { pattern: /^\/admin(\/.*)?$/, requiredRole: 'gk' }, // Diğer admin işlemleri gk+
+
   // API rotaları - middleware tarafından işlenmez (API kendi auth'unu yapar)
   { pattern: /^\/api\//, isPublic: true },
-  
+
   // Statik dosyalar
   { pattern: /^\/_next\//, isPublic: true },
   { pattern: /^\/favicon\.ico$/, isPublic: true },
-  
-  // Diğer tüm rotalar - onaylı mod+ kullanıcılar için
+
+  // Diğer tüm rotalar - onaylı reg+ kullanıcılar için
   // Bu kural en sonda olmalı (catch-all)
 ];
 
@@ -212,9 +309,9 @@ export function checkRouteAccess(
 ): RouteAccessResult {
   const rule = findRouteRule(pathname);
 
-  // Kural bulunamadı - varsayılan olarak mod+ gerekli
+  // Kural bulunamadı - varsayılan olarak reg+ gerekli
   if (!rule) {
-    const access = canAccess(user, 'mod');
+    const access = canAccess(user, 'reg');
     if (!access.allowed && access.reason) {
       return {
         allowed: false,
@@ -263,9 +360,9 @@ export function checkRouteAccess(
   }
 
   // Standart erişim kontrolü
-  const requiredRole = rule.requiredRole || 'mod';
+  const requiredRole = rule.requiredRole || 'reg';
   const access = canAccess(user, requiredRole);
-  
+
   if (!access.allowed && access.reason) {
     return {
       allowed: false,
@@ -275,4 +372,52 @@ export function checkRouteAccess(
   }
 
   return { allowed: true };
+}
+
+/**
+ * Rol adını kullanıcı dostu formata çevirir
+ */
+export function getRoleDisplayName(roleCode: string | null): string {
+  if (!roleCode) return 'Rol Yok';
+
+  const roleNames: Record<string, string> = {
+    reg: 'Regülatör',
+    op: 'Operatör',
+    gk: 'GateKeeper',
+    council: 'Council',
+    gm: 'GM',
+    gm_plus: '🔖 GM+',
+    owner: 'Owner',
+    // Eski roller
+    none: 'Rol Yok',
+    mod: 'Moderatör',
+    admin: 'Admin',
+    ust_yetkili: 'Üst Yetkili',
+  };
+
+  return roleNames[roleCode] || roleCode;
+}
+
+/**
+ * Rol kısa adını döndürür
+ */
+export function getRoleShortName(roleCode: string | null): string {
+  if (!roleCode) return '-';
+
+  const shortNames: Record<string, string> = {
+    reg: 'REG',
+    op: 'OP',
+    gk: 'GK',
+    council: 'COUNCIL',
+    gm: 'GM',
+    gm_plus: 'GM+',
+    owner: 'OWNER',
+    // Eski roller
+    none: '-',
+    mod: 'MOD',
+    admin: 'ADMIN',
+    ust_yetkili: 'ÜST',
+  };
+
+  return shortNames[roleCode] || roleCode.toUpperCase();
 }

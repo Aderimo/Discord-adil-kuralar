@@ -2,7 +2,7 @@
  * İçerik Yükleme Servisi
  * Yetkili Kılavuzu, Cezalar, Komutlar ve Prosedürler için içerik yönetimi
  *
- * Requirements: 4.1, 4.3, 4.4, 10.2
+ * Requirements: 4.1, 4.3, 4.4, 8.1, 10.2
  */
 
 import {
@@ -19,17 +19,39 @@ import {
   PenaltyCategory,
 } from '@/types/content';
 
+import {
+  PenaltyTemplate,
+  TemplateCategory,
+} from '@/types/templates';
+
+// JSON dosyasından gelen ham şablon verisi tipi (tarihler string olarak gelir)
+interface RawTemplateData {
+  templates: Array<{
+    id: string;
+    name: string;
+    category: string;
+    message: string;
+    editableBy: string[];
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  lastUpdated: string;
+  version: string;
+}
+
 // İçerik dosyalarını import et
 import guideData from '../../content/guide/index.json';
 import penaltyData from '../../content/penalties/index.json';
 import commandData from '../../content/commands/index.json';
 import procedureData from '../../content/procedures/index.json';
+import templateData from '../../content/templates/index.json';
 
 // Cache için içerik depoları
 let guideCache: GuideContent[] | null = null;
 let penaltyCache: PenaltyDefinition[] | null = null;
 let commandCache: CommandDefinition[] | null = null;
 let procedureCache: ProcedureDefinition[] | null = null;
+let templateCache: PenaltyTemplate[] | null = null;
 
 /**
  * Tüm kılavuz içeriğini yükler
@@ -96,6 +118,63 @@ export function loadProcedures(): ProcedureDefinition[] {
   const data = procedureData as ProcedureIndex;
   procedureCache = data.items.sort((a, b) => (a.order || 0) - (b.order || 0));
   return procedureCache;
+}
+
+/**
+ * Tüm ceza şablonlarını yükler
+ * Requirement 8.1: THE System SHALL provide pre-defined ban message templates for common scenarios
+ *
+ * @returns PenaltyTemplate[] - Tarih stringleri Date objelerine dönüştürülmüş şablon dizisi
+ */
+export function loadTemplates(): PenaltyTemplate[] {
+  if (templateCache) {
+    return templateCache;
+  }
+
+  try {
+    const data = templateData as RawTemplateData;
+
+    // JSON'dan gelen tarih stringlerini Date objelerine dönüştür
+    // ve category/editableBy alanlarını doğru tiplere cast et
+    templateCache = data.templates.map((template) => ({
+      id: template.id,
+      name: template.name,
+      category: template.category as TemplateCategory,
+      message: template.message,
+      editableBy: template.editableBy as PenaltyTemplate['editableBy'],
+      createdAt: new Date(template.createdAt),
+      updatedAt: new Date(template.updatedAt),
+    }));
+
+    return templateCache;
+  } catch (error) {
+    console.error('Şablonlar yüklenirken hata oluştu:', error);
+    return [];
+  }
+}
+
+/**
+ * ID ile şablon getirir
+ * Requirement 8.1: THE System SHALL provide pre-defined ban message templates
+ *
+ * @param id - Şablon ID'si (örn: "tpl-001")
+ * @returns PenaltyTemplate | null - Bulunan şablon veya null
+ */
+export function getTemplateById(id: string): PenaltyTemplate | null {
+  const templates = loadTemplates();
+  return templates.find((t) => t.id === id) || null;
+}
+
+/**
+ * Kategoriye göre şablonları filtreler
+ * Requirement 8.1: THE System SHALL provide pre-defined ban message templates
+ *
+ * @param category - Şablon kategorisi (ban, mute, warn)
+ * @returns PenaltyTemplate[] - Kategoriye ait şablonlar
+ */
+export function getTemplatesByCategory(category: TemplateCategory): PenaltyTemplate[] {
+  const templates = loadTemplates();
+  return templates.filter((t) => t.category === category);
 }
 
 /**
@@ -424,6 +503,7 @@ export function clearContentCache(): void {
   penaltyCache = null;
   commandCache = null;
   procedureCache = null;
+  templateCache = null;
 }
 
 /**
@@ -434,18 +514,21 @@ export function getContentStats(): {
   penaltyCount: number;
   commandCount: number;
   procedureCount: number;
+  templateCount: number;
   totalCount: number;
 } {
   const guideCount = loadGuideContent().length;
   const penaltyCount = loadPenalties().length;
   const commandCount = loadCommands().length;
   const procedureCount = loadProcedures().length;
+  const templateCount = loadTemplates().length;
 
   return {
     guideCount,
     penaltyCount,
     commandCount,
     procedureCount,
-    totalCount: guideCount + penaltyCount + commandCount + procedureCount,
+    templateCount,
+    totalCount: guideCount + penaltyCount + commandCount + procedureCount + templateCount,
   };
 }

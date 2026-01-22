@@ -158,19 +158,42 @@ export function Sidebar(): React.ReactElement {
           href: `/procedures/${proc.slug}`,
         })),
       },
+      // Şablonlar
+      {
+        id: 'templates',
+        label: 'Şablonlar',
+        icon: <FileText className="h-4 w-4" />,
+        href: '/templates',
+      },
     ];
 
-    // Admin Paneli - sadece admin ve ust_yetkili için
-    if (user && (user.role === 'admin' || user.role === 'ust_yetkili')) {
+    // Admin yetkisi olan roller
+    const adminRoles = ['gk', 'council', 'gm', 'gm_plus', 'owner', 'admin', 'ust_yetkili'];
+    const ownerRoles = ['owner', 'ust_yetkili'];
+
+    // Admin Paneli - gk ve üstü roller için
+    if (user && adminRoles.includes(user.role || '')) {
+      const adminChildren = [
+        { id: 'admin-users', label: 'Kullanıcı Yönetimi', href: '/admin' },
+      ];
+
+      // Log görüntüleme - gm ve üstü
+      const logRoles = ['gm', 'gm_plus', 'owner', 'ust_yetkili'];
+      if (logRoles.includes(user.role || '')) {
+        adminChildren.push({ id: 'admin-logs', label: 'Aktivite Logları', href: '/admin/logs' });
+      }
+
+      // Rol yönetimi - sadece owner
+      if (ownerRoles.includes(user.role || '')) {
+        adminChildren.push({ id: 'admin-settings', label: 'Rol Yönetimi', href: '/admin/settings' });
+      }
+
       sections.push({
         id: 'admin',
         label: 'Admin Paneli',
         icon: <Settings className="h-4 w-4" />,
         href: '/admin',
-        children: [
-          { id: 'admin-users', label: 'Kullanıcı Yönetimi', href: '/admin' },
-          { id: 'admin-logs', label: 'Aktivite Logları', href: '/admin/logs' },
-        ],
+        children: adminChildren,
       });
     }
 
@@ -223,8 +246,8 @@ export function Sidebar(): React.ReactElement {
       </div>
 
       {/* SearchBar Dialog */}
-      <SearchBar 
-        isOpen={isSearchOpen} 
+      <SearchBar
+        isOpen={isSearchOpen}
         onOpenChange={setIsSearchOpen}
         placeholder="Madde, ceza, komut ara..."
       />
@@ -275,10 +298,9 @@ function SidebarSection({
         href={section.href as never}
         className={`
           flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors
-          ${
-            isActive(section.href)
-              ? 'bg-discord-accent/20 text-discord-accent'
-              : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
+          ${isActive(section.href)
+            ? 'bg-discord-accent/20 text-discord-accent'
+            : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
           }
         `}
       >
@@ -293,10 +315,9 @@ function SidebarSection({
       <CollapsibleTrigger
         className={`
           flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors
-          ${
-            section.children?.some((child) => isActive(child.href))
-              ? 'text-discord-accent'
-              : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
+          ${section.children?.some((child) => isActive(child.href))
+            ? 'text-discord-accent'
+            : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
           }
         `}
       >
@@ -317,10 +338,9 @@ function SidebarSection({
               href={item.href as never}
               className={`
                 flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors
-                ${
-                  isActive(item.href)
-                    ? 'bg-discord-accent/20 text-discord-accent'
-                    : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
+                ${isActive(item.href)
+                  ? 'bg-discord-accent/20 text-discord-accent'
+                  : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
                 }
               `}
             >

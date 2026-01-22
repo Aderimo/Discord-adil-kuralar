@@ -76,6 +76,188 @@ export interface ChatRequest {
 let openaiClient: OpenAI | null = null;
 
 /**
+ * Mock yanıtlar - API key olmadığında veya test modunda kullanılır
+ * Keyword bazlı yanıt sistemi
+ * Requirements: 4.1, 4.4
+ */
+export const MOCK_RESPONSES: Record<string, { keywords: string[]; response: string }> = {
+  hakaret: {
+    keywords: ['hakaret', 'küfür', 'sövme', 'argo', 'kaba'],
+    response: `**Hakaret/Küfür İhlali**
+
+Hakaret için standart cezalar:
+- **İlk ihlal:** 3 gün uyarılmış veya 3-7 gün susturulmuş
+- **Tekrar:** 7-14 gün susturulmuş
+- **Ağır hakaret:** 14-30 gün susturulmuş veya kalıcı ban
+
+📋 CEZA KAYDI
+━━━━━━━━━━━━━━━━━━━━
+İhlal: Hakaret/Küfür
+Madde: 2.1
+Süre: 3-7 gün susturulmuş
+Gerekçe: Topluluk kurallarına aykırı davranış
+━━━━━━━━━━━━━━━━━━━━
+
+💡 Not: Hakaretin şiddeti ve tekrar durumuna göre ceza artırılabilir.`,
+  },
+  spam: {
+    keywords: ['spam', 'flood', 'tekrar', 'mesaj', 'caps'],
+    response: `**Spam/Flood İhlali**
+
+Spam için standart cezalar:
+- **Hafif spam:** 1-3 gün susturulmuş
+- **Orta spam:** 4-7 gün susturulmuş
+- **Ağır spam/flood:** 7-14 gün susturulmuş
+
+📋 CEZA KAYDI
+━━━━━━━━━━━━━━━━━━━━
+İhlal: Spam/Flood
+Madde: 3.1
+Süre: 4 gün susturulmuş
+Gerekçe: Kanal düzenini bozucu davranış
+━━━━━━━━━━━━━━━━━━━━
+
+💡 Not: CAPS LOCK kullanımı da spam kategorisinde değerlendirilir.`,
+  },
+  reklam: {
+    keywords: ['reklam', 'tanıtım', 'link', 'davet', 'invite'],
+    response: `**Reklam İhlali**
+
+Reklam için standart cezalar:
+- **İlk ihlal:** 7-14 gün susturulmuş
+- **Tekrar:** 30 gün susturulmuş
+- **Ağır reklam:** Kalıcı ban
+
+📋 CEZA KAYDI
+━━━━━━━━━━━━━━━━━━━━
+İhlal: Reklam/Tanıtım
+Madde: 4.1
+Süre: 30 gün susturulmuş
+Gerekçe: İzinsiz reklam/tanıtım yapma
+━━━━━━━━━━━━━━━━━━━━
+
+💡 Not: Sunucu davet linkleri paylaşmak da reklam sayılır.`,
+  },
+  underage: {
+    keywords: ['underage', 'yaş', '13', 'küçük', 'çocuk'],
+    response: `**Underage (Yaş Sınırı) İhlali**
+
+Discord kullanım yaşı 13'tür. 13 yaşından küçük kullanıcılar için:
+- **Ceza:** Kalıcı ban
+- **Açılma koşulu:** 13 yaşına basınca kimlik ile başvuru
+
+📋 CEZA KAYDI
+━━━━━━━━━━━━━━━━━━━━
+İhlal: Underage
+Madde: 1.1
+Süre: Kalıcı ban
+Gerekçe: Discord ToS ihlali - 13 yaş altı
+━━━━━━━━━━━━━━━━━━━━
+
+**Ban mesajı şablonu:**
+"underage, discord sözleşmesi nedeniyle 13 altı kullanıcı yasak. 13 yaşına bastığında bir moda kimliğinin tarih kısmını atarak banını kaldırabilirsin."`,
+  },
+  calinti: {
+    keywords: ['çalıntı', 'calinti', 'hack', 'hesap', 'ele geçir'],
+    response: `**Çalıntı Hesap**
+
+Çalıntı hesap tespit edildiğinde:
+- **Ceza:** Kalıcı ban
+- **Açılma koşulu:** Hesap geri alındığında moderatöre başvuru
+
+📋 CEZA KAYDI
+━━━━━━━━━━━━━━━━━━━━
+İhlal: Çalıntı Hesap
+Madde: 1.2
+Süre: Kalıcı ban
+Gerekçe: Hesap güvenliği ihlali
+━━━━━━━━━━━━━━━━━━━━
+
+**Ban mesajı şablonu:**
+"çalıntı hesap, hesabın çalındığından dolayı seni sunucudan uzaklaştırmak durumunda kaldık. eğer hesabını geri alırsan, moderatörlerimize ulaşıp banını açtırabilirsin."`,
+  },
+  mute: {
+    keywords: ['mute', 'sustur', 'susturma', 'timeout'],
+    response: `**Mute/Susturma Komutları**
+
+Mute vermek için kullanılabilecek komutlar:
+- \`s!mute id süre\` - Dyno ile mute
+- \`h!timeout id süre\` - Helper ile timeout
+
+**Süre formatları:**
+- \`1h\` = 1 saat
+- \`1d\` = 1 gün
+- \`7d\` = 7 gün
+
+💡 Not: Dyno bozukken Carl bot kullanılabilir.`,
+  },
+  ban: {
+    keywords: ['ban', 'yasakla', 'banla', 'uzaklaştır'],
+    response: `**Ban Komutları**
+
+Ban vermek için (GK+ yetkisi gerekli):
+- \`h!ban id sebep\` - Kullanıcıyı banlar
+- \`h!unban id\` - Banı kaldırır
+
+**Yan hesap işlemleri:**
+- \`/allow id\` - Yan hesap banı açar
+- \`/deny id\` - Yan hesap başvurusunu reddeder
+
+💡 Not: Ban vermeden önce mutlaka kanıt toplayın ve log tutun.`,
+  },
+  komut: {
+    keywords: ['komut', 'command', 'nasıl', 'kullan'],
+    response: `**Sık Kullanılan Komutlar**
+
+**Bilgi Komutları:**
+- \`h!i id\` - Kullanıcı bilgisi
+- \`h!n id\` - Kullanıcı notları
+- \`h!s id\` - Ceza kayıtları
+- \`h!joins id\` - Giriş/çıkış geçmişi
+
+**Ceza Komutları:**
+- \`s!mute id süre\` - Mute ver
+- \`s!unmute id\` - Mute kaldır
+- \`h!timeout id süre\` - Timeout ver
+
+**Sesli Kanal:**
+- \`h!j id\` - Kullanıcının odasına gir
+- \`h!pull id\` - Kullanıcıyı odana çek
+
+Daha fazla bilgi için /commands sayfasını ziyaret edin.`,
+  },
+};
+
+/**
+ * Keyword bazlı gelişmiş mock yanıt oluşturur
+ * Requirements: 4.3, 4.4
+ */
+export function generateEnhancedMockResponse(message: string): string {
+  const lowerMessage = message.toLowerCase();
+  
+  // Her mock yanıt kategorisini kontrol et
+  for (const [, config] of Object.entries(MOCK_RESPONSES)) {
+    for (const keyword of config.keywords) {
+      if (lowerMessage.includes(keyword)) {
+        return config.response;
+      }
+    }
+  }
+  
+  // Hiçbir keyword eşleşmezse varsayılan yanıt
+  return `Bu konuda yeterli bilgi bulunamadı. 
+
+Yardımcı olabileceğim konular:
+- **Cezalar:** hakaret, spam, reklam, underage, çalıntı hesap
+- **Komutlar:** mute, ban, bilgi komutları
+- **Prosedürler:** kayıt, onay, red işlemleri
+
+Daha spesifik bir soru sorabilir veya üst yetkililere danışabilirsiniz.
+
+💡 İpucu: "hakaret cezası nedir?" veya "mute nasıl verilir?" gibi sorular sorabilirsiniz.`;
+}
+
+/**
  * OpenAI client'ı döndürür (lazy initialization)
  */
 function getOpenAIClient(): OpenAI {
@@ -251,23 +433,34 @@ export function getConfidenceLevel(score: number): 'high' | 'medium' | 'low' {
 }
 
 /**
- * Mock AI yanıtı oluşturur (test için)
+ * Mock AI yanıtı oluşturur (API key yokken veya test için)
+ * Requirements: 4.1, 4.4
  */
 async function generateMockResponse(
   message: string,
   ragResult: RAGRetrievalResult
 ): Promise<string> {
+  // Önce keyword bazlı gelişmiş mock yanıtı dene
+  const enhancedResponse = generateEnhancedMockResponse(message);
+  
+  // Eğer varsayılan yanıt değilse (keyword eşleşti), onu kullan
+  if (!enhancedResponse.includes('Bu konuda yeterli bilgi bulunamadı.')) {
+    return enhancedResponse;
+  }
+  
+  // RAG sonuçlarını kontrol et
   const confidence = determineConfidenceLevel(ragResult);
 
   if (confidence === 'low' || ragResult.chunks.length === 0) {
-    return 'Bu konuda yeterli bilgi bulunamadı. Bu durumda üst yetkililere danışılmalıdır.';
+    // Keyword eşleşmedi ve RAG sonucu da yok - varsayılan yanıt
+    return enhancedResponse;
   }
 
   // Context'ten basit bir yanıt oluştur
   const firstChunk = ragResult.chunks[0];
   if (firstChunk) {
     if (isPenaltyRelatedQuery(message)) {
-      return `${firstChunk.title} hakkında bilgi:
+      return `**${firstChunk.title}** hakkında bilgi:
 
 ${firstChunk.content}
 
@@ -275,15 +468,17 @@ ${firstChunk.content}
 ━━━━━━━━━━━━━━━━━━━━
 İhlal: ${firstChunk.title}
 Madde: ${firstChunk.sourceId}
-Süre: Belirtilmemiş
+Süre: Kılavuza göre belirlenir
 Gerekçe: Kılavuz kurallarına aykırı davranış
-━━━━━━━━━━━━━━━━━━━━`;
+━━━━━━━━━━━━━━━━━━━━
+
+💡 Detaylı bilgi için ilgili kılavuz bölümüne bakabilirsiniz.`;
     }
 
-    return `${firstChunk.title} hakkında bilgi:\n\n${firstChunk.content}`;
+    return `**${firstChunk.title}** hakkında bilgi:\n\n${firstChunk.content}\n\n💡 Daha fazla bilgi için kılavuzu inceleyebilirsiniz.`;
   }
 
-  return 'Yanıt oluşturulamadı.';
+  return enhancedResponse;
 }
 
 /**
