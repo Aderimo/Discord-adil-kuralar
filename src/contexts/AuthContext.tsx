@@ -247,5 +247,8 @@ export function useAuthContext(): AuthContextValue {
   return context;
 }
 
+// useAuth alias - geriye dönük uyumluluk için
+export const useAuth = useAuthContext;
+
 // Export context for direct access if needed
 export { AuthContext };

@@ -50,7 +50,7 @@ export const PERMISSIONS = {
   VIEW_CONTENT: ['reg', 'op', 'gk', 'council', 'gm', 'gm_plus', 'owner', 'mod', 'admin', 'ust_yetkili'] as const,
   VIEW_USERS: ['gk', 'council', 'gm', 'gm_plus', 'owner', 'admin', 'ust_yetkili'] as const,
   VIEW_LOGS: ['gm', 'gm_plus', 'owner', 'ust_yetkili'] as const,
-  VIEW_NOTIFICATIONS: ['gm_plus', 'owner', 'ust_yetkili'] as const,
+  VIEW_NOTIFICATIONS: ['gk', 'council', 'gm', 'gm_plus', 'owner', 'admin', 'ust_yetkili'] as const,
 
   // Düzenleme izinleri
   EDIT_CONTENT: ['op', 'gk', 'council', 'gm', 'gm_plus', 'owner', 'admin', 'ust_yetkili'] as const,

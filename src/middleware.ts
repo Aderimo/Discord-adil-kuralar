@@ -10,7 +10,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { 
-  ROLE_HIERARCHY, 
   type AccessDeniedReason 
 } from './lib/rbac';
 import type { UserRole, UserStatus } from './types';
@@ -116,11 +115,30 @@ function getUserFromJWT(token: string): MiddlewareUser | null {
 }
 
 /**
+ * Yeni rol hiyerarşisi - middleware için inline tanım
+ * Edge runtime'da veritabanına erişemediğimiz için statik
+ */
+const MIDDLEWARE_ROLE_HIERARCHY: Record<string, number> = {
+  none: 0,
+  reg: 1,
+  op: 2,
+  gk: 3,
+  council: 4,
+  gm: 5,
+  gm_plus: 6,
+  owner: 7,
+  // Eski rolleri de destekle (geriye uyumluluk)
+  mod: 2,
+  admin: 5,
+  ust_yetkili: 7,
+};
+
+/**
  * Rol kontrolü yapar
  */
 function hasRole(userRole: UserRole, requiredRole: UserRole): boolean {
-  const userHierarchy = ROLE_HIERARCHY[userRole] ?? 0;
-  const requiredHierarchy = ROLE_HIERARCHY[requiredRole] ?? 0;
+  const userHierarchy = MIDDLEWARE_ROLE_HIERARCHY[userRole] ?? 0;
+  const requiredHierarchy = MIDDLEWARE_ROLE_HIERARCHY[requiredRole] ?? 0;
   return userHierarchy >= requiredHierarchy;
 }
 
@@ -153,8 +171,10 @@ const ROUTE_RULES: RouteRule[] = [
   // Beklemede sayfası - sadece pending kullanıcılar
   { pattern: /^\/pending$/, allowedStatuses: ['pending'] },
   
-  // Admin rotaları - admin ve üstü
-  { pattern: /^\/admin(\/.*)?$/, requiredRole: 'admin' },
+  // Admin rotaları - gk ve üstü (yeni rol sistemi)
+  { pattern: /^\/admin\/settings(\/.*)?$/, requiredRole: 'owner' },
+  { pattern: /^\/admin\/logs(\/.*)?$/, requiredRole: 'gm' },
+  { pattern: /^\/admin(\/.*)?$/, requiredRole: 'gk' },
 ];
 
 /**
@@ -184,7 +204,7 @@ interface AccessResult {
 function checkAccess(pathname: string, user: MiddlewareUser | null): AccessResult {
   const rule = findRouteRule(pathname);
 
-  // Kural bulunamadı - varsayılan olarak mod+ ve approved gerekli
+  // Kural bulunamadı - varsayılan olarak reg+ ve approved gerekli (yeni rol sistemi)
   if (!rule) {
     if (!user) {
       return { allowed: false, redirect: '/login', reason: 'not_authenticated' };
@@ -198,7 +218,8 @@ function checkAccess(pathname: string, user: MiddlewareUser | null): AccessResul
     if (user.role === 'none') {
       return { allowed: false, redirect: '/unauthorized', reason: 'no_role' };
     }
-    if (!hasRole(user.role, 'mod')) {
+    // reg (hierarchy 1) ve üstü erişebilir
+    if (!hasRole(user.role, 'reg')) {
       return { allowed: false, redirect: '/unauthorized', reason: 'insufficient_role' };
     }
     return { allowed: true };
@@ -245,8 +266,8 @@ function checkAccess(pathname: string, user: MiddlewareUser | null): AccessResul
     return { allowed: false, redirect: '/unauthorized', reason: 'rejected' };
   }
 
-  // Rol kontrolü
-  const requiredRole = rule.requiredRole || 'mod';
+  // Rol kontrolü - varsayılan reg (yeni rol sistemi)
+  const requiredRole = rule.requiredRole || 'reg';
   if (user.role === 'none') {
     return { allowed: false, redirect: '/unauthorized', reason: 'no_role' };
   }
