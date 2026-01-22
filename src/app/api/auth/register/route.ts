@@ -155,10 +155,34 @@ export async function POST(request: NextRequest): Promise<NextResponse<RegisterR
     );
   } catch (error) {
     console.error('Register error:', error);
+    
+    // Daha detaylı hata mesajı
+    let errorMessage = 'Kayıt işlemi sırasında bir hata oluştu';
+    
+    if (error instanceof Error) {
+      // Prisma unique constraint hatası
+      if (error.message.includes('Unique constraint')) {
+        if (error.message.includes('email')) {
+          errorMessage = 'Bu email adresi zaten kullanılıyor';
+        } else if (error.message.includes('username')) {
+          errorMessage = 'Bu kullanıcı adı zaten kullanılıyor';
+        }
+        return NextResponse.json(
+          { success: false, message: errorMessage },
+          { status: 409 }
+        );
+      }
+      
+      // Veritabanı bağlantı hatası
+      if (error.message.includes('connect') || error.message.includes('Connection')) {
+        errorMessage = 'Veritabanı bağlantı hatası. Lütfen daha sonra tekrar deneyin.';
+      }
+    }
+    
     return NextResponse.json(
       {
         success: false,
-        message: 'Kayıt işlemi sırasında bir hata oluştu',
+        message: errorMessage,
       },
       { status: 500 }
     );
