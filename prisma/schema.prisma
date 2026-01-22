@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -17,7 +17,7 @@ model Role {
   code        String   @unique // reg, op, gk, council, gm, gm_plus, owner
   name        String   // Regülatör, Operatör, etc.
   shortName   String   // REG, OP, GK, etc.
-  description String   @db.Text
+  description String
   hierarchy   Int      // 1-7 (daha yüksek = daha yetkili)
   color       String   @default("#5865F2") // Discord rengi
   permissions String   @default("[]") // JSON array of permission codes
