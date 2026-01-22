@@ -107,6 +107,7 @@ export default function GuidePage(): React.ReactElement {
           <ContentViewer
             type="guide"
             content={guide}
+            userId={user?.id}
           />
         )}
       </div>

@@ -8,7 +8,8 @@ interface UserInfo {
   username: string;
   email: string;
   status: string;
-  role: string;
+  role: string | null;
+  roleId: string | null;
   createdAt: Date;
   updatedAt: Date;
   lastLoginAt: Date | null | undefined;
@@ -60,6 +61,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<MeResponse
           email: user.email,
           status: user.status,
           role: user.role,
+          roleId: user.roleId,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
           lastLoginAt: user.lastLoginAt,

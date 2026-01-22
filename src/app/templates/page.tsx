@@ -5,6 +5,7 @@
  * Ceza şablonlarını listeler ve kopyalama/düzenleme işlevleri sunar
  *
  * Requirement 8.1: THE System SHALL provide pre-defined ban message templates for common scenarios
+ * Requirement 12.3: WHEN a user copies a template or content THEN THE System SHALL log the copy action with content details
  */
 
 import React, { useMemo, useCallback, useState } from 'react';
@@ -16,6 +17,7 @@ import { PenaltyTemplates } from '@/components/templates/PenaltyTemplates';
 import { loadTemplates } from '@/lib/content';
 import { usePermission } from '@/hooks/usePermission';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { FileText } from 'lucide-react';
 import type { PenaltyTemplate } from '@/types/templates';
 
@@ -23,6 +25,7 @@ export default function TemplatesPage(): React.ReactElement {
   const templates = useMemo(() => loadTemplates(), []);
   const canEdit = usePermission('EDIT_TEMPLATES');
   const { toast } = useToast();
+  const { user } = useAuth();
   const [, setLastCopied] = useState<string | null>(null);
 
   // Breadcrumb öğeleri
@@ -121,6 +124,7 @@ export default function TemplatesPage(): React.ReactElement {
           canEdit={canEdit}
           onCopy={handleCopy}
           onEdit={canEdit ? handleEdit : undefined}
+          userId={user?.id}
         />
       </div>
     </MainLayout>

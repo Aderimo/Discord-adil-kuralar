@@ -8,6 +8,8 @@
  * - 8.4: WHEN a user clicks the copy button THEN THE System SHALL copy the template text to clipboard
  * - 8.5: WHEN an üst_yetkili edits a template THEN THE System SHALL save the changes
  * - 8.6: WHEN a non-üst_yetkili user views templates THEN THE System SHALL hide edit functionality
+ * 
+ * Requirement 12.3: WHEN a user copies a template or content THEN THE System SHALL log the copy action with content details
  */
 
 import React, { useState } from 'react';
@@ -47,6 +49,8 @@ export interface PenaltyTemplatesProps {
   onCopy: (text: string) => void;
   /** Düzenleme callback'i - şablon düzenlendiğinde çağrılır (opsiyonel) */
   onEdit?: (template: PenaltyTemplate) => void;
+  /** Kullanıcı ID'si - loglama için (opsiyonel) */
+  userId?: string;
 }
 
 // Kategori ikonları ve etiketleri
@@ -93,6 +97,7 @@ export function PenaltyTemplates({
   canEdit,
   onCopy,
   onEdit,
+  userId,
 }: PenaltyTemplatesProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [editingTemplate, setEditingTemplate] = useState<PenaltyTemplate | null>(null);
@@ -100,15 +105,44 @@ export function PenaltyTemplates({
   const [editedMessage, setEditedMessage] = useState('');
 
   /**
+   * Şablon kopyalama logunu API'ye gönder
+   * Requirement 12.3: WHEN a user copies a template or content THEN THE System SHALL log the copy action with content details
+   */
+  const logTemplateCopy = async (template: PenaltyTemplate) => {
+    try {
+      await fetch('/api/logs/copy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'template',
+          templateId: template.id,
+          templateName: template.name,
+          templateCategory: template.category,
+          userId: userId,
+        }),
+      });
+    } catch (error) {
+      // Loglama hatası sessizce yoksayılır - kullanıcı deneyimini etkilememeli
+      console.error('Template copy log error:', error);
+    }
+  };
+
+  /**
    * Kopyala işlevi
    * Requirement 8.4: WHEN a user clicks the copy button THEN THE System SHALL copy the template text to clipboard
+   * Requirement 12.3: Log the copy action with content details
    */
-  const handleCopy = (template: PenaltyTemplate) => {
+  const handleCopy = async (template: PenaltyTemplate) => {
     // Callback'i çağır - parent component clipboard işlemini yapacak
     onCopy(template.message);
     
     // Görsel feedback için kopyalanan şablonu işaretle
     setCopiedId(template.id);
+
+    // Kopyalama işlemini logla (Requirement 12.3)
+    await logTemplateCopy(template);
 
     // 2 saniye sonra işareti kaldır
     setTimeout(() => {

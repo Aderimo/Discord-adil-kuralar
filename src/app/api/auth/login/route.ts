@@ -16,6 +16,7 @@ interface UserInfo {
   email: string;
   status: string;
   role: string | null;
+  roleId: string | null;
 }
 
 interface LoginResponse {
@@ -84,14 +85,21 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
       );
     }
 
-    // Rol kodunu çıkar (yeni şema: role relation, eski şema: role string)
+    // Rol kodunu ve ID'sini çıkar (yeni şema: role relation, eski şema: role string)
     let roleCode: string | null = null;
+    let roleId: string | null = null;
     if (typeof user.role === 'string') {
       // Eski şema
       roleCode = user.role;
     } else if (user.role && typeof user.role === 'object') {
       // Yeni şema - role relation
       roleCode = user.role.code;
+      roleId = user.role.id;
+    }
+    
+    // roleId doğrudan user'dan da gelebilir
+    if (user.roleId) {
+      roleId = user.roleId;
     }
 
     // Oturum oluştur - kullanıcı bilgileriyle birlikte (RBAC middleware için)
@@ -114,6 +122,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
       email: user.email,
       status: user.status,
       role: roleCode,
+      roleId: roleId,
     };
 
     // Response oluştur

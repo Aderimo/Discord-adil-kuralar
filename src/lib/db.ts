@@ -6,18 +6,28 @@ import type {
   Session as AppSession,
   ActivityLog as AppActivityLog,
   UserStatus,
-  UserRole,
   ActivityAction,
 } from '@/types';
 
 // Prisma User -> App User dönüşümü
-export function toAppUser(prismaUser: User): AppUser {
+// Yeni şemada role bir relation, roleId ise foreign key
+export function toAppUser(prismaUser: User & { role?: { code: string; id: string } | null }): AppUser {
+  // Role bilgisini çıkar
+  let roleCode: string | null = null;
+  let roleId: string | null = prismaUser.roleId;
+  
+  if (prismaUser.role && typeof prismaUser.role === 'object') {
+    roleCode = prismaUser.role.code;
+    roleId = prismaUser.role.id;
+  }
+  
   return {
     id: prismaUser.id,
     username: prismaUser.username,
     email: prismaUser.email,
     status: prismaUser.status as UserStatus,
-    role: prismaUser.role as UserRole,
+    role: roleCode,
+    roleId: roleId,
     createdAt: prismaUser.createdAt,
     updatedAt: prismaUser.updatedAt,
     lastLoginAt: prismaUser.lastLoginAt ?? undefined,

@@ -119,7 +119,9 @@ function getUserFromJWT(token: string): MiddlewareUser | null {
  * Rol kontrolü yapar
  */
 function hasRole(userRole: UserRole, requiredRole: UserRole): boolean {
-  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+  const userHierarchy = ROLE_HIERARCHY[userRole] ?? 0;
+  const requiredHierarchy = ROLE_HIERARCHY[requiredRole] ?? 0;
+  return userHierarchy >= requiredHierarchy;
 }
 
 /**

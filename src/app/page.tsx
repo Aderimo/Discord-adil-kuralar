@@ -372,6 +372,7 @@ export default function HomePage(): React.ReactElement {
                 handleContentSelect(content);
               }
             }}
+            userId={user?.id}
           />
         ) : (
           <WelcomeCard />

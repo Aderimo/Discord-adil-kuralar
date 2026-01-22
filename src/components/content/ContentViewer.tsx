@@ -28,13 +28,15 @@ export interface ContentViewerProps {
   /** İçerik verisi */
   content: GuideContent | PenaltyDefinition | CommandDefinition | ProcedureDefinition;
   /** Vurgulanacak arama terimleri */
-  highlightTerms?: string[];
+  highlightTerms?: string[] | undefined;
   /** Önceki içerik (navigasyon için) */
-  prevContent?: { title: string; href: string } | null;
+  prevContent?: { title: string; href: string } | null | undefined;
   /** Sonraki içerik (navigasyon için) */
-  nextContent?: { title: string; href: string } | null;
+  nextContent?: { title: string; href: string } | null | undefined;
   /** Navigasyon callback */
-  onNavigate?: (href: string) => void;
+  onNavigate?: ((href: string) => void) | undefined;
+  /** Kullanıcı ID'si - loglama için (opsiyonel) */
+  userId?: string | undefined;
 }
 
 // Basit markdown parser
@@ -305,6 +307,7 @@ export function ContentViewer({
   prevContent,
   nextContent,
   onNavigate,
+  userId,
 }: ContentViewerProps): React.ReactElement {
   const [copied, setCopied] = React.useState(false);
 
@@ -340,6 +343,22 @@ export function ContentViewer({
     }
   }, [type, content]);
 
+  // İçerik ID'sini al
+  const contentId = useMemo(() => {
+    switch (type) {
+      case 'guide':
+        return (content as GuideContent).slug;
+      case 'penalty':
+        return (content as PenaltyDefinition).id;
+      case 'command':
+        return (content as CommandDefinition).id;
+      case 'procedure':
+        return (content as ProcedureDefinition).id;
+      default:
+        return 'unknown';
+    }
+  }, [type, content]);
+
   // Navigasyon handler
   const handleNavigate = useCallback(
     (href: string) => {
@@ -352,6 +371,31 @@ export function ContentViewer({
     [onNavigate]
   );
 
+  /**
+   * İçerik kopyalama logunu API'ye gönder
+   * Requirement 12.3: WHEN a user copies a template or content THEN THE System SHALL log the copy action with content details
+   */
+  const logContentCopy = useCallback(async () => {
+    try {
+      await fetch('/api/logs/copy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'content',
+          contentId: contentId,
+          contentTitle: title,
+          contentType: type,
+          userId: userId,
+        }),
+      });
+    } catch (error) {
+      // Loglama hatası sessizce yoksayılır - kullanıcı deneyimini etkilememeli
+      console.error('Content copy log error:', error);
+    }
+  }, [contentId, title, type, userId]);
+
   // İçeriği kopyala
   const handleCopy = useCallback(async () => {
     try {
@@ -362,11 +406,15 @@ export function ContentViewer({
       
       await navigator.clipboard.writeText(textContent);
       setCopied(true);
+      
+      // Kopyalama işlemini logla (Requirement 12.3)
+      await logContentCopy();
+      
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Kopyalama hatası:', err);
     }
-  }, [renderedContent]);
+  }, [renderedContent, logContentCopy]);
 
   return (
     <div className="flex flex-col h-full">

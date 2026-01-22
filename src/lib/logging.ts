@@ -557,3 +557,55 @@ export async function logContentChange(
     timestamp: new Date().toISOString(),
   }, ipAddress);
 }
+
+/**
+ * Şablon kopyalama logunu kaydeder
+ * Requirement 12.3: WHEN a user copies a template or content THEN THE System SHALL log the copy action with content details
+ * @param userId - Kopyalayan kullanıcı ID'si
+ * @param templateId - Kopyalanan şablon ID'si
+ * @param templateName - Şablon adı
+ * @param ipAddress - IP adresi
+ * @param templateCategory - Şablon kategorisi (opsiyonel)
+ * @returns Oluşturulan log kaydı
+ */
+export async function logTemplateCopy(
+  userId: string,
+  templateId: string,
+  templateName: string,
+  ipAddress: string,
+  templateCategory?: string
+): Promise<ActivityLog> {
+  return logActivity(userId, 'copy_template', {
+    event: 'template_copy',
+    templateId,
+    templateName,
+    templateCategory,
+    timestamp: new Date().toISOString(),
+  }, ipAddress);
+}
+
+/**
+ * İçerik kopyalama logunu kaydeder
+ * Requirement 12.3: WHEN a user copies a template or content THEN THE System SHALL log the copy action with content details
+ * @param userId - Kopyalayan kullanıcı ID'si
+ * @param contentId - Kopyalanan içerik ID'si
+ * @param contentTitle - İçerik başlığı
+ * @param ipAddress - IP adresi
+ * @param contentType - İçerik türü (guide, penalty, command, procedure)
+ * @returns Oluşturulan log kaydı
+ */
+export async function logContentCopy(
+  userId: string,
+  contentId: string,
+  contentTitle: string,
+  ipAddress: string,
+  contentType?: string
+): Promise<ActivityLog> {
+  return logActivity(userId, 'copy_content', {
+    event: 'content_copy',
+    contentId,
+    contentTitle,
+    contentType,
+    timestamp: new Date().toISOString(),
+  }, ipAddress);
+}

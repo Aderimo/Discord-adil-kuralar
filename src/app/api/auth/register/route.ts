@@ -89,17 +89,38 @@ export async function POST(request: NextRequest): Promise<NextResponse<RegisterR
     // Şifreyi hashle
     const passwordHash = await hashPassword(password);
 
-    // Kullanıcıyı "pending" (Beklemede) durumunda oluştur
+    // Founder email kontrolü - Requirement 11.9
+    // esenyurtcocg65@gmail.com (Aderimo) otomatik olarak owner olarak ayarlanmalı
+    const FOUNDER_EMAIL = 'esenyurtcocg65@gmail.com';
+    const isFounder = email.toLowerCase() === FOUNDER_EMAIL.toLowerCase();
+    
+    let roleId: string | null = null;
+    let status: 'pending' | 'approved' = 'pending';
+    
+    if (isFounder) {
+      // Founder için owner rolünü bul
+      const ownerRole = await prisma.role.findUnique({
+        where: { code: 'owner' },
+      });
+      
+      if (ownerRole) {
+        roleId = ownerRole.id;
+        status = 'approved';
+      }
+    }
+
+    // Kullanıcıyı oluştur
     // Requirement 1.1: Varsayılan durum "Beklemede"
     // Yeni kullanıcılar onaylanana kadar siteye erişemez
     // roleId null olarak başlar - admin onayladıktan sonra rol atanır
+    // İstisna: Founder email'i otomatik olarak owner ve approved olur
     const user = await prisma.user.create({
       data: {
         username,
         email,
         passwordHash,
-        status: 'pending', // Varsayılan "Beklemede" durumu - admin onayı gerekli
-        roleId: null, // Rol atanmamış - admin onayladıktan sonra atanacak
+        status, // Founder için 'approved', diğerleri için 'pending'
+        roleId, // Founder için owner role ID, diğerleri için null
       },
     });
 
@@ -115,10 +136,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<RegisterR
       console.error('Notification error:', notificationError);
     }
 
+    // Founder için özel mesaj
+    const successMessage = isFounder && status === 'approved'
+      ? 'Kayıt başarılı. Owner olarak otomatik onaylandınız.'
+      : 'Kayıt başarılı. Hesabınız yetkili onayı bekliyor.';
+
     return NextResponse.json(
       {
         success: true,
-        message: 'Kayıt başarılı. Hesabınız yetkili onayı bekliyor.',
+        message: successMessage,
         userId: user.id,
       },
       { status: 201 }

@@ -253,37 +253,37 @@ Bu plan, Yetkili Kılavuzu v2 Discord moderasyon panelinin kapsamlı güncelleme
     - Owner rolü silinemez (isSystem: true)
     - _Requirements: 11.8_
 
-- [ ] 16. Founder/Owner Kullanıcı Ayarı
+- [x] 16. Founder/Owner Kullanıcı Ayarı
   - [x] 16.1 esenyurtcocg65@gmail.com kullanıcısını owner yap
     - Seed script'inde bu kullanıcıyı owner olarak ayarla
     - Kullanıcı yoksa oluştur ve onayla
     - _Requirements: 11.9_
 
-- [ ] 17. Gelişmiş Log Sistemi
+- [x] 17. Gelişmiş Log Sistemi
   - [x] 17.1 Yeni log türlerini ekle
     - copy_content, copy_template, edit_content, delete_content
     - create_role, edit_role, delete_role
     - view_logs, export_logs
     - _Requirements: 12.1_
   
-  - [-] 17.2 AI sorgu loglaması ekle
+  - [x] 17.2 AI sorgu loglaması ekle
     - AI'a sorulan her soru loglanmalı
     - _Requirements: 12.2_
   
-  - [ ] 17.3 Kopyalama loglaması ekle
+  - [x] 17.3 Kopyalama loglaması ekle
     - Şablon ve içerik kopyalamalarını logla
     - _Requirements: 12.3_
 
-- [ ] 18. Login Hatası Düzeltmesi
-  - [ ] 18.1 Auth sistemini kontrol et ve düzelt
+- [x] 18. Login Hatası Düzeltmesi
+  - [x] 18.1 Auth sistemini kontrol et ve düzelt
     - Login API'sini debug et
     - Session yönetimini kontrol et
     - _Requirements: 13.1_
 
-- [ ] 19. Checkpoint - Rol sistemi tamamlandı
+- [x] 19. Checkpoint - Rol sistemi tamamlandı
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 20. Final Checkpoint - Tüm özellikler tamamlandı
+- [x] 20. Final Checkpoint - Tüm özellikler tamamlandı
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

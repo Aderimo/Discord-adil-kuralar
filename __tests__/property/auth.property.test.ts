@@ -104,13 +104,14 @@ describe('Property Tests: Auth - Kayıt Durumu Tutarlılığı', () => {
               const passwordHash = await hashPassword(password);
 
               // Kullanıcıyı oluştur (register endpoint'inin yaptığı işlem)
+              // Yeni şemada roleId kullanılıyor, role string değil
               const user = await prisma.user.create({
                 data: {
                   username,
                   email,
                   passwordHash,
                   status: 'pending',
-                  role: 'none',
+                  roleId: null, // Yeni kullanıcılar rol atanmadan başlar
                 },
               });
 
@@ -126,7 +127,7 @@ describe('Property Tests: Auth - Kayıt Durumu Tutarlılığı', () => {
 
               expect(savedUser).not.toBeNull();
               expect(savedUser?.status).toBe('pending');
-              expect(savedUser?.role).toBe('none');
+              expect(savedUser?.roleId).toBeNull(); // Yeni kullanıcılar rol atanmadan başlar
 
               return true;
             }
@@ -151,9 +152,12 @@ describe('Property Tests: Auth - Kayıt Durumu Tutarlılığı', () => {
   /**
    * Property 1.1: Kayıt sonrası varsayılan değerler
    *
+  /**
+   * Property 1.1: Kayıt sonrası varsayılan değerler
+   *
    * Yeni kayıt olan her kullanıcı için:
    * - status = "pending"
-   * - role = "none"
+   * - roleId = null (rol atanmamış)
    *
    * **Validates: Requirements 1.1**
    */
@@ -181,7 +185,7 @@ describe('Property Tests: Auth - Kayıt Durumu Tutarlılığı', () => {
                   email,
                   passwordHash,
                   status: 'pending',
-                  role: 'none',
+                  roleId: null, // Yeni kullanıcılar rol atanmadan başlar
                 },
               });
 
@@ -190,8 +194,8 @@ describe('Property Tests: Auth - Kayıt Durumu Tutarlılığı', () => {
               // Property 1: Status her zaman "pending" olmalı
               expect(user.status).toBe('pending');
 
-              // Property 2: Role her zaman "none" olmalı (yeni kayıt)
-              expect(user.role).toBe('none');
+              // Property 2: roleId her zaman null olmalı (yeni kayıt, rol atanmamış)
+              expect(user.roleId).toBeNull();
 
               // Property 3: Kullanıcı veritabanında bulunabilmeli
               const dbUser = await prisma.user.findUnique({
@@ -266,13 +270,19 @@ describe('Property Tests: Auth - Kimlik Doğrulama Round-Trip', () => {
 
               // Kullanıcı oluştur
               const passwordHash = await hashPassword(password);
+              
+              // Test için bir rol bul (varsa)
+              const testRole = await prisma.role.findFirst({
+                where: { hierarchy: { gte: 2 } },
+              });
+              
               const user = await prisma.user.create({
                 data: {
                   username,
                   email,
                   passwordHash,
                   status: 'approved',
-                  role: 'mod',
+                  roleId: testRole?.id || null,
                 },
               });
               createdUserIds.push(user.id);
@@ -349,13 +359,19 @@ describe('Property Tests: Auth - Kimlik Doğrulama Round-Trip', () => {
 
               // Kullanıcı oluştur
               const passwordHash = await hashPassword(password);
+              
+              // Test için bir rol bul (varsa)
+              const testRole = await prisma.role.findFirst({
+                where: { hierarchy: { gte: 2 } },
+              });
+              
               const user = await prisma.user.create({
                 data: {
                   username,
                   email,
                   passwordHash,
                   status: 'approved',
-                  role: 'mod',
+                  roleId: testRole?.id || null,
                 },
               });
               createdUserIds.push(user.id);
@@ -429,13 +445,19 @@ describe('Property Tests: Auth - Kimlik Doğrulama Round-Trip', () => {
 
               // Kullanıcı oluştur (doğru şifre ile)
               const passwordHash = await hashPassword(correctPassword);
+              
+              // Test için bir rol bul (varsa)
+              const testRole = await prisma.role.findFirst({
+                where: { hierarchy: { gte: 2 } },
+              });
+              
               const user = await prisma.user.create({
                 data: {
                   username,
                   email,
                   passwordHash,
                   status: 'approved',
-                  role: 'mod',
+                  roleId: testRole?.id || null,
                 },
               });
               createdUserIds.push(user.id);

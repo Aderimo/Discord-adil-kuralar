@@ -107,6 +107,7 @@ export default function ProcedurePage(): React.ReactElement {
           <ContentViewer
             type="procedure"
             content={procedure}
+            userId={user?.id}
           />
         )}
       </div>
