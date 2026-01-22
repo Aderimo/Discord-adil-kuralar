@@ -27,28 +27,28 @@ const categoryConfig: Record<CommandCategory, {
     description: 'Mute, timeout, temprole ve diğer ceza komutları.',
     icon: <Gavel className="h-6 w-6" />,
     color: 'text-discord-red',
-    requiredRole: 'mod'
+    requiredRole: 'reg'
   },
   bilgi: { 
     label: 'Bilgi Komutları', 
     description: 'Kullanıcı bilgisi, sicil ve geçmiş sorgulama.',
     icon: <Info className="h-6 w-6" />,
     color: 'text-discord-accent',
-    requiredRole: 'mod'
+    requiredRole: 'reg'
   },
   sesli: { 
     label: 'Sesli Kanal Komutları', 
     description: 'Voice channel yönetimi ve kullanıcı çekme.',
     icon: <Mic className="h-6 w-6" />,
     color: 'text-discord-green',
-    requiredRole: 'mod'
+    requiredRole: 'reg'
   },
   'gk-plus': { 
     label: 'GK+ Komutları', 
     description: 'Genel Koordinatör ve üstü için ban/unban komutları.',
     icon: <Shield className="h-6 w-6" />,
     color: 'text-discord-yellow',
-    requiredRole: 'admin'
+    requiredRole: 'gk'
   },
 };
 
@@ -85,7 +85,7 @@ export default function CommandCategoryPage(): React.ReactElement {
     return filtered;
   }, [allCommands, category, searchQuery]);
 
-  const canEdit = user?.role && hasRole(user.role, 'ust_yetkili');
+  const canEdit = user?.role && hasRole(user.role, 'gm_plus');
 
   const breadcrumbItems = useMemo(() => [
     { label: 'Ana Sayfa', href: '/' },

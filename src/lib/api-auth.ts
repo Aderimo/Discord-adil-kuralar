@@ -26,7 +26,7 @@ export type AuthenticatedApiHandler<T = unknown> = (
  * withAuth options
  */
 export interface WithAuthOptions {
-  /** Gerekli minimum rol (varsayılan: 'mod') */
+  /** Gerekli minimum rol (varsayılan: 'reg') */
   requiredRole?: UserRole;
   /** Sadece onaylı kullanıcılar mı? (varsayılan: true) */
   requireApproved?: boolean;
@@ -95,7 +95,7 @@ export function withAuth<T = unknown>(
   handler: AuthenticatedApiHandler<T>,
   options: WithAuthOptions = {}
 ): ApiHandler<T> {
-  const { requiredRole = 'mod', requireApproved = true } = options;
+  const { requiredRole = 'reg', requireApproved = true } = options;
 
   return async (request: NextRequest, context: { params: Record<string, string> }) => {
     // Token'ı çıkar
@@ -196,5 +196,43 @@ export function withOptionalAuth<T = unknown>(
     }
 
     return handler(request, { ...context, user });
+  };
+}
+
+/**
+ * Kimlik doğrulama sonucu
+ */
+export interface AuthResult {
+  success: boolean;
+  user?: User;
+  error?: string;
+}
+
+/**
+ * Request'ten kullanıcı bilgisini çıkarır
+ * API route'larda doğrudan kullanılabilir
+ */
+export async function getAuthenticatedUser(request: NextRequest): Promise<AuthResult> {
+  const token = extractToken(request);
+  
+  if (!token) {
+    return {
+      success: false,
+      error: 'Kimlik doğrulama gerekli',
+    };
+  }
+
+  const user = await getUserFromToken(token);
+  
+  if (!user) {
+    return {
+      success: false,
+      error: 'Geçersiz veya süresi dolmuş oturum',
+    };
+  }
+
+  return {
+    success: true,
+    user,
   };
 }

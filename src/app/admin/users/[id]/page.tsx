@@ -64,6 +64,14 @@ interface ApiResponse {
 
 const ROLE_LABELS: Record<string, string> = {
   none: 'Yok',
+  reg: 'Regülatör',
+  op: 'Operatör',
+  gk: 'GateKeeper',
+  council: 'Council',
+  gm: 'GM',
+  gm_plus: '🔖 GM+',
+  owner: 'Owner',
+  // Eski roller (geriye uyumluluk)
   mod: 'Moderatör',
   admin: 'Admin',
   ust_yetkili: 'Üst Yetkili',
@@ -125,8 +133,9 @@ export default function UserDetailPage(): React.ReactElement {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isRoleChangeDialogOpen, setIsRoleChangeDialogOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>('mod');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('reg');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [roles, setRoles] = useState<Array<{ code: string; name: string; hierarchy: number }>>([]);
 
 
   // Kullanıcı detaylarını getir
@@ -168,11 +177,27 @@ export default function UserDetailPage(): React.ReactElement {
     }
   }, [userId, toast, router]);
 
+  // Rolleri yükle
+  const fetchRoles = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/roles', {
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (data.success && data.roles) {
+        setRoles(data.roles);
+      }
+    } catch (error) {
+      console.error('Roller yüklenemedi:', error);
+    }
+  }, []);
+
   useEffect(() => {
     if (userId) {
       fetchUserDetail();
+      fetchRoles();
     }
-  }, [userId, fetchUserDetail]);
+  }, [userId, fetchUserDetail, fetchRoles]);
 
   // Yetki değiştirme
   const handleRoleChange = async (): Promise<void> => {
@@ -367,33 +392,18 @@ export default function UserDetailPage(): React.ReactElement {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Yetki Seçin</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setSelectedRole('mod');
-                      setIsRoleChangeDialogOpen(true);
-                    }}
-                    disabled={user.role === 'mod'}
-                  >
-                    Moderatör
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setSelectedRole('admin');
-                      setIsRoleChangeDialogOpen(true);
-                    }}
-                    disabled={user.role === 'admin'}
-                  >
-                    Admin
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setSelectedRole('ust_yetkili');
-                      setIsRoleChangeDialogOpen(true);
-                    }}
-                    disabled={user.role === 'ust_yetkili'}
-                  >
-                    Üst Yetkili
-                  </DropdownMenuItem>
+                  {roles.filter(r => r.code !== 'owner').sort((a, b) => a.hierarchy - b.hierarchy).map((role) => (
+                    <DropdownMenuItem
+                      key={role.code}
+                      onClick={() => {
+                        setSelectedRole(role.code);
+                        setIsRoleChangeDialogOpen(true);
+                      }}
+                      disabled={user.role === role.code}
+                    >
+                      {role.name}
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}

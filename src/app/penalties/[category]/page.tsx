@@ -64,8 +64,8 @@ export default function PenaltyCategoryPage(): React.ReactElement {
     return filtered;
   }, [allPenalties, category, searchQuery]);
 
-  // Sadece ust_yetkili rolü düzenleme yapabilir
-  const canEdit = user?.role && hasRole(user.role, 'ust_yetkili');
+  // Sadece gm_plus ve owner rolü düzenleme yapabilir
+  const canEdit = user?.role && hasRole(user.role, 'gm_plus');
 
   // Breadcrumb öğeleri
   const breadcrumbItems = useMemo(() => [
@@ -185,7 +185,7 @@ export default function PenaltyCategoryPage(): React.ReactElement {
               {categoryDescriptions[category]}
             </p>
           </div>
-          {/* Yeni Ekle butonu - sadece ust_yetkili için */}
+          {/* Yeni Ekle butonu - sadece gm_plus için */}
           {canEdit && !editingPenalty && !isAddingNew && (
             <Button
               onClick={() => setIsAddingNew(true)}
@@ -261,7 +261,7 @@ export default function PenaltyCategoryPage(): React.ReactElement {
                     <span className="px-3 py-1 bg-discord-red/20 text-discord-red text-sm rounded-full">
                       {penalty.duration}
                     </span>
-                    {/* Düzenleme ve silme butonları - sadece ust_yetkili için */}
+                    {/* Düzenleme ve silme butonları - sadece gm_plus için */}
                     {canEdit && (
                       <>
                         <Button

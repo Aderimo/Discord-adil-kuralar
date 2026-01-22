@@ -120,6 +120,9 @@ export default function AdminPage(): React.ReactElement {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>('reg');
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
+  
+  // Dinamik rol listesi (owner hariç, hiyerarşi sırasına göre)
+  const availableRoles = roles.filter(r => r.code !== 'owner').sort((a, b) => a.hierarchy - b.hierarchy);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [isRoleChangeDialogOpen, setIsRoleChangeDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -446,7 +449,7 @@ export default function AdminPage(): React.ReactElement {
   // Dialog açma fonksiyonları
   const openApproveDialog = (user: User): void => {
     setSelectedUser(user);
-    setSelectedRole('mod');
+    setSelectedRole('reg');
     setIsApproveDialogOpen(true);
   };
 
@@ -457,7 +460,7 @@ export default function AdminPage(): React.ReactElement {
 
   const openBulkDialog = (action: 'approve' | 'reject'): void => {
     setBulkAction(action);
-    setSelectedRole('mod');
+    setSelectedRole('reg');
     setIsBulkDialogOpen(true);
   };
 
@@ -756,15 +759,15 @@ export default function AdminPage(): React.ReactElement {
                           <DropdownMenuContent>
                             <DropdownMenuLabel>Yetki Seçin</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => { setSelectedUser(user); setSelectedRole('mod'); setIsRoleChangeDialogOpen(true); }}>
-                              Moderatör
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { setSelectedUser(user); setSelectedRole('admin'); setIsRoleChangeDialogOpen(true); }}>
-                              Admin
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { setSelectedUser(user); setSelectedRole('ust_yetkili'); setIsRoleChangeDialogOpen(true); }}>
-                              Üst Yetkili
-                            </DropdownMenuItem>
+                            {availableRoles.map((role) => (
+                              <DropdownMenuItem 
+                                key={role.code} 
+                                onClick={() => { setSelectedUser(user); setSelectedRole(role.code); setIsRoleChangeDialogOpen(true); }}
+                                disabled={user.role === role.code}
+                              >
+                                {role.name}
+                              </DropdownMenuItem>
+                            ))}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       ) : (
@@ -862,15 +865,15 @@ export default function AdminPage(): React.ReactElement {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuLabel>Yetki Seçin</DropdownMenuLabel>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem onClick={() => { setSelectedUser(user); setSelectedRole('mod'); setIsRoleChangeDialogOpen(true); }}>
-                                    Moderatör
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => { setSelectedUser(user); setSelectedRole('admin'); setIsRoleChangeDialogOpen(true); }}>
-                                    Admin
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => { setSelectedUser(user); setSelectedRole('ust_yetkili'); setIsRoleChangeDialogOpen(true); }}>
-                                    Üst Yetkili
-                                  </DropdownMenuItem>
+                                  {availableRoles.map((role) => (
+                                    <DropdownMenuItem 
+                                      key={role.code} 
+                                      onClick={() => { setSelectedUser(user); setSelectedRole(role.code); setIsRoleChangeDialogOpen(true); }}
+                                      disabled={user.role === role.code}
+                                    >
+                                      {role.name}
+                                    </DropdownMenuItem>
+                                  ))}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             ) : null}

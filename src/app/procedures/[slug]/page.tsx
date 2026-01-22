@@ -27,8 +27,8 @@ export default function ProcedurePage(): React.ReactElement {
     [procedures, slug]
   );
 
-  // Sadece ust_yetkili rolü düzenleme yapabilir
-  const canEdit = user?.role && hasRole(user.role, 'ust_yetkili');
+  // Sadece gm_plus ve owner rolü düzenleme yapabilir
+  const canEdit = user?.role && hasRole(user.role, 'gm_plus');
 
   // Breadcrumb öğeleri
   const breadcrumbItems = useMemo(() => [
@@ -81,7 +81,7 @@ export default function ProcedurePage(): React.ReactElement {
           <Breadcrumb items={breadcrumbItems} />
         </div>
 
-        {/* Düzenleme butonu - sadece ust_yetkili için */}
+        {/* Düzenleme butonu - sadece gm_plus için */}
         {canEdit && !isEditing && (
           <div className="flex justify-end mb-4">
             <Button

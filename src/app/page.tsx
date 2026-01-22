@@ -106,6 +106,14 @@ function WelcomeCard(): React.ReactElement {
 function getRoleLabel(role?: string): string {
   const labels: Record<string, string> = {
     none: 'Kullanıcı',
+    reg: 'Regülatör',
+    op: 'Operatör',
+    gk: 'GateKeeper',
+    council: 'Council',
+    gm: 'GM',
+    gm_plus: '🔖 GM+',
+    owner: 'Owner',
+    // Eski roller (geriye uyumluluk)
     mod: 'Moderatör',
     admin: 'Admin',
     ust_yetkili: 'Üst Yetkili',

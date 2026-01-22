@@ -35,8 +35,8 @@ export default function GuidePage(): React.ReactElement {
     );
   }, [allGuideContent, searchQuery]);
 
-  // Sadece ust_yetkili rolü düzenleme yapabilir
-  const canEdit = user?.role && hasRole(user.role, 'ust_yetkili');
+  // Sadece gm_plus ve owner rolü düzenleme yapabilir
+  const canEdit = user?.role && hasRole(user.role, 'gm_plus');
 
   // Breadcrumb öğeleri
   const breadcrumbItems = useMemo(() => [
@@ -193,7 +193,7 @@ export default function GuidePage(): React.ReactElement {
                     <ChevronRight className="h-5 w-5 text-discord-muted group-hover:text-discord-accent transition-colors" />
                   </div>
                 </Link>
-                {/* Silme butonu - sadece ust_yetkili için */}
+                {/* Silme butonu - sadece gm_plus için */}
                 {canEdit && (
                   <Button
                     onClick={(e) => handleDelete(guide.id, e)}

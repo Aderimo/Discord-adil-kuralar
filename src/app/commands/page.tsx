@@ -22,28 +22,28 @@ const categoryConfig: Record<CommandCategory, {
     description: 'Mute, timeout, temprole ve diğer ceza komutları.',
     icon: <Gavel className="h-6 w-6" />,
     color: 'text-discord-red bg-discord-red/10',
-    requiredRole: 'mod'
+    requiredRole: 'reg'
   },
   bilgi: { 
     label: 'Bilgi Komutları', 
     description: 'Kullanıcı bilgisi, sicil ve geçmiş sorgulama.',
     icon: <Info className="h-6 w-6" />,
     color: 'text-discord-accent bg-discord-accent/10',
-    requiredRole: 'mod'
+    requiredRole: 'reg'
   },
   sesli: { 
     label: 'Sesli Kanal Komutları', 
     description: 'Voice channel yönetimi ve kullanıcı çekme.',
     icon: <Mic className="h-6 w-6" />,
     color: 'text-discord-green bg-discord-green/10',
-    requiredRole: 'mod'
+    requiredRole: 'reg'
   },
   'gk-plus': { 
     label: 'GK+ Komutları', 
     description: 'Genel Koordinatör ve üstü için ban/unban komutları.',
     icon: <Shield className="h-6 w-6" />,
     color: 'text-discord-yellow bg-discord-yellow/10',
-    requiredRole: 'admin'
+    requiredRole: 'gk'
   },
 };
 
@@ -118,9 +118,9 @@ export default function CommandsPage(): React.ReactElement {
                         <span className="text-xs bg-discord-lighter px-2 py-1 rounded text-discord-muted">
                           {count} komut
                         </span>
-                        {config.requiredRole !== 'mod' && (
+                        {config.requiredRole !== 'reg' && (
                           <span className="text-xs bg-discord-yellow/20 px-2 py-1 rounded text-discord-yellow">
-                            {config.requiredRole === 'admin' ? 'GK+' : config.requiredRole}
+                            {config.requiredRole === 'gk' ? 'GK+' : config.requiredRole.toUpperCase()}
                           </span>
                         )}
                       </div>

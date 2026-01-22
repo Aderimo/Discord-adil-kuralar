@@ -6,8 +6,8 @@
  *
  * Requirement 8: Ceza Şablonları
  * - 8.4: WHEN a user clicks the copy button THEN THE System SHALL copy the template text to clipboard
- * - 8.5: WHEN an üst_yetkili edits a template THEN THE System SHALL save the changes
- * - 8.6: WHEN a non-üst_yetkili user views templates THEN THE System SHALL hide edit functionality
+ * - 8.5: WHEN a gm_plus edits a template THEN THE System SHALL save the changes
+ * - 8.6: WHEN a non-gm_plus user views templates THEN THE System SHALL hide edit functionality
  * 
  * Requirement 12.3: WHEN a user copies a template or content THEN THE System SHALL log the copy action with content details
  */

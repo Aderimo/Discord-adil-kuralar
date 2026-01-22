@@ -35,7 +35,7 @@ export default function ProceduresPage(): React.ReactElement {
     );
   }, [allProcedures, searchQuery]);
 
-  const canEdit = user?.role && hasRole(user.role, 'ust_yetkili');
+  const canEdit = user?.role && hasRole(user.role, 'gm_plus');
 
   const breadcrumbItems = useMemo(() => [
     { label: 'Ana Sayfa', href: '/' },
@@ -188,7 +188,7 @@ export default function ProceduresPage(): React.ReactElement {
                     <ChevronRight className="h-5 w-5 text-discord-muted group-hover:text-discord-accent transition-colors" />
                   </div>
                 </Link>
-                {/* Silme butonu - sadece ust_yetkili için */}
+                {/* Silme butonu - sadece gm_plus için */}
                 {canEdit && (
                   <Button
                     onClick={(e) => handleDelete(proc.id, e)}
