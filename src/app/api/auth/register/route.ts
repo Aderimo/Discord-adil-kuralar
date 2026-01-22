@@ -124,16 +124,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<RegisterR
       },
     });
 
-    // Üst yetkililere bildirim gönder
+    // Üst yetkililere bildirim gönder (opsiyonel - hata olursa devam et)
     try {
-      await notifyNewUserRegistration({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      });
+      // Sadece roller varsa bildirim gönder
+      const roles = await prisma.role.findMany({ take: 1 });
+      if (roles.length > 0) {
+        await notifyNewUserRegistration({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+        });
+      }
     } catch (notificationError) {
       // Bildirim hatası kritik değil, log'la ve devam et
-      console.error('Notification error:', notificationError);
+      console.error('Notification error (non-critical):', notificationError);
     }
 
     // Founder için özel mesaj
