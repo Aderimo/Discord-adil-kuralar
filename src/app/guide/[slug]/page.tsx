@@ -33,7 +33,7 @@ export default function GuidePage(): React.ReactElement {
   // Breadcrumb öğeleri
   const breadcrumbItems = useMemo(() => [
     { label: 'Ana Sayfa', href: '/' },
-    { label: 'Yetkili Kılavuzu', href: '/guide' },
+    { label: 'Saniye Yetkili Kılavuzu', href: '/guide' },
     { label: guide?.title || 'Yükleniyor...', href: `/guide/${slug}` },
   ], [guide?.title, slug]);
 

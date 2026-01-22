@@ -111,10 +111,10 @@ export function Sidebar(): React.ReactElement {
   // Menü yapısını oluştur
   const menuSections: MenuSection[] = useMemo(() => {
     const sections: MenuSection[] = [
-      // Yetkili Kılavuzu
+      // Saniye Yetkili Kılavuzu
       {
         id: 'guide',
-        label: 'Yetkili Kılavuzu',
+        label: 'Saniye Yetkili Kılavuzu',
         icon: <Book className="h-4 w-4" />,
         defaultOpen: true,
         children: guideContent.map((guide) => ({
@@ -266,9 +266,21 @@ export function Sidebar(): React.ReactElement {
       </div>
 
       {/* Alt bilgi */}
-      <div className="mt-auto px-3 sm:px-4 py-2 sm:py-3 border-t border-discord-light">
+      <div className="mt-auto px-3 sm:px-4 py-2 sm:py-3 border-t border-discord-light space-y-2">
         <p className="text-xs text-discord-muted text-center">
-          Yetkili Kılavuzu v2.0
+          Saniye Yetkili Kılavuzu
+        </p>
+        <p className="text-xs text-discord-muted/70 text-center">
+          Bu siteyi yapan kişi{' '}
+          <a 
+            href="https://discord.gg/wMmtaG7UCx" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-discord-accent hover:underline font-medium"
+          >
+            Aderimo
+          </a>
+          &apos;dur
         </p>
       </div>
     </nav>

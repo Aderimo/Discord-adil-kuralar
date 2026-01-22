@@ -364,7 +364,7 @@ export function AIChatBubble({
                 AI Ceza Danışmanı
               </h3>
               <p className="text-xs text-discord-muted">
-                Yetkili Kılavuzu v2 tabanlı
+                Saniye Yetkili Kılavuzu tabanlı
               </p>
             </div>
           </div>
@@ -391,7 +391,7 @@ export function AIChatBubble({
               </h4>
               <p className="text-xs text-discord-muted max-w-[250px]">
                 Ceza soruları sorun, olay anlatın veya kılavuz hakkında bilgi
-                isteyin. Yanıtlar Yetkili Kılavuzu v2&apos;ye dayanır.
+                isteyin. Yanıtlar Saniye Yetkili Kılavuzu&apos;na dayanır.
               </p>
               <div className="mt-4 space-y-2 w-full">
                 <p className="text-xs text-discord-muted">Örnek sorular:</p>

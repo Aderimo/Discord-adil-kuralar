@@ -149,7 +149,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps): React.R
               className="text-xs text-center"
               style={{ color: '#949ba4' }}
             >
-              SANIYE MODLARI Yetkili Kılavuzu
+              SANIYE MODLARI Saniye Yetkili Kılavuzu
             </p>
           </div>
         </div>

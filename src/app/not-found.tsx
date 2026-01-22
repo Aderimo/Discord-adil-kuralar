@@ -88,7 +88,7 @@ export default function NotFound(): React.ReactElement {
           </Link>
           
           <p className="text-xs text-discord-muted text-center">
-            SANIYE MODLARI Yetkili Kılavuzu
+            SANIYE MODLARI Saniye Yetkili Kılavuzu
           </p>
         </CardFooter>
       </Card>

@@ -35,7 +35,7 @@ function WelcomeCard(): React.ReactElement {
           Hoş Geldin, {user?.username || 'Yetkili'}! 👋
         </h1>
         <p className="text-discord-muted">
-          SANIYE MODLARI Yetkili Kılavuzu ve Ceza Danışman Sistemi
+          SANIYE MODLARI Saniye Yetkili Kılavuzu ve Ceza Danışman Sistemi
         </p>
       </div>
 
@@ -43,7 +43,7 @@ function WelcomeCard(): React.ReactElement {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <QuickAccessCard
           icon={<Book className="h-6 w-6" />}
-          title="Yetkili Kılavuzu"
+          title="Saniye Yetkili Kılavuzu"
           description="Moderasyon kuralları ve prosedürler"
           href="/guide"
           color="accent"
@@ -292,10 +292,10 @@ export default function HomePage(): React.ReactElement {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-discord-text mb-4">
-            Yetkili Kılavuzu
+            Saniye Yetkili Kılavuzu
           </h1>
           <p className="text-discord-muted mb-8">
-            SANIYE MODLARI Discord sunucusu için Yetkili Kılavuzu ve Ceza Danışman Sistemi
+            SANIYE MODLARI Discord sunucusu için Saniye Yetkili Kılavuzu ve Ceza Danışman Sistemi
           </p>
           <div className="flex gap-4 justify-center">
             <a

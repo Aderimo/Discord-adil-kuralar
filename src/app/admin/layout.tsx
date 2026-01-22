@@ -31,8 +31,10 @@ export default function AdminLayout({
     );
   }
 
-  // Yetkisiz erişim kontrolü
-  if (!user || (user.role !== 'admin' && user.role !== 'ust_yetkili')) {
+  // Yetkisiz erişim kontrolü - owner, admin ve ust_yetkili erişebilir
+  // Ayrıca yeni rol sistemindeki gk, council, gm, gm_plus rolleri de erişebilir
+  const allowedRoles = ['owner', 'admin', 'ust_yetkili', 'gk', 'council', 'gm', 'gm_plus'];
+  if (!user || !allowedRoles.includes(user.role || '')) {
     return (
       <div className="flex h-screen items-center justify-center bg-discord-darker">
         <div className="text-center">

@@ -41,7 +41,7 @@ export default function GuidePage(): React.ReactElement {
   // Breadcrumb öğeleri
   const breadcrumbItems = useMemo(() => [
     { label: 'Ana Sayfa', href: '/' },
-    { label: 'Yetkili Kılavuzu', href: '/guide' },
+    { label: 'Saniye Yetkili Kılavuzu', href: '/guide' },
   ], []);
 
   // Yeni içerik ekleme
@@ -123,7 +123,7 @@ export default function GuidePage(): React.ReactElement {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold text-discord-text mb-2">
-              Yetkili Kılavuzu
+              Saniye Yetkili Kılavuzu
             </h1>
             <p className="text-discord-muted">
               Moderasyon kuralları, prosedürler ve rehberler.

@@ -68,7 +68,7 @@ export default function PendingPage(): React.ReactElement {
           </CardTitle>
           
           <CardDescription className="text-discord-muted">
-            SANIYE MODLARI Yetkili Kılavuzu
+            SANIYE MODLARI Saniye Yetkili Kılavuzu
           </CardDescription>
         </CardHeader>
 

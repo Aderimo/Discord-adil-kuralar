@@ -253,7 +253,7 @@ export default function RegisterPage(): React.ReactElement {
             Kayıt Ol
           </CardTitle>
           <CardDescription className="text-discord-muted">
-            SANIYE MODLARI Yetkili Kılavuzu
+            SANIYE MODLARI Saniye Yetkili Kılavuzu
           </CardDescription>
         </CardHeader>
 

@@ -136,7 +136,7 @@ export function MainLayout({ children, sidebar }: MainLayoutProps): React.ReactE
           >
             <Shield className="h-6 w-6 text-discord-accent" />
             <span className="hidden font-semibold text-discord-text sm:inline-block">
-              Yetkili Kılavuzu
+              Saniye Yetkili Kılavuzu
             </span>
           </Link>
         </div>

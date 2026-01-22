@@ -7,8 +7,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Yetkili Kılavuzu - SANIYE MODLARI',
-  description: 'SANIYE MODLARI Discord sunucusu için Yetkili Kılavuzu ve Ceza Danışman Sistemi',
+  title: 'Saniye Yetkili Kılavuzu - SANIYE MODLARI',
+  description: 'SANIYE MODLARI Discord sunucusu için Saniye Yetkili Kılavuzu ve Ceza Danışman Sistemi',
 };
 
 export default function RootLayout({

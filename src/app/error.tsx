@@ -106,7 +106,7 @@ export default function Error({ error, reset }: ErrorPageProps): React.ReactElem
           </Button>
           
           <p className="text-xs text-discord-muted text-center">
-            SANIYE MODLARI Yetkili Kılavuzu
+            SANIYE MODLARI Saniye Yetkili Kılavuzu
           </p>
         </CardFooter>
       </Card>

@@ -149,7 +149,7 @@ export default function LoginPage(): React.ReactElement {
             Giriş Yap
           </CardTitle>
           <CardDescription className="text-discord-muted">
-            SANIYE MODLARI Yetkili Kılavuzu
+            SANIYE MODLARI Saniye Yetkili Kılavuzu
           </CardDescription>
         </CardHeader>
 
@@ -284,6 +284,22 @@ export default function LoginPage(): React.ReactElement {
                 >
                   Kayıt Ol
                 </Link>
+              </p>
+            </div>
+
+            {/* İzinsiz giriş uyarısı */}
+            <div className="mt-4 p-3 rounded-md bg-discord-red/10 border border-discord-red/30">
+              <p className="text-xs text-discord-muted text-center">
+                ⚠️ İzinsiz giriş yapmaya çalışıyorsanız, lütfen{' '}
+                <a
+                  href="https://discord.gg/KVMmAJvVPr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-discord-accent hover:underline font-medium"
+                >
+                  Saniye Discord sunucusuna
+                </a>
+                {' '}katılarak modlarla görüşün.
               </p>
             </div>
           </CardFooter>
