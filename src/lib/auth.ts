@@ -172,3 +172,12 @@ export function isValidEmail(email: string): boolean {
 export function isValidPassword(password: string): boolean {
   return password.length >= 8;
 }
+
+// Cookie'den session bilgisi alma (server-side)
+// Not: Bu fonksiyon Next.js API route'larında kullanılır
+export async function getSessionFromCookie(): Promise<{ userId: string } | null> {
+  // Server-side'da cookie'ye erişim için next/headers kullanılmalı
+  // Ancak bu fonksiyon API route'larında çağrıldığında request'ten alınmalı
+  // Bu basit implementasyon null döner - gerçek implementasyon request'ten almalı
+  return null;
+}

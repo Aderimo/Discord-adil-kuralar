@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useMemo, useState, useCallback } from 'react';
-import { useParams, notFound } from 'next/navigation';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import { useParams, useSearchParams, notFound } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { ContentEditor } from '@/components/content/ContentEditor';
@@ -33,6 +33,7 @@ const categoryDescriptions: Record<PenaltyCategory, string> = {
 
 export default function PenaltyCategoryPage(): React.ReactElement {
   const params = useParams();
+  const searchParams = useSearchParams();
   const category = params.category as PenaltyCategory;
   const { user } = useAuth();
   const [editingPenalty, setEditingPenalty] = useState<PenaltyDefinition | null>(null);
@@ -45,6 +46,15 @@ export default function PenaltyCategoryPage(): React.ReactElement {
   if (!validCategories.includes(category)) {
     notFound();
   }
+
+  // URL'den ?add=true parametresini kontrol et
+  useEffect(() => {
+    if (searchParams.get('add') === 'true' && user?.role && hasRole(user.role, 'gm_plus')) {
+      setIsAddingNew(true);
+      // URL'den parametreyi temizle
+      window.history.replaceState({}, '', `/penalties/${category}`);
+    }
+  }, [searchParams, user?.role, category]);
 
   const allPenalties = useMemo(() => loadPenalties(), []);
   const penalties = useMemo(() => {

@@ -137,7 +137,7 @@ const handler: AuthenticatedApiHandler<BulkActionResponse> = async (
       }
 
       // Owner rolü kontrolü - sadece founder atayabilir
-      if (!canManageOwnerRole(adminUser.email, role)) {
+      if (role === 'owner' && !canManageOwnerRole(adminUser.email)) {
         return NextResponse.json(
           {
             success: false,

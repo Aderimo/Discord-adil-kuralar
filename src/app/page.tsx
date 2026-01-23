@@ -18,12 +18,15 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { ContentViewer } from '@/components/content/ContentViewer';
 import { loadGuideContent } from '@/lib/content';
+import { hasRole } from '@/lib/rbac';
 import type { GuideContent } from '@/types/content';
-import { Book, Shield, Gavel, Terminal, FileText } from 'lucide-react';
+import { Book, Shield, Gavel, Terminal, FileText, Plus } from 'lucide-react';
 
 // Hoşgeldin kartı bileşeni
 function WelcomeCard(): React.ReactElement {
   const { user } = useAuth();
+  const router = useRouter();
+  const canEdit = user?.role ? hasRole(user.role, 'gm_plus') : false;
   
   return (
     <div className="p-6 h-full flex flex-col">
@@ -45,6 +48,8 @@ function WelcomeCard(): React.ReactElement {
           description="Moderasyon kuralları ve prosedürler"
           href="/guide"
           color="accent"
+          canEdit={canEdit}
+          onAdd={() => router.push('/guide?add=true' as Parameters<typeof router.push>[0])}
         />
         <QuickAccessCard
           icon={<Gavel className="h-6 w-6" />}
@@ -52,6 +57,8 @@ function WelcomeCard(): React.ReactElement {
           description="Ceza türleri ve süreleri"
           href="/penalties"
           color="red"
+          canEdit={canEdit}
+          onAdd={() => router.push('/penalties?add=true' as Parameters<typeof router.push>[0])}
         />
         <QuickAccessCard
           icon={<Terminal className="h-6 w-6" />}
@@ -59,6 +66,8 @@ function WelcomeCard(): React.ReactElement {
           description="Bot komutları ve kullanımları"
           href="/commands"
           color="green"
+          canEdit={canEdit}
+          onAdd={() => router.push('/commands?add=true' as Parameters<typeof router.push>[0])}
         />
         <QuickAccessCard
           icon={<FileText className="h-6 w-6" />}
@@ -66,11 +75,13 @@ function WelcomeCard(): React.ReactElement {
           description="İşlem adımları ve yönergeler"
           href="/procedures"
           color="yellow"
+          canEdit={canEdit}
+          onAdd={() => router.push('/procedures?add=true' as Parameters<typeof router.push>[0])}
         />
         <QuickAccessCard
           icon={<Shield className="h-6 w-6" />}
           title="Yetki Bilgisi"
-          description={`Mevcut yetkiniz: ${getRoleLabel(user?.role)}`}
+          description={`Mevcut yetkiniz: ${getRoleLabel(user?.role ?? undefined)}`}
           color="muted"
         />
       </div>
@@ -118,6 +129,8 @@ interface QuickAccessCardProps {
   href?: string;
   onClick?: () => void;
   color: 'accent' | 'red' | 'green' | 'yellow' | 'muted';
+  canEdit?: boolean;
+  onAdd?: () => void;
 }
 
 function QuickAccessCard({
@@ -127,6 +140,8 @@ function QuickAccessCard({
   href,
   onClick,
   color,
+  canEdit,
+  onAdd,
 }: QuickAccessCardProps): React.ReactElement {
   const router = useRouter();
   
@@ -146,13 +161,20 @@ function QuickAccessCard({
     }
   };
 
+  const handleAddClick = (e: React.MouseEvent): void => {
+    e.stopPropagation();
+    if (onAdd) {
+      onAdd();
+    }
+  };
+
   const isClickable = href || onClick;
 
   return (
     <div
       onClick={isClickable ? handleClick : undefined}
       className={`
-        p-4 rounded-lg border border-discord-lighter transition-all
+        p-4 rounded-lg border border-discord-lighter transition-all relative group
         ${isClickable ? 'cursor-pointer hover:border-discord-accent/50' : ''}
         ${colorClasses[color]}
       `}
@@ -161,12 +183,22 @@ function QuickAccessCard({
     >
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">{icon}</div>
-        <div>
+        <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-discord-text text-sm mb-1">
             {title}
           </h3>
           <p className="text-xs text-discord-muted">{description}</p>
         </div>
+        {/* Yeni Ekle butonu - sadece gm_plus ve owner için */}
+        {canEdit && onAdd && (
+          <button
+            onClick={handleAddClick}
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-md bg-discord-green/20 hover:bg-discord-green/30 text-discord-green"
+            title="Yeni Ekle"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </div>
   );

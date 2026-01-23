@@ -140,7 +140,6 @@ async function main() {
   console.log('\n👑 Setting up founder/owner user...');
   
   const founderEmail = 'esenyurtcocg65@gmail.com';
-  const founderUsername = 'Aderimo';
   
   const ownerRole = await prisma.role.findUnique({
     where: { code: 'owner' },

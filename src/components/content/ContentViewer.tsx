@@ -39,7 +39,7 @@ export interface ContentViewerProps {
   userId?: string | undefined;
 }
 
-// Basit markdown parser
+// Basit markdown parser - kompakt ve okunabilir tasarım
 function parseMarkdown(markdown: string): string {
   let html = markdown;
 
@@ -49,10 +49,10 @@ function parseMarkdown(markdown: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // Headers
-  html = html.replace(/^### (.+)$/gm, '<h3 class="text-lg font-semibold text-discord-text mt-6 mb-3">$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2 class="text-xl font-semibold text-discord-text mt-8 mb-4">$1</h2>');
-  html = html.replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold text-discord-text mt-8 mb-4">$1</h1>');
+  // Headers - daha kompakt spacing
+  html = html.replace(/^### (.+)$/gm, '<h3 class="text-base font-semibold text-discord-text mt-4 mb-2">$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2 class="text-lg font-semibold text-discord-text mt-5 mb-2 pb-1 border-b border-discord-light/50">$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1 class="text-xl font-bold text-discord-text mt-6 mb-3 pb-2 border-b border-discord-light">$1</h1>');
 
   // Bold and italic
   html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
@@ -66,40 +66,40 @@ function parseMarkdown(markdown: string): string {
 
   // Code blocks
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, _lang, code) => {
-    return `<pre class="bg-discord-darker rounded-lg p-4 my-4 overflow-x-auto"><code class="text-sm font-mono text-discord-text">${code.trim()}</code></pre>`;
+    return `<pre class="bg-discord-darker rounded-lg p-3 my-3 overflow-x-auto border border-discord-light/30"><code class="text-sm font-mono text-discord-text">${code.trim()}</code></pre>`;
   });
 
   // Blockquotes
-  html = html.replace(/^&gt; (.+)$/gm, '<blockquote class="border-l-4 border-discord-accent pl-4 my-4 text-discord-muted italic">$1</blockquote>');
+  html = html.replace(/^&gt; (.+)$/gm, '<blockquote class="border-l-3 border-discord-accent pl-3 my-2 text-discord-muted italic text-sm">$1</blockquote>');
 
-  // Unordered lists
-  html = html.replace(/^- (.+)$/gm, '<li class="ml-4 list-disc text-discord-text">$1</li>');
-  html = html.replace(/^\* (.+)$/gm, '<li class="ml-4 list-disc text-discord-text">$1</li>');
+  // Unordered lists - daha kompakt
+  html = html.replace(/^- (.+)$/gm, '<li class="ml-4 list-disc text-discord-text text-sm leading-relaxed">$1</li>');
+  html = html.replace(/^\* (.+)$/gm, '<li class="ml-4 list-disc text-discord-text text-sm leading-relaxed">$1</li>');
 
   // Ordered lists
-  html = html.replace(/^\d+\. (.+)$/gm, '<li class="ml-4 list-decimal text-discord-text">$1</li>');
+  html = html.replace(/^\d+\. (.+)$/gm, '<li class="ml-4 list-decimal text-discord-text text-sm leading-relaxed">$1</li>');
 
-  // Wrap consecutive list items
+  // Wrap consecutive list items - daha az spacing
   html = html.replace(/(<li[^>]*>.*<\/li>\n?)+/g, (match) => {
-    return `<ul class="my-4 space-y-2">${match}</ul>`;
+    return `<ul class="my-2 space-y-1">${match}</ul>`;
   });
 
   // Horizontal rule
-  html = html.replace(/^---$/gm, '<hr class="my-6 border-discord-light" />');
+  html = html.replace(/^---$/gm, '<hr class="my-4 border-discord-light/50" />');
 
   // Links
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-discord-accent hover:underline">$1</a>');
 
-  // Paragraphs - wrap remaining text
+  // Paragraphs - daha kompakt
   html = html.split('\n\n').map(block => {
     if (block.trim() && !block.startsWith('<')) {
-      return `<p class="text-discord-text leading-relaxed mb-4">${block}</p>`;
+      return `<p class="text-discord-text text-sm leading-relaxed mb-2">${block}</p>`;
     }
     return block;
   }).join('\n');
 
-  // Line breaks
-  html = html.replace(/\n/g, '<br />');
+  // Line breaks - tek satır boşluk için br kullanma
+  html = html.replace(/\n(?!<)/g, ' ');
 
   return html;
 }

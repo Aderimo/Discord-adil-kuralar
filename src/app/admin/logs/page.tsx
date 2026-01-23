@@ -70,6 +70,17 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   role_change: 'Yetki Değişikliği',
   user_approve: 'Kullanıcı Onaylama',
   user_reject: 'Kullanıcı Reddetme',
+  copy_content: 'İçerik Kopyalama',
+  copy_template: 'Şablon Kopyalama',
+  edit_content: 'İçerik Düzenleme',
+  delete_content: 'İçerik Silme',
+  create_role: 'Rol Oluşturma',
+  edit_role: 'Rol Düzenleme',
+  delete_role: 'Rol Silme',
+  view_logs: 'Log Görüntüleme',
+  export_logs: 'Log Dışa Aktarma',
+  view_notifications: 'Bildirim Görüntüleme',
+  mark_notification_read: 'Bildirim Okundu',
 };
 
 const ACTION_ICONS: Record<ActivityAction, React.ReactNode> = {
@@ -81,6 +92,17 @@ const ACTION_ICONS: Record<ActivityAction, React.ReactNode> = {
   role_change: <Shield className="h-4 w-4" />,
   user_approve: <UserCheck className="h-4 w-4" />,
   user_reject: <UserX className="h-4 w-4" />,
+  copy_content: <Eye className="h-4 w-4" />,
+  copy_template: <Eye className="h-4 w-4" />,
+  edit_content: <Eye className="h-4 w-4" />,
+  delete_content: <Eye className="h-4 w-4" />,
+  create_role: <Shield className="h-4 w-4" />,
+  edit_role: <Shield className="h-4 w-4" />,
+  delete_role: <Shield className="h-4 w-4" />,
+  view_logs: <Eye className="h-4 w-4" />,
+  export_logs: <Eye className="h-4 w-4" />,
+  view_notifications: <Eye className="h-4 w-4" />,
+  mark_notification_read: <Eye className="h-4 w-4" />,
 };
 
 const ACTION_COLORS: Record<ActivityAction, string> = {
@@ -92,6 +114,17 @@ const ACTION_COLORS: Record<ActivityAction, string> = {
   role_change: 'text-discord-accent',
   user_approve: 'text-discord-green',
   user_reject: 'text-discord-red',
+  copy_content: 'text-discord-accent',
+  copy_template: 'text-discord-accent',
+  edit_content: 'text-discord-yellow',
+  delete_content: 'text-discord-red',
+  create_role: 'text-discord-green',
+  edit_role: 'text-discord-yellow',
+  delete_role: 'text-discord-red',
+  view_logs: 'text-discord-muted',
+  export_logs: 'text-discord-muted',
+  view_notifications: 'text-discord-muted',
+  mark_notification_read: 'text-discord-muted',
 };
 
 export default function LogsPage(): React.ReactElement {

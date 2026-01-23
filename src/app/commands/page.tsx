@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { BackButton } from '@/components/navigation/BackButton';
 import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 import { loadCommands } from '@/lib/content';
+import { useAuth } from '@/hooks/useAuth';
+import { hasRole } from '@/lib/rbac';
 import { Gavel, Info, Mic, Shield, ChevronRight } from 'lucide-react';
 import type { CommandCategory } from '@/types/content';
 
@@ -49,6 +52,16 @@ const categoryConfig: Record<CommandCategory, {
 
 export default function CommandsPage(): React.ReactElement {
   const commands = useMemo(() => loadCommands(), []);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user } = useAuth();
+
+  // URL'den ?add=true parametresini kontrol et - varsayılan olarak ceza kategorisine yönlendir
+  useEffect(() => {
+    if (searchParams.get('add') === 'true' && user?.role && hasRole(user.role, 'gm_plus')) {
+      router.push('/commands/ceza?add=true');
+    }
+  }, [searchParams, user?.role, router]);
 
   // Her kategorideki komut sayısını hesapla
   const categoryCounts = useMemo(() => {

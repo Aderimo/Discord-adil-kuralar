@@ -72,7 +72,7 @@ const handler: AuthenticatedApiHandler<ApproveResponse> = async (
     }
 
     // Owner rolü kontrolü - sadece founder atayabilir
-    if (!canManageOwnerRole(adminUser.email, role)) {
+    if (role === 'owner' && !canManageOwnerRole(adminUser.email)) {
       return NextResponse.json(
         {
           success: false,
@@ -159,11 +159,11 @@ const handler: AuthenticatedApiHandler<ApproveResponse> = async (
 
     // Bildirim gönder
     try {
-      await notifyRoleChange({
-        id: targetUser.id,
-        username: targetUser.username,
-        email: targetUser.email,
-      }, null, role, adminUser.username);
+      await notifyRoleChange(
+        { id: targetUser.id, username: targetUser.username },
+        { code: targetRole.code, name: targetRole.name },
+        { id: adminUser.id, username: adminUser.username }
+      );
     } catch {
       // Bildirim hatası kritik değil
     }

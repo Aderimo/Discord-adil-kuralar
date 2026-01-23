@@ -98,6 +98,17 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   role_change: 'Yetki Değişikliği',
   user_approve: 'Kullanıcı Onayı',
   user_reject: 'Kullanıcı Reddi',
+  copy_content: 'İçerik Kopyaladı',
+  copy_template: 'Şablon Kopyaladı',
+  edit_content: 'İçerik Düzenledi',
+  delete_content: 'İçerik Sildi',
+  create_role: 'Rol Oluşturdu',
+  edit_role: 'Rol Düzenledi',
+  delete_role: 'Rol Sildi',
+  view_logs: 'Log Görüntüledi',
+  export_logs: 'Log Dışa Aktardı',
+  view_notifications: 'Bildirim Görüntüledi',
+  mark_notification_read: 'Bildirim Okundu',
 };
 
 const ACTION_ICONS: Record<ActivityAction, React.ReactNode> = {
@@ -109,6 +120,17 @@ const ACTION_ICONS: Record<ActivityAction, React.ReactNode> = {
   role_change: <Shield className="h-4 w-4" />,
   user_approve: <UserCheck className="h-4 w-4" />,
   user_reject: <UserX className="h-4 w-4" />,
+  copy_content: <Eye className="h-4 w-4" />,
+  copy_template: <Eye className="h-4 w-4" />,
+  edit_content: <Eye className="h-4 w-4" />,
+  delete_content: <Eye className="h-4 w-4" />,
+  create_role: <Shield className="h-4 w-4" />,
+  edit_role: <Shield className="h-4 w-4" />,
+  delete_role: <Shield className="h-4 w-4" />,
+  view_logs: <Eye className="h-4 w-4" />,
+  export_logs: <Eye className="h-4 w-4" />,
+  view_notifications: <Eye className="h-4 w-4" />,
+  mark_notification_read: <Eye className="h-4 w-4" />,
 };
 
 const ACTION_COLORS: Record<ActivityAction, string> = {
@@ -120,6 +142,17 @@ const ACTION_COLORS: Record<ActivityAction, string> = {
   role_change: 'bg-orange-500/20 text-orange-400',
   user_approve: 'bg-green-500/20 text-green-400',
   user_reject: 'bg-red-500/20 text-red-400',
+  copy_content: 'bg-blue-500/20 text-blue-400',
+  copy_template: 'bg-blue-500/20 text-blue-400',
+  edit_content: 'bg-yellow-500/20 text-yellow-400',
+  delete_content: 'bg-red-500/20 text-red-400',
+  create_role: 'bg-green-500/20 text-green-400',
+  edit_role: 'bg-yellow-500/20 text-yellow-400',
+  delete_role: 'bg-red-500/20 text-red-400',
+  view_logs: 'bg-gray-500/20 text-gray-400',
+  export_logs: 'bg-gray-500/20 text-gray-400',
+  view_notifications: 'bg-gray-500/20 text-gray-400',
+  mark_notification_read: 'bg-gray-500/20 text-gray-400',
 };
 
 export default function UserDetailPage(): React.ReactElement {

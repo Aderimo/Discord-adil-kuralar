@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { BackButton } from '@/components/navigation/BackButton';
 import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 import { loadPenalties } from '@/lib/content';
+import { useAuth } from '@/hooks/useAuth';
+import { hasRole } from '@/lib/rbac';
 import { AlertTriangle, Mic, Plus, Flag, Skull, ChevronRight } from 'lucide-react';
 import type { PenaltyCategory } from '@/types/content';
 
@@ -50,6 +53,16 @@ const categoryConfig: Record<PenaltyCategory, {
 
 export default function PenaltiesPage(): React.ReactElement {
   const penalties = useMemo(() => loadPenalties(), []);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user } = useAuth();
+
+  // URL'den ?add=true parametresini kontrol et - varsayılan olarak yazılı kategorisine yönlendir
+  useEffect(() => {
+    if (searchParams.get('add') === 'true' && user?.role && hasRole(user.role, 'gm_plus')) {
+      router.push('/penalties/yazili?add=true');
+    }
+  }, [searchParams, user?.role, router]);
 
   // Her kategorideki ceza sayısını hesapla
   const categoryCounts = useMemo(() => {

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { ContentEditor } from '@/components/content/ContentEditor';
@@ -18,9 +19,19 @@ import type { GuideContent, PenaltyDefinition, CommandDefinition, ProcedureDefin
 export default function GuidePage(): React.ReactElement {
   const allGuideContent = useMemo(() => loadGuideContent(), []);
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // URL'den ?add=true parametresini kontrol et
+  useEffect(() => {
+    if (searchParams.get('add') === 'true' && user?.role && hasRole(user.role, 'gm_plus')) {
+      setIsAddingNew(true);
+      // URL'den parametreyi temizle
+      window.history.replaceState({}, '', '/guide');
+    }
+  }, [searchParams, user?.role]);
 
   // Arama filtresi
   const guideContent = useMemo(() => {

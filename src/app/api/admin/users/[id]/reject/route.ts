@@ -98,7 +98,6 @@ const handler: AuthenticatedApiHandler<RejectResponse> = async (
           targetUserId: userId,
           targetUsername: targetUser.username,
           previousStatus: targetUser.status,
-          previousRole: targetUser.role,
           reason: reason || 'Sebep belirtilmedi',
         }),
         ipAddress: request.headers.get('x-forwarded-for') ||

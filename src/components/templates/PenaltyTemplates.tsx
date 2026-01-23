@@ -48,7 +48,7 @@ export interface PenaltyTemplatesProps {
   /** Kopyalama callback'i - şablon mesajını panoya kopyalar */
   onCopy: (text: string) => void;
   /** Düzenleme callback'i - şablon düzenlendiğinde çağrılır (opsiyonel) */
-  onEdit?: (template: PenaltyTemplate) => void;
+  onEdit?: (template: PenaltyTemplate) => void | Promise<void>;
   /** Kullanıcı ID'si - loglama için (opsiyonel) */
   userId?: string;
 }

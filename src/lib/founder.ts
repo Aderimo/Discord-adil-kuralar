@@ -16,6 +16,14 @@ export function isFounder(email: string): boolean {
 }
 
 /**
+ * Bir kullanıcının owner rolünü yönetip yönetemeyeceğini kontrol eder
+ * Sadece founder owner rolünü atayabilir
+ */
+export function canManageOwnerRole(userEmail: string): boolean {
+  return isFounder(userEmail);
+}
+
+/**
  * Founder'ın rolünü kontrol eder ve gerekirse düzeltir
  * Bu fonksiyon login sırasında çağrılabilir
  */

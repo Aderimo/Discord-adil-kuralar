@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useMemo, useState, useCallback } from 'react';
-import { useParams, notFound } from 'next/navigation';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import { useParams, useSearchParams, notFound } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { ContentEditor } from '@/components/content/ContentEditor';
@@ -54,6 +54,7 @@ const categoryConfig: Record<CommandCategory, {
 
 export default function CommandCategoryPage(): React.ReactElement {
   const params = useParams();
+  const searchParams = useSearchParams();
   const category = params.category as CommandCategory;
   const { user } = useAuth();
   const [editingCommand, setEditingCommand] = useState<CommandDefinition | null>(null);
@@ -68,6 +69,15 @@ export default function CommandCategoryPage(): React.ReactElement {
   }
 
   const config = categoryConfig[category];
+
+  // URL'den ?add=true parametresini kontrol et
+  useEffect(() => {
+    if (searchParams.get('add') === 'true' && user?.role && hasRole(user.role, 'gm_plus')) {
+      setIsAddingNew(true);
+      // URL'den parametreyi temizle
+      window.history.replaceState({}, '', `/commands/${category}`);
+    }
+  }, [searchParams, user?.role, category]);
 
   const allCommands = useMemo(() => loadCommands(), []);
   const commands = useMemo(() => {

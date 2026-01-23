@@ -13,7 +13,19 @@ interface UserDetailResponse {
     username: string;
     email: string;
     status: string;
-    role: string;
+    role: {
+      id: string;
+      code: string;
+      name: string;
+      shortName: string;
+      description: string;
+      hierarchy: number;
+      color: string;
+      permissions: string;
+      isSystem: boolean;
+      createdAt: Date;
+      updatedAt: Date;
+    } | null;
     createdAt: string;
     updatedAt: string;
     lastLoginAt: string | null;
@@ -23,7 +35,7 @@ interface UserDetailResponse {
 }
 
 const handler: AuthenticatedApiHandler<UserDetailResponse> = async (
-  request: NextRequest,
+  _request: NextRequest,
   { params }
 ) => {
   try {
