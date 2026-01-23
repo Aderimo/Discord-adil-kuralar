@@ -59,8 +59,28 @@
       "keywords": ["kkk", "kontrol", "kayıt", "kalite", "denetim"],
       "relatedArticles": ["guide-003"],
       "order": 6
+    },
+    {
+      "id": "guide-007",
+      "title": "Sesli Kanal Notları",
+      "slug": "sesli-kanal-notlari",
+      "category": "kilavuz",
+      "content": "# Sesli Kanal Notları\n\n## Oda Durumu ve Ceza\n\n- **Oda açıksa** → Ceza uygulanır\n- **Oda kapalıysa** → Kişisel alan sayılır, ceza uygulanmaz\n- **Ancak** sunucu kuralları her durumda geçerlidir\n\n## Ceza Esnekliği\n\n- Ceza süreleri **+2 / -2 gün** esnetilebilir\n- Durumun ciddiyetine göre değerlendirme yapılır\n\n## Oda Sahibi Sorumluluğu\n\n- Oda sahibi, odasındaki düzenden sorumludur\n- Tartışmaya engel olmadıysa, mod çağırmadıysa, hakaret edenleri susturmadıysa/atmadıysa ceza alır\n- NoRoomPls cezası uygulanabilir",
+      "keywords": ["sesli", "oda", "kapalı", "açık", "esneklik"],
+      "relatedArticles": ["guide-003", "guide-004"],
+      "order": 7
+    },
+    {
+      "id": "guide-008",
+      "title": "Blacklist Kuralları",
+      "slug": "blacklist-kurallari",
+      "category": "kilavuz",
+      "content": "# Blacklist Kuralları\n\n## Blacklist Sebepleri\n\n1. **Dini Küfür** - Dini değerlere hakaret\n2. **NSFW** - Yetişkin içerik paylaşımı\n3. **Atatürk'e Hakaret** - Atatürk'e hakaret içeren içerik\n4. **Pedofili** - Pedofili içerik veya davranış\n\n## Önemli Notlar\n\n- **BL'ye girenler ban affından yararlanamaz**\n- Tüm blacklist vakaları: Banlanana kadar mute + Blacklist\n- Acil müdahale gerektirir\n\n## Prosedür\n\n1. İçeriği hemen sil\n2. Kullanıcıyı anında mute\n3. Üst yetkililere bildir\n4. Kanıt topla ve kaydet",
+      "keywords": ["blacklist", "ban", "dini küfür", "nsfw", "atatürk", "pedofili"],
+      "relatedArticles": ["guide-003"],
+      "order": 8
     }
   ],
-  "lastUpdated": "2024-01-15T00:00:00.000Z",
-  "version": "2.0.0"
+  "lastUpdated": "2026-01-23T00:00:00.000Z",
+  "version": "3.0.0"
 }
