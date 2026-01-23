@@ -79,6 +79,16 @@
       "keywords": ["blacklist", "ban", "dini küfür", "nsfw", "atatürk", "pedofili"],
       "relatedArticles": ["guide-003"],
       "order": 8
+    },
+    {
+      "id": "guide-009",
+      "title": "Ceza Rolleri",
+      "slug": "ceza-rolleri",
+      "category": "kilavuz",
+      "content": "# Ceza Rolleri\n\n## @marked\n**Son şans rolüdür.** Bu rol sıklıkla ceza alan veya büyük bir kuralı çiğnemiş kişilere verilir. Bir sonraki en ufak cezasında banlanır.\n\n## @Susturulmuş\nUyarıları dinlemeyen kişilere sunucudan belli süreliğine uzaklaştırmak için verilir. Bazı durumlarda üye uyarılmadan uzaklaştırılabilir.\n\n## @Kısıtlanmış\nBotun uyarılarına dinlemeyen, CapsLock kullanan, spam atan kişilere **bot tarafından otomatik** verilir. Susturulmuş gibi sizi sunucudan uzaklaştırır.\n\n### Uyarı Sayısına Göre Ceza Süresi:\n- **1 bot uyarısı:** Mesajınız silinir, bottan uyarı alırsınız (kısıtlanmış yemezsiniz)\n- **2 bot uyarısı:** 5 dakika kısıtlanmış\n- **3 bot uyarısı:** 20 dakika kısıtlanmış\n- **5 bot uyarısı:** 1 gün kısıtlanmış\n\n## @Uyarılmış\nKural ihlali yaptığında verilir. Sunucu içerisindeki birkaç şeyi kısıtlar:\n- Sesli kanallarda konuşamama\n- Özel oda oluşturamama\n- Topluluk kanallara erişim engeli\n\n## @unselfie\n📲saniyetagram kanalının kuralları ihlal edildiği zaman verilir. Bu rol kanala erişimini engeller. **Bir istisna oluşmadığı süreçte KALICIDIR!**\n\n## @nofotopls\nDosya paylaşma yetkisi olanların çok fazla dosya paylaşması ya da izni kötüye kullanması durumunda verilir.\n\n## @noroompls\nAçtığınız sesli odaya sahip çıkmadığınızda, çıkan kavgalara modlar gelene kadar müsaade gösterdiğinizde, kötü amaçlar için kullandığınızda veya **XP abuse** için kullandığınız zaman verilen bir cezadır.\n\n**Not:** Bir oda sahibiysen ya da oda içerisindeysen 👤seskitabı kurallarına uy!",
+      "keywords": ["rol", "marked", "susturulmuş", "kısıtlanmış", "uyarılmış", "unselfie", "nofotopls", "noroompls"],
+      "relatedArticles": ["guide-003", "guide-005"],
+      "order": 9
     }
   ],
   "lastUpdated": "2026-01-23T00:00:00.000Z",

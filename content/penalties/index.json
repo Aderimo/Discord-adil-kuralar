@@ -250,6 +250,19 @@
     {
       "id": "penalty-020",
       "code": "EKS-002",
+      "name": "Dosya Paylaşım İhlali (NoFotoPls)",
+      "category": "ekstra",
+      "duration": "nofotopls rolü",
+      "description": "Dosya paylaşma yetkisini kötüye kullanan kullanıcılara verilen ceza.",
+      "conditions": ["Çok fazla dosya paylaşma", "Dosya paylaşma iznini kötüye kullanma"],
+      "alternatives": [],
+      "examples": ["Kullanıcı çok fazla dosya paylaştı"],
+      "keywords": ["nofotopls", "dosya", "fotoğraf"],
+      "order": 20
+    },
+    {
+      "id": "penalty-021",
+      "code": "EKS-003",
       "name": "İsteyerek Susturulma",
       "category": "ekstra",
       "duration": "Minimum 7 gün susturulmuş",
@@ -258,11 +271,11 @@
       "alternatives": [],
       "examples": ["Kullanıcı kasıtlı olarak ceza almak istedi"],
       "keywords": ["isteyerek", "kasıtlı"],
-      "order": 20
+      "order": 21
     },
     {
-      "id": "penalty-021",
-      "code": "EKS-003",
+      "id": "penalty-022",
+      "code": "EKS-004",
       "name": "Bana Ulaşana Kadar Susturulmuş",
       "category": "ekstra",
       "duration": "Süresiz mute",
@@ -271,11 +284,11 @@
       "alternatives": [],
       "examples": ["Kullanıcı şikayete yanıt vermedi"],
       "keywords": ["ulaşana kadar", "kaçma", "süresiz"],
-      "order": 21
+      "order": 22
     },
     {
-      "id": "penalty-022",
-      "code": "EKS-004",
+      "id": "penalty-023",
+      "code": "EKS-005",
       "name": "Taciz",
       "category": "ekstra",
       "duration": "Uyarı-mute / Banlanana kadar mute + blacklist",
@@ -284,11 +297,11 @@
       "alternatives": [],
       "examples": ["Kullanıcı başka birini taciz etti"],
       "keywords": ["taciz", "rahatsız etme"],
-      "order": 22
+      "order": 23
     },
     {
-      "id": "penalty-023",
-      "code": "EKS-005",
+      "id": "penalty-024",
+      "code": "EKS-006",
       "name": "Yeni Üye Kuralı (3 Gün)",
       "category": "ekstra",
       "duration": "Normal ceza / Banlanana kadar susturulmuş",
@@ -297,10 +310,10 @@
       "alternatives": [],
       "examples": ["Yeni üye kural ihlali yaptı"],
       "keywords": ["yeni üye", "3 gün", "aktiflik"],
-      "order": 23
+      "order": 24
     },
     {
-      "id": "penalty-024",
+      "id": "penalty-025",
       "code": "MRK-001",
       "name": "Marked - 30 Gün Kuralı",
       "category": "marked",
@@ -310,10 +323,10 @@
       "alternatives": [],
       "examples": ["Kullanıcı 30 gün içinde 3. cezasını aldı"],
       "keywords": ["marked", "30 gün", "3 ceza"],
-      "order": 24
+      "order": 25
     },
     {
-      "id": "penalty-025",
+      "id": "penalty-026",
       "code": "MRK-002",
       "name": "Marked - Toplam Ceza Kuralı",
       "category": "marked",
@@ -323,10 +336,10 @@
       "alternatives": [],
       "examples": ["Kullanıcı toplamda 6. cezasını aldı"],
       "keywords": ["marked", "6 ceza", "toplam"],
-      "order": 25
+      "order": 26
     },
     {
-      "id": "penalty-026",
+      "id": "penalty-027",
       "code": "BLK-001",
       "name": "Dini Küfür",
       "category": "blacklist",
@@ -336,10 +349,10 @@
       "alternatives": [],
       "examples": ["Kullanıcı dini değerlere küfür etti"],
       "keywords": ["dini küfür", "din", "blacklist"],
-      "order": 26
+      "order": 27
     },
     {
-      "id": "penalty-027",
+      "id": "penalty-028",
       "code": "BLK-002",
       "name": "NSFW İçerik",
       "category": "blacklist",
@@ -349,10 +362,10 @@
       "alternatives": [],
       "examples": ["Kullanıcı NSFW içerik paylaştı"],
       "keywords": ["nsfw", "yetişkin", "blacklist"],
-      "order": 27
+      "order": 28
     },
     {
-      "id": "penalty-028",
+      "id": "penalty-029",
       "code": "BLK-003",
       "name": "Atatürk'e Hakaret",
       "category": "blacklist",
@@ -362,10 +375,10 @@
       "alternatives": [],
       "examples": ["Kullanıcı Atatürk'e hakaret etti"],
       "keywords": ["atatürk", "hakaret", "blacklist"],
-      "order": 28
+      "order": 29
     },
     {
-      "id": "penalty-029",
+      "id": "penalty-030",
       "code": "BLK-004",
       "name": "Pedofili",
       "category": "blacklist",
@@ -375,7 +388,7 @@
       "alternatives": [],
       "examples": ["Kullanıcı pedofili içerik paylaştı"],
       "keywords": ["pedofili", "blacklist"],
-      "order": 29
+      "order": 30
     }
   ],
   "lastUpdated": "2026-01-23T00:00:00.000Z",
