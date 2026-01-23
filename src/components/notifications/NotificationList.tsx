@@ -70,7 +70,7 @@ export function NotificationList({
         // Link varsa yönlendir
         const data = notification.data as { link?: string };
         if (data.link) {
-            router.push(data.link);
+            router.push(data.link as Parameters<typeof router.push>[0]);
             onClose();
         }
     };
