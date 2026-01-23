@@ -126,16 +126,16 @@ export async function POST(request: NextRequest) {
         const newRole = await createRole(roleData);
 
         // Log kaydet
-        await logActivity({
-            userId: user.id,
-            action: 'create_role',
-            details: {
+        await logActivity(
+            user.id,
+            'create_role',
+            {
                 roleId: newRole.id,
                 roleCode: newRole.code,
                 roleName: newRole.name,
             },
-            ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        });
+            request.headers.get('x-forwarded-for') || 'unknown'
+        );
 
         return NextResponse.json({
             success: true,

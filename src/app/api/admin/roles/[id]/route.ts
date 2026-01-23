@@ -120,17 +120,17 @@ export async function PUT(request: NextRequest, context: RouteParams) {
         const updatedRole = await updateRole(id, updateData);
 
         // Log kaydet
-        await logActivity({
-            userId: user.id,
-            action: 'edit_role',
-            details: {
+        await logActivity(
+            user.id,
+            'edit_role',
+            {
                 roleId: updatedRole.id,
                 roleCode: updatedRole.code,
                 roleName: updatedRole.name,
                 changes: updateData,
             },
-            ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        });
+            request.headers.get('x-forwarded-for') || 'unknown'
+        );
 
         return NextResponse.json({
             success: true,
@@ -194,12 +194,12 @@ export async function DELETE(request: NextRequest, context: RouteParams) {
         await deleteRole(id);
 
         // Log kaydet
-        await logActivity({
-            userId: user.id,
-            action: 'delete_role',
-            details: roleInfo,
-            ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        });
+        await logActivity(
+            user.id,
+            'delete_role',
+            roleInfo,
+            request.headers.get('x-forwarded-for') || 'unknown'
+        );
 
         return NextResponse.json({
             success: true,
