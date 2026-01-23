@@ -7,21 +7,19 @@
  * - MainLayout with Sidebar
  * - ContentViewer for guide content
  * - SearchBar integration
- * - AI Chat Bubble
  * 
  * Requirements: Tüm gereksinimler
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { ContentViewer } from '@/components/content/ContentViewer';
-import { AIChatBubble, type ChatMessage, type PenaltyRecord } from '@/components/chat/AIChatBubble';
 import { loadGuideContent } from '@/lib/content';
 import type { GuideContent } from '@/types/content';
-import { Book, Shield, Gavel, Terminal, FileText, Bot } from 'lucide-react';
+import { Book, Shield, Gavel, Terminal, FileText } from 'lucide-react';
 
 // Hoşgeldin kartı bileşeni
 function WelcomeCard(): React.ReactElement {
@@ -70,14 +68,6 @@ function WelcomeCard(): React.ReactElement {
           color="yellow"
         />
         <QuickAccessCard
-          icon={<Bot className="h-6 w-6" />}
-          title="AI Danışman"
-          description="Ceza önerileri ve rehberlik"
-          onClick={() => {}}
-          color="accent"
-          isAI
-        />
-        <QuickAccessCard
           icon={<Shield className="h-6 w-6" />}
           title="Yetki Bilgisi"
           description={`Mevcut yetkiniz: ${getRoleLabel(user?.role)}`}
@@ -94,7 +84,6 @@ function WelcomeCard(): React.ReactElement {
           <p className="text-sm text-discord-muted">
             Hızlı arama için <kbd className="px-1.5 py-0.5 bg-discord-darker rounded text-xs">⌘K</kbd> veya{' '}
             <kbd className="px-1.5 py-0.5 bg-discord-darker rounded text-xs">Ctrl+K</kbd> kısayolunu kullanabilirsiniz.
-            AI Danışman&apos;a soru sormak için sağ alttaki sohbet balonuna tıklayın.
           </p>
         </div>
       </div>
@@ -129,7 +118,6 @@ interface QuickAccessCardProps {
   href?: string;
   onClick?: () => void;
   color: 'accent' | 'red' | 'green' | 'yellow' | 'muted';
-  isAI?: boolean;
 }
 
 function QuickAccessCard({
@@ -139,7 +127,6 @@ function QuickAccessCard({
   href,
   onClick,
   color,
-  isAI,
 }: QuickAccessCardProps): React.ReactElement {
   const router = useRouter();
   
@@ -177,11 +164,6 @@ function QuickAccessCard({
         <div>
           <h3 className="font-semibold text-discord-text text-sm mb-1">
             {title}
-            {isAI && (
-              <span className="ml-2 text-xs bg-discord-accent/20 text-discord-accent px-1.5 py-0.5 rounded">
-                AI
-              </span>
-            )}
           </h3>
           <p className="text-xs text-discord-muted">{description}</p>
         </div>
@@ -195,87 +177,11 @@ export default function HomePage(): React.ReactElement {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   
-  // AI Chat state
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [isChatLoading, setIsChatLoading] = useState(false);
-  
   // Seçili içerik state
   const [selectedContent, setSelectedContent] = useState<GuideContent | null>(null);
 
   // Kılavuz içeriğini yükle
   const guideContent = useMemo(() => loadGuideContent(), []);
-
-  // Chat toggle
-  const toggleChat = useCallback(() => {
-    setIsChatOpen((prev) => !prev);
-  }, []);
-
-  // AI mesaj gönderme
-  const handleSendMessage = useCallback(async (message: string): Promise<void> => {
-    // Kullanıcı mesajını ekle
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: message,
-      timestamp: new Date(),
-    };
-    setChatMessages((prev) => [...prev, userMessage]);
-    setIsChatLoading(true);
-
-    try {
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Ceza kaydı varsa parse et
-        let penaltyRecord: PenaltyRecord | undefined;
-        if (data.penaltyRecord) {
-          penaltyRecord = {
-            violation: data.penaltyRecord.violation || '',
-            duration: data.penaltyRecord.duration || '',
-            article: data.penaltyRecord.article || '',
-            reason: data.penaltyRecord.reason || '',
-            copyableText: data.penaltyRecord.copyableText || '',
-          };
-        }
-
-        const assistantMessage: ChatMessage = {
-          id: `assistant-${Date.now()}`,
-          role: 'assistant',
-          content: data.response,
-          timestamp: new Date(),
-          penaltyRecord,
-        };
-        setChatMessages((prev) => [...prev, assistantMessage]);
-      } else {
-        // Hata mesajı
-        const errorMessage: ChatMessage = {
-          id: `assistant-${Date.now()}`,
-          role: 'assistant',
-          content: data.error || 'Bir hata oluştu. Lütfen tekrar deneyin.',
-          timestamp: new Date(),
-        };
-        setChatMessages((prev) => [...prev, errorMessage]);
-      }
-    } catch (error) {
-      console.error('AI chat error:', error);
-      const errorMessage: ChatMessage = {
-        id: `assistant-${Date.now()}`,
-        role: 'assistant',
-        content: 'Bağlantı hatası. Lütfen tekrar deneyin.',
-        timestamp: new Date(),
-      };
-      setChatMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsChatLoading(false);
-    }
-  }, []);
 
   // Yükleniyor durumu
   if (isLoading) {
@@ -371,44 +277,33 @@ export default function HomePage(): React.ReactElement {
   const nextContent = currentIndex < guideContent.length - 1 ? guideContent[currentIndex + 1] : null;
 
   return (
-    <>
-      <MainLayout sidebar={<Sidebar />}>
-        {selectedContent ? (
-          <ContentViewer
-            type="guide"
-            content={selectedContent}
-            prevContent={
-              prevContent
-                ? { title: prevContent.title, href: `/guide/${prevContent.slug}` }
-                : null
+    <MainLayout sidebar={<Sidebar />}>
+      {selectedContent ? (
+        <ContentViewer
+          type="guide"
+          content={selectedContent}
+          prevContent={
+            prevContent
+              ? { title: prevContent.title, href: `/guide/${prevContent.slug}` }
+              : null
+          }
+          nextContent={
+            nextContent
+              ? { title: nextContent.title, href: `/guide/${nextContent.slug}` }
+              : null
+          }
+          onNavigate={(href) => {
+            const slug = href.split('/').pop();
+            const content = guideContent.find((c) => c.slug === slug);
+            if (content) {
+              handleContentSelect(content);
             }
-            nextContent={
-              nextContent
-                ? { title: nextContent.title, href: `/guide/${nextContent.slug}` }
-                : null
-            }
-            onNavigate={(href) => {
-              const slug = href.split('/').pop();
-              const content = guideContent.find((c) => c.slug === slug);
-              if (content) {
-                handleContentSelect(content);
-              }
-            }}
-            userId={user?.id}
-          />
-        ) : (
-          <WelcomeCard />
-        )}
-      </MainLayout>
-
-      {/* AI Chat Bubble */}
-      <AIChatBubble
-        isOpen={isChatOpen}
-        onToggle={toggleChat}
-        messages={chatMessages}
-        onSendMessage={handleSendMessage}
-        isLoading={isChatLoading}
-      />
-    </>
+          }}
+          userId={user?.id}
+        />
+      ) : (
+        <WelcomeCard />
+      )}
+    </MainLayout>
   );
 }

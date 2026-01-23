@@ -164,6 +164,8 @@ const ROUTE_RULES: RouteRule[] = [
   // Auth sayfaları - giriş yapmış kullanıcıları yönlendir
   { pattern: /^\/login$/, isPublic: true, redirectIfAuthenticated: '/' },
   { pattern: /^\/register$/, isPublic: true, redirectIfAuthenticated: '/' },
+  { pattern: /^\/forgot-password$/, isPublic: true },
+  { pattern: /^\/reset-password$/, isPublic: true },
   
   // Yetkisiz erişim sayfası - herkese açık
   { pattern: /^\/unauthorized$/, isPublic: true },
