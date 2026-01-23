@@ -32,19 +32,29 @@ interface SearchResponse {
 
 /**
  * İçerik tipine göre href oluşturur
+ * 
+ * Route yapıları:
+ * - Guide: /guide/[slug] - slug kullanır
+ * - Penalties: /penalties/[category] - kategori kullanır (yazili, sesli, ekstra, marked, blacklist)
+ * - Commands: /commands/[category] - kategori kullanır
+ * - Procedures: /procedures/[slug] - slug kullanır
  */
 function generateHref(result: SearchResult): string {
   switch (result.type) {
     case 'madde':
-      return `/guide/${result.id}`;
+      // Guide için category alanı slug olarak kullanılıyor
+      return `/guide/${result.category}`;
     case 'ceza':
-      return `/penalties/${result.id}`;
+      // Penalties için category alanı route parametresi
+      return `/penalties/${result.category}`;
     case 'komut':
-      return `/commands/${result.id}`;
+      // Commands için category alanı route parametresi
+      return `/commands/${result.category}`;
     case 'prosedur':
-      return `/procedures/${result.id}`;
+      // Procedures için category alanı slug olarak kullanılıyor
+      return `/procedures/${result.category}`;
     default:
-      return `/${result.type}/${result.id}`;
+      return `/${result.type}/${result.category}`;
   }
 }
 

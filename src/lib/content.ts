@@ -352,7 +352,7 @@ export function searchContent(query: string): SearchResult[] {
         type: 'madde' as SearchResultType,
         title: guide.title,
         excerpt: extractExcerpt(guide.content, normalizedQuery),
-        category: guide.category,
+        category: guide.slug, // Route için slug kullanılıyor: /guide/[slug]
         relevanceScore: score,
       });
     }
@@ -394,7 +394,7 @@ export function searchContent(query: string): SearchResult[] {
         type: 'komut' as SearchResultType,
         title: command.command,
         excerpt: command.description,
-        category: 'komut',
+        category: command.category, // Route için category kullanılıyor: /commands/[category]
         relevanceScore: score,
       });
     }
@@ -415,7 +415,7 @@ export function searchContent(query: string): SearchResult[] {
         type: 'prosedur' as SearchResultType,
         title: procedure.title,
         excerpt: procedure.description,
-        category: 'prosedur',
+        category: procedure.slug, // Route için slug kullanılıyor: /procedures/[slug]
         relevanceScore: score,
       });
     }
