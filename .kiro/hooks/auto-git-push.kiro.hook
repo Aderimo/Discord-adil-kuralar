@@ -9,5 +9,7 @@
   "then": {
     "type": "runCommand",
     "command": "git add -A && git commit -m \"Auto-commit: Updates from Kiro\" --allow-empty && git push origin main"
-  }
+  },
+  "workspaceFolderName": "modluk kuralları",
+  "shortName": "auto-git-push"
 }

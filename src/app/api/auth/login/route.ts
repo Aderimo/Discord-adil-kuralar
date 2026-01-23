@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyPassword, createSession, isValidEmail } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { FOUNDER_EMAIL } from '@/lib/founder';
 
 interface LoginRequest {
   email: string;
@@ -99,6 +100,23 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     // roleId doğrudan user'dan da gelebilir
     if (user.roleId) {
       roleId = user.roleId;
+    }
+
+    // Founder kontrolü - founder her zaman owner olmalı
+    if (email === FOUNDER_EMAIL) {
+      const ownerRole = await prisma.role.findUnique({
+        where: { code: 'owner' },
+      });
+      
+      if (ownerRole && roleCode !== 'owner') {
+        // Founder'ın rolünü owner olarak düzelt
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { roleId: ownerRole.id },
+        });
+        roleCode = 'owner';
+        roleId = ownerRole.id;
+      }
     }
 
     // Oturum oluştur - kullanıcı bilgileriyle birlikte (RBAC middleware için)

@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { withAdmin, type AuthenticatedApiHandler } from '@/lib/api-auth';
 import { notifyRoleChange } from '@/lib/notifications';
+import { FOUNDER_EMAIL } from '@/lib/founder';
 
 interface RoleChangeRequest {
   role: string; // Dinamik rol kodu
@@ -126,6 +127,17 @@ const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
           error: 'Sadece onaylı kullanıcıların yetki seviyesi değiştirilebilir',
         },
         { status: 400 }
+      );
+    }
+
+    // Founder koruması - founder'ın rolü değiştirilemez
+    if (targetUser.email === FOUNDER_EMAIL) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Site kurucusunun rolü değiştirilemez',
+        },
+        { status: 403 }
       );
     }
 
