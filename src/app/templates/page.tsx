@@ -123,7 +123,7 @@ export default function TemplatesPage(): React.ReactElement {
           templates={templates}
           canEdit={canEdit}
           onCopy={handleCopy}
-          onEdit={canEdit ? handleEdit : undefined}
+          {...(canEdit && { onEdit: handleEdit })}
           userId={user?.id}
         />
       </div>
