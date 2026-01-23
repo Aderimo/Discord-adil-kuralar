@@ -49,6 +49,7 @@ model User {
   sessions      Session[]
   activityLogs  ActivityLog[]
   notifications Notification[]
+  logPermission LogPermission?
 
   @@map("users")
 }
@@ -106,4 +107,33 @@ model Notification {
   @@index([read])
   @@index([createdAt])
   @@map("notifications")
+}
+
+// LogPermission Model - Log indirme ve silme yetkileri
+// Requirement 6.1, 7.4, 8.3: Log yönetim yetkileri
+model LogPermission {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  canDownload  Boolean   @default(false)
+  canDelete    Boolean   @default(false)
+  grantedAt    DateTime  @default(now())
+  downloadedAt DateTime?
+  deletedAt    DateTime?
+
+  // İlişkiler
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("log_permissions")
+}
+
+// LogThreshold Model - Log eşik durumu takibi
+// Requirement 6.1: Log birikimi bildirimi için eşik takibi
+model LogThreshold {
+  id                    String    @id @default(cuid())
+  lastNotificationAt    DateTime?
+  lastNotificationCount Int       @default(0)
+  lastDownloadAt        DateTime?
+  lastDeleteAt          DateTime?
+
+  @@map("log_thresholds")
 }

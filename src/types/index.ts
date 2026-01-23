@@ -95,7 +95,21 @@ export type ActivityAction =
   | 'export_logs'
   // Bildirim işlemleri (YENİ)
   | 'view_notifications'
-  | 'mark_notification_read';
+  | 'mark_notification_read'
+  // Gelişmiş Loglama - Ziyaretçi ve Erişim (Requirements 1.1, 3.1)
+  | 'visitor_access'      // Anonim ziyaretçi erişimi
+  | 'page_access'         // Sayfa erişimi (detaylı)
+  // Gelişmiş Loglama - AI Etkileşim (Requirement 2.1)
+  | 'ai_interaction'      // AI soru-cevap (detaylı)
+  // Gelişmiş Loglama - Metin İşlemleri (Requirements 5.1, 10.1)
+  | 'text_input'          // Metin girişi
+  | 'text_copy'           // Metin kopyalama
+  // Gelişmiş Loglama - Referrer ve URL (Requirement 9.1)
+  | 'referrer_track'      // Referrer takibi
+  | 'url_copy'            // URL kopyalama
+  // Gelişmiş Loglama - Log Yönetimi (Requirements 7.4, 8.6)
+  | 'log_download'        // Log indirme
+  | 'log_delete';         // Log silme
 
 /**
  * Aktivite Log Interface

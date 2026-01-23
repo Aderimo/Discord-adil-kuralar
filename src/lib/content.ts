@@ -394,7 +394,7 @@ export function searchContent(query: string): SearchResult[] {
         type: 'komut' as SearchResultType,
         title: command.command,
         excerpt: command.description,
-        category: command.category, // Route için category kullanılıyor: /commands/[category]
+        category: command.category || 'genel', // Route için category kullanılıyor: /commands/[category]
         relevanceScore: score,
       });
     }
