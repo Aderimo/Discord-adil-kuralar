@@ -48,9 +48,9 @@ export interface PenaltyTemplatesProps {
   /** Kopyalama callback'i - şablon mesajını panoya kopyalar */
   onCopy: (text: string) => void;
   /** Düzenleme callback'i - şablon düzenlendiğinde çağrılır (opsiyonel) */
-  onEdit?: (template: PenaltyTemplate) => void | Promise<void>;
+  onEdit?: ((template: PenaltyTemplate) => void | Promise<void>) | undefined;
   /** Kullanıcı ID'si - loglama için (opsiyonel) */
-  userId?: string;
+  userId?: string | undefined;
 }
 
 // Kategori ikonları ve etiketleri
