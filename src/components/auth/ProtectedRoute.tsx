@@ -107,7 +107,7 @@ export function ProtectedRoute({
     }
 
     // Onaylı kullanıcı için yetki seviyesi kontrolü
-    if (requiredRole && !hasRequiredRole(user.role, requiredRole)) {
+    if (requiredRole && !hasRequiredRole(user.role || 'none', requiredRole)) {
       return unauthorizedRedirect;
     }
 
