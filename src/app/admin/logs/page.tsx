@@ -81,6 +81,16 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   export_logs: 'Log Dışa Aktarma',
   view_notifications: 'Bildirim Görüntüleme',
   mark_notification_read: 'Bildirim Okundu',
+  // Gelişmiş Loglama
+  visitor_access: 'Ziyaretçi Erişimi',
+  page_access: 'Sayfa Erişimi',
+  ai_interaction: 'AI Etkileşimi',
+  text_input: 'Metin Girişi',
+  text_copy: 'Metin Kopyalama',
+  referrer_track: 'Referrer Takibi',
+  url_copy: 'URL Kopyalama',
+  log_download: 'Log İndirme',
+  log_delete: 'Log Silme',
 };
 
 const ACTION_ICONS: Record<ActivityAction, React.ReactNode> = {
@@ -103,6 +113,16 @@ const ACTION_ICONS: Record<ActivityAction, React.ReactNode> = {
   export_logs: <Eye className="h-4 w-4" />,
   view_notifications: <Eye className="h-4 w-4" />,
   mark_notification_read: <Eye className="h-4 w-4" />,
+  // Gelişmiş Loglama
+  visitor_access: <Eye className="h-4 w-4" />,
+  page_access: <Eye className="h-4 w-4" />,
+  ai_interaction: <Bot className="h-4 w-4" />,
+  text_input: <Eye className="h-4 w-4" />,
+  text_copy: <Eye className="h-4 w-4" />,
+  referrer_track: <Eye className="h-4 w-4" />,
+  url_copy: <Eye className="h-4 w-4" />,
+  log_download: <Eye className="h-4 w-4" />,
+  log_delete: <Eye className="h-4 w-4" />,
 };
 
 const ACTION_COLORS: Record<ActivityAction, string> = {
@@ -125,6 +145,16 @@ const ACTION_COLORS: Record<ActivityAction, string> = {
   export_logs: 'text-discord-muted',
   view_notifications: 'text-discord-muted',
   mark_notification_read: 'text-discord-muted',
+  // Gelişmiş Loglama
+  visitor_access: 'text-discord-accent',
+  page_access: 'text-discord-accent',
+  ai_interaction: 'text-discord-yellow',
+  text_input: 'text-discord-muted',
+  text_copy: 'text-discord-muted',
+  referrer_track: 'text-discord-accent',
+  url_copy: 'text-discord-muted',
+  log_download: 'text-discord-green',
+  log_delete: 'text-discord-red',
 };
 
 export default function LogsPage(): React.ReactElement {
