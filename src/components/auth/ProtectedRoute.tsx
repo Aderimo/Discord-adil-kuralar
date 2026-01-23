@@ -37,7 +37,9 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
  * Kullanıcının gerekli yetkiye sahip olup olmadığını kontrol eder
  */
 function hasRequiredRole(userRole: UserRole, requiredRole: UserRole): boolean {
-  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+  const userLevel = ROLE_HIERARCHY[userRole] ?? 0;
+  const requiredLevel = ROLE_HIERARCHY[requiredRole] ?? 0;
+  return userLevel >= requiredLevel;
 }
 
 /**
