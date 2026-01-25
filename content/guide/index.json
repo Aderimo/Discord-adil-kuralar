@@ -6,8 +6,17 @@
       "slug": "giris",
       "category": "kilavuz",
       "content": "# Yetkili Kılavuzu\n\nBu kılavuz, Menos'un hem kendine hem de takım arkadaşlarına destek olmak amacıyla Modluk 101 ve Modluk 911 kanallarındaki bilgileri özetleyerek oluşturduğu bir rehberdir.\n\n**Faydalı olmasını dilerim, keyifle kullanın!**\n\n## Kılavuz İçeriği\n\n- İşleyiş Kuralları\n- Yetkili Etiği\n- Cezalar (Yazılı, Sesli, Ekstra)\n- Komutlar\n- K.K.K (Kayıt Kontrol Kılavuzu)",
-      "keywords": ["kılavuz", "giriş", "yetkili", "menos", "başlangıç"],
-      "relatedArticles": ["guide-002", "guide-003"],
+      "keywords": [
+        "kılavuz",
+        "giriş",
+        "yetkili",
+        "menos",
+        "başlangıç"
+      ],
+      "relatedArticles": [
+        "guide-002",
+        "guide-003"
+      ],
       "order": 1
     },
     {
@@ -16,8 +25,18 @@
       "slug": "isleyis-kurallari",
       "category": "kilavuz",
       "content": "# İşleyiş Kuralları\n\n## Moderasyon Kanalları\n\n- **revival-chat & god-chat**: Sadece ekip içi sohbet ve iletişim için kullanılmalı, ciddi kayıtlar paylaşılmamalıdır.\n- **god-evrak**: Tüm kanıt ve kayıtların toplandığı kanal.\n- **Not Kanalı**: Henüz kesinleşmemiş olaylar ve üyelerle ilgili ileride referans olabilecek notlar için kullanılır.\n\n## Not Alma Standartları\n\n1. İletişim ortamı (sesli, yazılı, DM) belirtilmeli\n2. Zaman bilgisi net olmalı\n3. Olay kronolojik sırayla yazılmalı\n4. Katılımcılar açıkça belirtilmeli\n5. Kanıtlar eklenmeli (görsel, log, ses vb.)\n6. Kişisel yorumlar olaya katkı sağlayacak şekilde yazılmalı\n7. Tek kelimelik notlardan kaçınılmalıdır\n\n## Yetkili İletişimi ve Saygı\n\n- Üst yetkililerin açıklamaları bölünmeden dinlenmelidir\n- Konuşmaların kesilmemesi, doğru anlaşılmayı sağlar\n\n## Şikayet Yönetimi\n\n- Şikayetsiz, duyuma dayalı işlem yapılmaz\n- Şikayetler açık ve net belgelenmelidir\n- Ceza amacıyla \"ihlal arayışı\" yapılmaz",
-      "keywords": ["işleyiş", "kurallar", "moderasyon", "not alma", "şikayet"],
-      "relatedArticles": ["guide-001", "guide-003", "guide-004"],
+      "keywords": [
+        "işleyiş",
+        "kurallar",
+        "moderasyon",
+        "not alma",
+        "şikayet"
+      ],
+      "relatedArticles": [
+        "guide-001",
+        "guide-003",
+        "guide-004"
+      ],
       "order": 2
     },
     {
@@ -26,8 +45,17 @@
       "slug": "ceza-proseduru",
       "category": "kilavuz",
       "content": "# Ceza Prosedürü\n\n## Ceza Kayıtları\n\n- Olayın ciddiyetine göre orantılı ceza uygulanır\n- Kayıtlar kısa, net ve gereksiz detaydan arındırılmış olmalıdır\n- Basit ihlaller için ağır cezalar verilmez\n\n## Örnek Kayıt Biçimleri\n\n```\n@Menos 1208226241002606644 vc troll 3 gün susturulmuş [God-Evrak (Kanıt)]\n```\n\n```\n@Menos 1208226241002606644 xp abuse 3 gün noroompls + 1 gün uyarılmış [God-Evrak (Kanıt)]\n```\n\n```\n@Menos 1208226241002606644 dini değerlere hakaret banlanana kadar mute [God-Evrak (Kanıt)]\n```\n\n## Kanıt Olmayan Durumlarda\n\n1. Taraf sesli sorguya çağrılır, bilgi alınır\n2. İtiraf varsa kayıt altına alınır\n3. İnkâr varsa loglar ve notlar incelenir\n4. Kanıt yetersizse şikayet eden bilgilendirilir, şüpheli uyarılır ve not tutulur\n\n## Ek Prosedürler\n\n### Regulator & Çöp Operatörleri İşbirliği\n- Tüm video kayıtları kontrol edildiğinde emoji ile işaretlenmelidir\n- Kolay kayıtları işaretleyip zor kayıtları atlamak yasaktır\n\n### Üst Yetkililerin Rolü\n- Denetim yükü azaltılmak istense de, anlaşmazlık durumlarında her zaman destek verirler\n- Yetkililerin işbirliği, gelecekteki görevlendirmelerde dikkate alınır\n\n### Hata Bildirme Prosedürü\n1. Hatalı kayıt tespit edilir\n2. Mesaj bağlantısı alınarak mod-chat'te bildirilir\n3. İlgili yetkili kaydını günceller ve teşekkür eder",
-      "keywords": ["ceza", "prosedür", "kayıt", "kanıt", "format"],
-      "relatedArticles": ["guide-002", "guide-004"],
+      "keywords": [
+        "ceza",
+        "prosedür",
+        "kayıt",
+        "kanıt",
+        "format"
+      ],
+      "relatedArticles": [
+        "guide-002",
+        "guide-004"
+      ],
       "order": 3
     },
     {
@@ -36,8 +64,17 @@
       "slug": "yetkili-etigi",
       "category": "kilavuz",
       "content": "# Yetkili Etiği\n\n## Üye İletişimi\n\n- Üyeler, verilen açıklamalara rağmen DM yoluyla tekrar tekrar soru sorduğunda kısa ve net bir yanıt verilmeli, gerekirse iletişim sonlandırılacağı belirtilmelidir\n- Üyelere \"Şikayetiniz varsa üst yetkililere gidin\" şeklinde yönlendirme yapılmamalıdır\n- Basit şikayetler üst yetkililere aktarılmamalı, gerekirse aynı yetki düzeyindeki bir yetkiliye yönlendirilmelidir (Üyenin haklı olduğu durumlarda bu yöntem tercih edilmelidir)\n\n## Kanıtlı İletişim\n\n- Tüm etkileşimler kayıt altına alınmalıdır\n- Sesli uyarılar da yazılı olarak özetlenmelidir\n- Sesli uyarı sonrası, üyeden \"evet\", \"anladım\" gibi bir onay alınmalı ve ekran görüntüsüyle kaydedilmelidir\n\n## Topluluk Kuralları\n\n- Yetkililer de diğer üyeler gibi topluluk kurallarına uymakla yükümlüdür\n- Slowmode, spam ve dil kuralları dahil tüm kurallar eşit şekilde uygulanır\n\n## Duygusal Yaklaşımlar\n\n- Yakın olunan üyelerle ilgili şikayetler mümkünse başka bir yetkiliye yönlendirilmelidir\n- Başka yetkili yoksa, tarafsızlık ilkesine azami özen gösterilmelidir\n\n## Kilitli Odalara Giriş\n\n- İzniniz olsa da, kişisel odalara izinsiz girilemez\n- Katılmadan önce oda sahibinden izin alınmalı, olumsuz yanıt saygıyla karşılanmalıdır\n\n## Kayıt Düzenleme & Silme\n\n- Yanlış veya güncellenmiş kayıtlar silinmemeli, üzerine çizgi çekilip yenisi eklenmelidir\n- Zorunlu silme durumunda, mod-chat üzerinden üst yetkili bilgilendirilmelidir",
-      "keywords": ["etik", "iletişim", "kanıt", "tarafsızlık", "kayıt"],
-      "relatedArticles": ["guide-002", "guide-003"],
+      "keywords": [
+        "etik",
+        "iletişim",
+        "kanıt",
+        "tarafsızlık",
+        "kayıt"
+      ],
+      "relatedArticles": [
+        "guide-002",
+        "guide-003"
+      ],
       "order": 4
     },
     {
@@ -46,8 +83,17 @@
       "slug": "marked-sistemi",
       "category": "kilavuz",
       "content": "# Marked Sistemi\n\n## Marked Alma Şartları\n\n### 30 Gün Kuralı\n- 30 gün içinde 3 ceza alan üye → 3. cezasında marked alır\n\n### Toplam Ceza Kuralı\n- Toplamda 6 ceza alan üye → 6. cezasında marked alır\n\n## Marked Kullanıcı Politikası\n\n- Marked kullanıcılar izleme altındadır\n- Yeni ihlallerde tolerans düşüktür\n- Ceza süreleri artırılabilir",
-      "keywords": ["marked", "işaretli", "izleme", "ceza", "takip"],
-      "relatedArticles": ["guide-003", "guide-004"],
+      "keywords": [
+        "marked",
+        "işaretli",
+        "izleme",
+        "ceza",
+        "takip"
+      ],
+      "relatedArticles": [
+        "guide-003",
+        "guide-004"
+      ],
       "order": 5
     },
     {
@@ -56,8 +102,16 @@
       "slug": "kkk",
       "category": "kilavuz",
       "content": "# K.K.K - Kayıt Kontrol Kılavuzu\n\n## Amaç\n\nTüm ceza kayıtları, oluşturulduktan sonra bir başka yetkili tarafından kontrol edilmelidir.\n\n## Süreç\n\n1. Kayıt oluşturulur\n2. Başka bir yetkili kontrol eder\n3. Hatalar nazikçe bildirilir\n4. Kayıt sahibi güncelleme yapar ve teşekkür eder\n\n## Hedef\n\n- Kayıt kalitesini artırmak\n- Üst yetkililerin yükünü azaltmak\n- Tutarlılığı sağlamak",
-      "keywords": ["kkk", "kontrol", "kayıt", "kalite", "denetim"],
-      "relatedArticles": ["guide-003"],
+      "keywords": [
+        "kkk",
+        "kontrol",
+        "kayıt",
+        "kalite",
+        "denetim"
+      ],
+      "relatedArticles": [
+        "guide-003"
+      ],
       "order": 6
     },
     {
@@ -66,8 +120,17 @@
       "slug": "sesli-kanal-notlari",
       "category": "kilavuz",
       "content": "# Sesli Kanal Notları\n\n## Oda Durumu ve Ceza\n\n- **Oda açıksa** → Ceza uygulanır\n- **Oda kapalıysa** → Kişisel alan sayılır, ceza uygulanmaz\n- **Ancak** sunucu kuralları her durumda geçerlidir\n\n## Ceza Esnekliği\n\n- Ceza süreleri **+2 / -2 gün** esnetilebilir\n- Durumun ciddiyetine göre değerlendirme yapılır\n\n## Oda Sahibi Sorumluluğu\n\n- Oda sahibi, odasındaki düzenden sorumludur\n- Tartışmaya engel olmadıysa, mod çağırmadıysa, hakaret edenleri susturmadıysa/atmadıysa ceza alır\n- NoRoomPls cezası uygulanabilir",
-      "keywords": ["sesli", "oda", "kapalı", "açık", "esneklik"],
-      "relatedArticles": ["guide-003", "guide-004"],
+      "keywords": [
+        "sesli",
+        "oda",
+        "kapalı",
+        "açık",
+        "esneklik"
+      ],
+      "relatedArticles": [
+        "guide-003",
+        "guide-004"
+      ],
       "order": 7
     },
     {
@@ -76,8 +139,17 @@
       "slug": "blacklist-kurallari",
       "category": "kilavuz",
       "content": "# Blacklist Kuralları\n\n## Blacklist Sebepleri\n\n1. **Dini Küfür** - Dini değerlere hakaret\n2. **NSFW** - Yetişkin içerik paylaşımı\n3. **Atatürk'e Hakaret** - Atatürk'e hakaret içeren içerik\n4. **Pedofili** - Pedofili içerik veya davranış\n\n## Önemli Notlar\n\n- **BL'ye girenler ban affından yararlanamaz**\n- Tüm blacklist vakaları: Banlanana kadar mute + Blacklist\n- Acil müdahale gerektirir\n\n## Prosedür\n\n1. İçeriği hemen sil\n2. Kullanıcıyı anında mute\n3. Üst yetkililere bildir\n4. Kanıt topla ve kaydet",
-      "keywords": ["blacklist", "ban", "dini küfür", "nsfw", "atatürk", "pedofili"],
-      "relatedArticles": ["guide-003"],
+      "keywords": [
+        "blacklist",
+        "ban",
+        "dini küfür",
+        "nsfw",
+        "atatürk",
+        "pedofili"
+      ],
+      "relatedArticles": [
+        "guide-003"
+      ],
       "order": 8
     },
     {
@@ -86,11 +158,23 @@
       "slug": "ceza-rolleri",
       "category": "kilavuz",
       "content": "# Ceza Rolleri\n\n## @marked\n**Son şans rolüdür.** Bu rol sıklıkla ceza alan veya büyük bir kuralı çiğnemiş kişilere verilir. Bir sonraki en ufak cezasında banlanır.\n\n## @Susturulmuş\nUyarıları dinlemeyen kişilere sunucudan belli süreliğine uzaklaştırmak için verilir. Bazı durumlarda üye uyarılmadan uzaklaştırılabilir.\n\n## @Kısıtlanmış\nBotun uyarılarına dinlemeyen, CapsLock kullanan, spam atan kişilere **bot tarafından otomatik** verilir. Susturulmuş gibi sizi sunucudan uzaklaştırır.\n\n### Uyarı Sayısına Göre Ceza Süresi:\n- **1 bot uyarısı:** Mesajınız silinir, bottan uyarı alırsınız (kısıtlanmış yemezsiniz)\n- **2 bot uyarısı:** 5 dakika kısıtlanmış\n- **3 bot uyarısı:** 20 dakika kısıtlanmış\n- **5 bot uyarısı:** 1 gün kısıtlanmış\n\n## @Uyarılmış\nKural ihlali yaptığında verilir. Sunucu içerisindeki birkaç şeyi kısıtlar:\n- Sesli kanallarda konuşamama\n- Özel oda oluşturamama\n- Topluluk kanallara erişim engeli\n\n## @unselfie\n📲saniyetagram kanalının kuralları ihlal edildiği zaman verilir. Bu rol kanala erişimini engeller. **Bir istisna oluşmadığı süreçte KALICIDIR!**\n\n## @nofotopls\nDosya paylaşma yetkisi olanların çok fazla dosya paylaşması ya da izni kötüye kullanması durumunda verilir.\n\n## @noroompls\nAçtığınız sesli odaya sahip çıkmadığınızda, çıkan kavgalara modlar gelene kadar müsaade gösterdiğinizde, kötü amaçlar için kullandığınızda veya **XP abuse** için kullandığınız zaman verilen bir cezadır.\n\n**Not:** Bir oda sahibiysen ya da oda içerisindeysen 👤seskitabı kurallarına uy!",
-      "keywords": ["rol", "marked", "susturulmuş", "kısıtlanmış", "uyarılmış", "unselfie", "nofotopls", "noroompls"],
-      "relatedArticles": ["guide-003", "guide-005"],
+      "keywords": [
+        "rol",
+        "marked",
+        "susturulmuş",
+        "kısıtlanmış",
+        "uyarılmış",
+        "unselfie",
+        "nofotopls",
+        "noroompls"
+      ],
+      "relatedArticles": [
+        "guide-003",
+        "guide-005"
+      ],
       "order": 9
     }
   ],
-  "lastUpdated": "2026-01-23T00:00:00.000Z",
+  "lastUpdated": "2026-01-24T11:23:20.202Z",
   "version": "3.0.0"
 }

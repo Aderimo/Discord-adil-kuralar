@@ -18,7 +18,7 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
   - [x] 1.3 Prisma migration çalıştır
     - _Requirements: 11.1_
 
-- [-] 2. Advanced Logger Service implementasyonu
+- [x] 2. Advanced Logger Service implementasyonu
   - [x] 2.1 `src/lib/advanced-logging.ts` dosyasını oluştur
     - VisitorInfo, AIInteractionLog, PageAccessLog, SearchLog, TextInputLog, TextCopyLog, ReferrerLog interface'lerini tanımla
     - Truncation helper fonksiyonları (2000, 1000, 500 karakter limitleri)
@@ -40,72 +40,72 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
   - [x] 2.6 logPageAccess fonksiyonunu implement et
     - URL, title, category, contentType, referrer, accessType
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
-  - [-] 2.7 Property test: Sayfa Erişim Loglama
+  - [x] 2.7 Property test: Sayfa Erişim Loglama
     - **Property 4: Sayfa Erişim Loglama**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4**
-  - [~] 2.8 logSearchActivity fonksiyonunu implement et
+  - [x] 2.8 logSearchActivity fonksiyonunu implement et
     - Query, resultsCount, selectedResult
     - Zero-result search desteği
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
-  - [~] 2.9 Property test: Arama Loglama
+  - [x] 2.9 Property test: Arama Loglama
     - **Property 5: Arama Loglama**
     - **Validates: Requirements 4.1, 4.2, 4.3, 4.4**
-  - [~] 2.10 logTextInput fonksiyonunu implement et
+  - [x] 2.10 logTextInput fonksiyonunu implement et
     - Field ID, form context, content (max 1000 chars)
     - Hassas alan filtreleme (password, personal data)
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
-  - [~] 2.11 Property test: Hassas Alan Filtreleme
+  - [x] 2.11 Property test: Hassas Alan Filtreleme
     - **Property 6: Hassas Alan Filtreleme**
     - **Validates: Requirements 5.1, 5.2, 5.3**
-  - [~] 2.12 Property test: Metin Truncation
+  - [x] 2.12 Property test: Metin Truncation
     - **Property 3: Metin Truncation**
     - **Validates: Requirements 2.4, 5.4, 10.3**
 
-- [~] 3. Checkpoint - Temel loglama servisi tamamlandı
+- [x] 3. Checkpoint - Temel loglama servisi tamamlandı
   - Tüm testlerin geçtiğinden emin ol, sorular varsa kullanıcıya sor.
 
-- [~] 4. Referrer ve Kopyalama Takibi
-  - [~] 4.1 logTextCopy fonksiyonunu implement et
+- [x] 4. Referrer ve Kopyalama Takibi
+  - [x] 4.1 logTextCopy fonksiyonunu implement et
     - Copied text (max 500 chars), source page, element context
     - Selection start/end positions
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
-  - [~] 4.2 Property test: Metin Kopyalama Loglama
+  - [x] 4.2 Property test: Metin Kopyalama Loglama
     - **Property 12: Metin Kopyalama Loglama**
     - **Validates: Requirements 10.1, 10.2, 10.4**
-  - [~] 4.3 logReferrer fonksiyonunu implement et
+  - [x] 4.3 logReferrer fonksiyonunu implement et
     - Referrer URL, source domain extraction
     - Source type classification (social/search/direct/other)
     - Source counter increment
     - _Requirements: 9.1, 9.3, 9.4, 9.5_
-  - [~] 4.4 Property test: Referrer Loglama
+  - [x] 4.4 Property test: Referrer Loglama
     - **Property 10: Referrer Loglama**
     - **Validates: Requirements 9.1, 9.3, 9.4, 9.5**
-  - [~] 4.5 logURLCopy fonksiyonunu implement et
+  - [x] 4.5 logURLCopy fonksiyonunu implement et
     - URL copy event with page context
     - _Requirements: 9.2_
-  - [~] 4.6 Property test: URL Kopyalama Loglama
+  - [x] 4.6 Property test: URL Kopyalama Loglama
     - **Property 11: URL Kopyalama Loglama**
     - **Validates: Requirements 9.2**
 
-- [~] 5. Threshold Monitor Service
-  - [~] 5.1 `src/lib/log-threshold.ts` dosyasını oluştur
+- [ ] 5. Threshold Monitor Service
+  - [x] 5.1 `src/lib/log-threshold.ts` dosyasını oluştur
     - ThresholdConfig, ThresholdStatus interface'leri
     - PAGE_SIZE = 20, NOTIFICATION_THRESHOLD = 50 (1000 kayıt)
     - _Requirements: 6.1_
-  - [~] 5.2 checkThreshold fonksiyonunu implement et
+  - [x] 5.2 checkThreshold fonksiyonunu implement et
     - Mevcut log sayısını hesapla
     - Sayfa sayısını döndür
     - _Requirements: 6.1_
-  - [~] 5.3 triggerNotification fonksiyonunu implement et
+  - [x] 5.3 triggerNotification fonksiyonunu implement et
     - Owner'a "Log geçmişi 50 sayfa oldu" bildirimi gönder
     - Download permission ver
     - Duplicate bildirim engelleme
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
-  - [~] 5.4 Property test: Eşik Bildirimi
+  - [x] 5.4 Property test: Eşik Bildirimi
     - **Property 7: Eşik Bildirimi**
     - **Validates: Requirements 6.1, 6.3, 6.4, 6.5**
 
-- [~] 6. Permission Manager Service
+- [ ] 6. Permission Manager Service
   - [~] 6.1 `src/lib/log-permission.ts` dosyasını oluştur
     - LogPermission interface
     - _Requirements: 7.4, 8.3_
@@ -121,7 +121,7 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
     - **Property 9: Yetki State Machine**
     - **Validates: Requirements 7.4, 8.2, 8.3, 8.4, 8.5, 8.6**
 
-- [~] 7. Export Service
+- [ ] 7. Export Service
   - [~] 7.1 `src/lib/log-export.ts` dosyasını oluştur
     - ExportOptions, ExportResult interface'leri
     - _Requirements: 7.2_
@@ -139,7 +139,7 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
 - [~] 8. Checkpoint - Servisler tamamlandı
   - Tüm testlerin geçtiğinden emin ol, sorular varsa kullanıcıya sor.
 
-- [~] 9. API Endpoints
+- [ ] 9. API Endpoints
   - [~] 9.1 `src/app/api/logs/visitor/route.ts` - Ziyaretçi erişimi loglama
     - POST: IP, userAgent, referrer
     - _Requirements: 1.1, 1.2, 1.3_
@@ -174,7 +174,7 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
     - GET: canDownload, canDelete
     - _Requirements: 8.1_
 
-- [~] 10. Client-Side Trackers
+- [ ] 10. Client-Side Trackers
   - [~] 10.1 `src/hooks/usePageTracker.ts` hook'unu oluştur
     - Sayfa değişikliklerini dinle
     - /api/logs/page endpoint'ine POST
@@ -191,7 +191,7 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
   - [~] 10.4 MainLayout'a tracker hook'larını entegre et
     - _Requirements: 1.1, 3.1, 9.1, 10.1_
 
-- [~] 11. Log Yönetim UI
+- [ ] 11. Log Yönetim UI
   - [~] 11.1 `src/app/admin/logs/page.tsx` sayfasını güncelle
     - Log durumu gösterimi (sayfa sayısı, eşik durumu)
     - İndirme butonu (yetkiye göre)
@@ -201,7 +201,7 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
     - Notification tıklandığında logs sayfasına yönlendir
     - _Requirements: 7.1_
 
-- [~] 12. Log Persistence ve Retry
+- [ ] 12. Log Persistence ve Retry
   - [~] 12.1 Retry mekanizmasını implement et
     - 3 kez retry, sonra discard
     - _Requirements: 11.2_
@@ -215,7 +215,7 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
     - **Property 14: Retry Mekanizması**
     - **Validates: Requirements 11.2**
 
-- [~] 13. AI Chat Entegrasyonu
+- [ ] 13. AI Chat Entegrasyonu
   - [~] 13.1 `src/app/api/ai/chat/route.ts` dosyasını güncelle
     - AI soru-cevap loglaması ekle
     - logAIInteraction çağrısı

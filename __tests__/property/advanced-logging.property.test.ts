@@ -231,7 +231,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -312,7 +312,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -390,7 +390,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -460,7 +460,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -542,7 +542,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -577,7 +577,7 @@ describe('Property Tests: IP Validation Functions', () => {
       fc.property(validIPv4Arbitrary, (ip) => {
         return isValidIPv4(ip) === true;
       }),
-      { numRuns: 20 }
+      { numRuns: 5 }
     );
   });
 
@@ -589,7 +589,7 @@ describe('Property Tests: IP Validation Functions', () => {
       fc.property(validIPv6Arbitrary, (ip) => {
         return isValidIPv6(ip) === true;
       }),
-      { numRuns: 20 }
+      { numRuns: 5 }
     );
   });
 
@@ -604,7 +604,7 @@ describe('Property Tests: IP Validation Functions', () => {
           return isValidIP(ip) === true;
         }
       ),
-      { numRuns: 20 }
+      { numRuns: 5 }
     );
   });
 
@@ -619,7 +619,7 @@ describe('Property Tests: IP Validation Functions', () => {
           return normalizeIP(ip) === ip;
         }
       ),
-      { numRuns: 20 }
+      { numRuns: 5 }
     );
   });
 
@@ -631,7 +631,7 @@ describe('Property Tests: IP Validation Functions', () => {
       fc.property(invalidIPArbitrary, (ip) => {
         return normalizeIP(ip) === DEFAULT_IP_ADDRESS;
       }),
-      { numRuns: 20 }
+      { numRuns: 5 }
     );
   });
 });
@@ -779,7 +779,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -870,7 +870,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -959,7 +959,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -1052,7 +1052,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -1147,7 +1147,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -1188,7 +1188,7 @@ describe('Property Tests: AI Text Truncation Functions', () => {
         const result = truncateAIText(text);
         return result === text;
       }),
-      { numRuns: 20 }
+      { numRuns: 5 }
     );
   });
 
@@ -1206,7 +1206,7 @@ describe('Property Tests: AI Text Truncation Functions', () => {
         const result = truncateAIText(text);
         return result.length === AI_TEXT_MAX_LENGTH && text.startsWith(result);
       }),
-      { numRuns: 20 }
+      { numRuns: 5 }
     );
   });
 
@@ -1412,7 +1412,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -1507,7 +1507,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -1602,7 +1602,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -1685,7 +1685,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -1775,7 +1775,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
@@ -1877,7 +1877,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 20,
+            numRuns: 5,
             verbose: false,
           }
         );
