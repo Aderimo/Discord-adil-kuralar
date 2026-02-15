@@ -87,7 +87,7 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
     - **Property 11: URL Kopyalama Loglama**
     - **Validates: Requirements 9.2**
 
-- [ ] 5. Threshold Monitor Service
+- [x] 5. Threshold Monitor Service
   - [x] 5.1 `src/lib/log-threshold.ts` dosyasını oluştur
     - ThresholdConfig, ThresholdStatus interface'leri
     - PAGE_SIZE = 20, NOTIFICATION_THRESHOLD = 50 (1000 kayıt)
@@ -105,123 +105,123 @@ Bu plan, mevcut loglama altyapısını genişleterek kapsamlı bir aktivite taki
     - **Property 7: Eşik Bildirimi**
     - **Validates: Requirements 6.1, 6.3, 6.4, 6.5**
 
-- [ ] 6. Permission Manager Service
-  - [~] 6.1 `src/lib/log-permission.ts` dosyasını oluştur
+- [x] 6. Permission Manager Service
+  - [x] 6.1 `src/lib/log-permission.ts` dosyasını oluştur
     - LogPermission interface
     - _Requirements: 7.4, 8.3_
-  - [~] 6.2 grantDownloadPermission ve grantDeletePermission fonksiyonlarını implement et
+  - [x] 6.2 grantDownloadPermission ve grantDeletePermission fonksiyonlarını implement et
     - _Requirements: 6.3, 7.4_
-  - [~] 6.3 revokeDeletePermission fonksiyonunu implement et
+  - [x] 6.3 revokeDeletePermission fonksiyonunu implement et
     - Silme sonrası yetki iptali
     - _Requirements: 8.3, 8.4_
-  - [~] 6.4 checkPermission fonksiyonunu implement et
+  - [x] 6.4 checkPermission fonksiyonunu implement et
     - Download/delete yetki kontrolü
     - _Requirements: 8.5_
-  - [~] 6.5 Property test: Yetki State Machine
+  - [x] 6.5 Property test: Yetki State Machine
     - **Property 9: Yetki State Machine**
     - **Validates: Requirements 7.4, 8.2, 8.3, 8.4, 8.5, 8.6**
 
-- [ ] 7. Export Service
-  - [~] 7.1 `src/lib/log-export.ts` dosyasını oluştur
+- [-] 7. Export Service
+  - [-] 7.1 `src/lib/log-export.ts` dosyasını oluştur
     - ExportOptions, ExportResult interface'leri
     - _Requirements: 7.2_
-  - [~] 7.2 exportLogs fonksiyonunu implement et
+  - [ ] 7.2 exportLogs fonksiyonunu implement et
     - CSV ve JSON format desteği
     - Son indirmeden sonraki tüm logları dahil et
     - _Requirements: 7.2, 7.3_
-  - [~] 7.3 generateFilename fonksiyonunu implement et
+  - [ ] 7.3 generateFilename fonksiyonunu implement et
     - Timestamp ile benzersiz dosya adı
     - _Requirements: 7.5_
-  - [~] 7.4 Property test: Log Export Round-Trip
+  - [ ] 7.4 Property test: Log Export Round-Trip
     - **Property 8: Log Export Round-Trip**
     - **Validates: Requirements 7.2, 7.3, 7.5**
 
-- [~] 8. Checkpoint - Servisler tamamlandı
+- [ ] 8. Checkpoint - Servisler tamamlandı
   - Tüm testlerin geçtiğinden emin ol, sorular varsa kullanıcıya sor.
 
 - [ ] 9. API Endpoints
-  - [~] 9.1 `src/app/api/logs/visitor/route.ts` - Ziyaretçi erişimi loglama
+  - [ ] 9.1 `src/app/api/logs/visitor/route.ts` - Ziyaretçi erişimi loglama
     - POST: IP, userAgent, referrer
     - _Requirements: 1.1, 1.2, 1.3_
-  - [~] 9.2 `src/app/api/logs/ai/route.ts` - AI etkileşimi loglama
+  - [ ] 9.2 `src/app/api/logs/ai/route.ts` - AI etkileşimi loglama
     - POST: question, response, confidence
     - _Requirements: 2.1, 2.2, 2.3_
-  - [~] 9.3 `src/app/api/logs/page/route.ts` - Sayfa erişimi loglama
+  - [ ] 9.3 `src/app/api/logs/page/route.ts` - Sayfa erişimi loglama
     - POST: url, title, category, contentType, referrer
     - _Requirements: 3.1, 3.2, 3.3_
-  - [~] 9.4 `src/app/api/logs/search/route.ts` - Arama loglama
+  - [ ] 9.4 `src/app/api/logs/search/route.ts` - Arama loglama
     - POST: query, resultsCount, selectedResult
     - _Requirements: 4.1, 4.2, 4.3_
-  - [~] 9.5 `src/app/api/logs/input/route.ts` - Metin girişi loglama
+  - [ ] 9.5 `src/app/api/logs/input/route.ts` - Metin girişi loglama
     - POST: fieldId, formContext, content
     - _Requirements: 5.1, 5.2_
-  - [~] 9.6 `src/app/api/logs/copy/route.ts` - Metin kopyalama loglama
+  - [ ] 9.6 `src/app/api/logs/copy/route.ts` - Metin kopyalama loglama
     - POST: copiedText, sourcePage, elementContext, selectionStart, selectionEnd
     - _Requirements: 10.1, 10.2, 10.4_
-  - [~] 9.7 `src/app/api/logs/referrer/route.ts` - Referrer loglama
+  - [ ] 9.7 `src/app/api/logs/referrer/route.ts` - Referrer loglama
     - POST: referrerUrl, sourceDomain, sourceType
     - _Requirements: 9.1, 9.3, 9.4_
-  - [~] 9.8 `src/app/api/logs/status/route.ts` - Log durumu
+  - [ ] 9.8 `src/app/api/logs/status/route.ts` - Log durumu
     - GET: currentCount, currentPages, thresholdReached
     - _Requirements: 6.1_
-  - [~] 9.9 `src/app/api/logs/download/route.ts` - Log indirme
+  - [ ] 9.9 `src/app/api/logs/download/route.ts` - Log indirme
     - GET: CSV/JSON export, yetki kontrolü
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
-  - [~] 9.10 `src/app/api/logs/delete/route.ts` - Log silme
+  - [ ] 9.10 `src/app/api/logs/delete/route.ts` - Log silme
     - DELETE: Yetki kontrolü, silme işlemi, yetki iptali
     - _Requirements: 8.1, 8.2, 8.3, 8.5, 8.6_
-  - [~] 9.11 `src/app/api/logs/permission/route.ts` - Yetki durumu
+  - [ ] 9.11 `src/app/api/logs/permission/route.ts` - Yetki durumu
     - GET: canDownload, canDelete
     - _Requirements: 8.1_
 
 - [ ] 10. Client-Side Trackers
-  - [~] 10.1 `src/hooks/usePageTracker.ts` hook'unu oluştur
+  - [ ] 10.1 `src/hooks/usePageTracker.ts` hook'unu oluştur
     - Sayfa değişikliklerini dinle
     - /api/logs/page endpoint'ine POST
     - _Requirements: 3.1_
-  - [~] 10.2 `src/hooks/useCopyTracker.ts` hook'unu oluştur
+  - [ ] 10.2 `src/hooks/useCopyTracker.ts` hook'unu oluştur
     - document.oncopy event listener
     - Selection bilgilerini al
     - /api/logs/copy endpoint'ine POST
     - _Requirements: 10.1, 10.4_
-  - [~] 10.3 `src/hooks/useReferrerTracker.ts` hook'unu oluştur
+  - [ ] 10.3 `src/hooks/useReferrerTracker.ts` hook'unu oluştur
     - document.referrer kontrolü
     - /api/logs/referrer endpoint'ine POST
     - _Requirements: 9.1_
-  - [~] 10.4 MainLayout'a tracker hook'larını entegre et
+  - [ ] 10.4 MainLayout'a tracker hook'larını entegre et
     - _Requirements: 1.1, 3.1, 9.1, 10.1_
 
 - [ ] 11. Log Yönetim UI
-  - [~] 11.1 `src/app/admin/logs/page.tsx` sayfasını güncelle
+  - [ ] 11.1 `src/app/admin/logs/page.tsx` sayfasını güncelle
     - Log durumu gösterimi (sayfa sayısı, eşik durumu)
     - İndirme butonu (yetkiye göre)
     - Silme butonu (yetkiye göre)
     - _Requirements: 7.1, 8.1_
-  - [~] 11.2 Log bildirim entegrasyonu
+  - [ ] 11.2 Log bildirim entegrasyonu
     - Notification tıklandığında logs sayfasına yönlendir
     - _Requirements: 7.1_
 
 - [ ] 12. Log Persistence ve Retry
-  - [~] 12.1 Retry mekanizmasını implement et
+  - [ ] 12.1 Retry mekanizmasını implement et
     - 3 kez retry, sonra discard
     - _Requirements: 11.2_
-  - [~] 12.2 Duplicate engelleme mekanizmasını implement et
+  - [ ] 12.2 Duplicate engelleme mekanizmasını implement et
     - Event hash ile kontrol
     - _Requirements: 11.5_
-  - [~] 12.3 Property test: Log Persistence
+  - [ ] 12.3 Property test: Log Persistence
     - **Property 13: Log Persistence**
     - **Validates: Requirements 11.1, 11.3, 11.4, 11.5**
-  - [~] 12.4 Property test: Retry Mekanizması
+  - [ ] 12.4 Property test: Retry Mekanizması
     - **Property 14: Retry Mekanizması**
     - **Validates: Requirements 11.2**
 
 - [ ] 13. AI Chat Entegrasyonu
-  - [~] 13.1 `src/app/api/ai/chat/route.ts` dosyasını güncelle
+  - [ ] 13.1 `src/app/api/ai/chat/route.ts` dosyasını güncelle
     - AI soru-cevap loglaması ekle
     - logAIInteraction çağrısı
     - _Requirements: 2.1, 2.2, 2.3_
 
-- [~] 14. Final Checkpoint
+- [ ] 14. Final Checkpoint
   - Tüm testlerin geçtiğinden emin ol, sorular varsa kullanıcıya sor.
   - Tüm gereksinimlerin karşılandığını doğrula.
 

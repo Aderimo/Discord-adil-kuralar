@@ -23,6 +23,37 @@ import {
   ANONYMOUS_USER_ID,
   type VisitorInfo,
   type VisitorAccessDetails,
+  // Text Input logging - Property 6
+  logTextInput,
+  isSensitiveField,
+  SENSITIVE_FIELD_PATTERNS,
+  SENSITIVE_FORM_PATTERNS,
+  truncateInputText,
+  INPUT_TEXT_MAX_LENGTH,
+  type TextInputLog,
+  type TextInputDetails,
+  // Truncation functions - Property 3
+  truncateText,
+  truncateAIText,
+  truncateCopyText,
+  AI_TEXT_MAX_LENGTH,
+  COPY_TEXT_MAX_LENGTH,
+  // AI Interaction logging - Property 2
+  logAIInteraction,
+  type AIInteractionLog,
+  type AIInteractionDetails,
+  // Page Access logging - Property 4
+  logPageAccess,
+  type PageAccessLog,
+  type PageAccessDetails,
+  // Search Activity logging - Property 5
+  logSearchActivity,
+  type SearchLog,
+  type SearchActivityDetails,
+  // Text Copy logging - Property 12
+  logTextCopy,
+  type TextCopyLog,
+  type TextCopyDetails,
 } from '@/lib/advanced-logging';
 import { hashPassword } from '@/lib/auth';
 
@@ -231,7 +262,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -312,7 +343,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -390,7 +421,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -460,7 +491,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -542,7 +573,7 @@ describe('Property Tests: IP ve Kullanıcı Bilgisi Loglama (Property 1)', () =>
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -577,7 +608,7 @@ describe('Property Tests: IP Validation Functions', () => {
       fc.property(validIPv4Arbitrary, (ip) => {
         return isValidIPv4(ip) === true;
       }),
-      { numRuns: 5 }
+      { numRuns: 20 }
     );
   });
 
@@ -589,7 +620,7 @@ describe('Property Tests: IP Validation Functions', () => {
       fc.property(validIPv6Arbitrary, (ip) => {
         return isValidIPv6(ip) === true;
       }),
-      { numRuns: 5 }
+      { numRuns: 20 }
     );
   });
 
@@ -604,7 +635,7 @@ describe('Property Tests: IP Validation Functions', () => {
           return isValidIP(ip) === true;
         }
       ),
-      { numRuns: 5 }
+      { numRuns: 20 }
     );
   });
 
@@ -619,7 +650,7 @@ describe('Property Tests: IP Validation Functions', () => {
           return normalizeIP(ip) === ip;
         }
       ),
-      { numRuns: 5 }
+      { numRuns: 20 }
     );
   });
 
@@ -631,7 +662,7 @@ describe('Property Tests: IP Validation Functions', () => {
       fc.property(invalidIPArbitrary, (ip) => {
         return normalizeIP(ip) === DEFAULT_IP_ADDRESS;
       }),
-      { numRuns: 5 }
+      { numRuns: 20 }
     );
   });
 });
@@ -698,15 +729,6 @@ const confidenceArbitrary = fc.constantFrom<'high' | 'medium' | 'low'>('high', '
  * Response time (ms) arbitrary
  */
 const responseTimeArbitrary = fc.integer({ min: 50, max: 30000 });
-
-// Import AI interaction logging function
-import {
-  logAIInteraction,
-  truncateAIText,
-  AI_TEXT_MAX_LENGTH,
-  type AIInteractionLog,
-  type AIInteractionDetails,
-} from '@/lib/advanced-logging';
 
 describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
   /**
@@ -779,7 +801,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -870,7 +892,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -959,7 +981,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -1052,7 +1074,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -1147,7 +1169,7 @@ describe('Property Tests: AI Etkileşim Loglama (Property 2)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -1188,7 +1210,7 @@ describe('Property Tests: AI Text Truncation Functions', () => {
         const result = truncateAIText(text);
         return result === text;
       }),
-      { numRuns: 5 }
+      { numRuns: 20 }
     );
   });
 
@@ -1206,7 +1228,7 @@ describe('Property Tests: AI Text Truncation Functions', () => {
         const result = truncateAIText(text);
         return result.length === AI_TEXT_MAX_LENGTH && text.startsWith(result);
       }),
-      { numRuns: 5 }
+      { numRuns: 20 }
     );
   });
 
@@ -1412,7 +1434,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -1507,7 +1529,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -1602,7 +1624,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -1685,7 +1707,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -1775,7 +1797,7 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
             }
           ),
           {
-            numRuns: 5,
+            numRuns: 20,
             verbose: false,
           }
         );
@@ -1872,6 +1894,3541 @@ describe('Property Tests: Sayfa Erişim Loglama (Property 4)', () => {
 
               // Property: Action page_access olmalı
               expect(log.action).toBe('page_access');
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+});
+
+
+// ============================================================================
+// Property 5: Arama Loglama
+// Feature: gelismis-loglama, Property 5: Arama Loglama
+// **Validates: Requirements 4.1, 4.2, 4.3, 4.4**
+// ============================================================================
+
+// Import Search Activity logging function
+import {
+  logSearchActivity,
+  type SearchLog,
+  type SearchActivityDetails,
+} from '@/lib/advanced-logging';
+
+// Arbitraries for Search Activity Tests
+
+/**
+ * Arama sorgusu oluşturan arbitrary
+ */
+const searchQueryArbitrary = fc.oneof(
+  // Kısa sorgular
+  fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '), {
+    minLength: 1,
+    maxLength: 20,
+  }),
+  // Orta uzunlukta sorgular
+  fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '), {
+    minLength: 20,
+    maxLength: 100,
+  }),
+  // Gerçekçi arama sorguları
+  fc.constantFrom(
+    'ceza',
+    'prosedür',
+    'komut',
+    'tutuklama',
+    'trafik cezası',
+    'admin komutları',
+    'yetkili kılavuzu',
+    'nasıl yapılır'
+  )
+);
+
+/**
+ * Sonuç sayısı oluşturan arbitrary
+ */
+const resultsCountArbitrary = fc.integer({ min: 0, max: 100 });
+
+/**
+ * Seçilen sonuç oluşturan arbitrary
+ */
+const selectedResultArbitrary = fc.oneof(
+  fc.constant(null),
+  fc.constantFrom(
+    '/guide/introduction',
+    '/penalties/traffic',
+    '/procedures/arrest',
+    '/commands/admin',
+    '/guide/rules'
+  ),
+  fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz-/'), { minLength: 5, maxLength: 50 })
+);
+
+describe('Property Tests: Arama Loglama (Property 5)', () => {
+  /**
+   * Property 5.1: Arama Sorgusunun Kaydedilmesi
+   * 
+   * *For any* search operation, the log entry SHALL contain the search query.
+   * 
+   * **Validates: Requirements 4.1**
+   */
+  it(
+    'Property 5.1: Arama sorgusu kaydedilmeli',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            resultsCountArbitrary,
+            selectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde query bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.query).toBeDefined();
+              expect(details.query).toBe(query);
+
+              // Property: Action search olmalı
+              expect(log.action).toBe('search');
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.2: Sonuç Sayısının Kaydedilmesi
+   * 
+   * *For any* search operation, the log entry SHALL include the number of results returned.
+   * 
+   * **Validates: Requirements 4.2**
+   */
+  it(
+    'Property 5.2: Sonuç sayısı kaydedilmeli',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            resultsCountArbitrary,
+            selectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde resultsCount bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.resultsCount).toBeDefined();
+              expect(typeof details.resultsCount).toBe('number');
+              expect(details.resultsCount).toBe(resultsCount);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.3: Seçilen Sonucun Kaydedilmesi
+   * 
+   * *For any* search operation where user clicks on a result, the log entry SHALL record the selected result.
+   * 
+   * **Validates: Requirements 4.3**
+   */
+  it(
+    'Property 5.3: Seçilen sonuç kaydedilmeli (varsa)',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      // Sadece seçilen sonuç olan durumları test et
+      const nonNullSelectedResultArbitrary = fc.oneof(
+        fc.constantFrom(
+          '/guide/introduction',
+          '/penalties/traffic',
+          '/procedures/arrest',
+          '/commands/admin',
+          '/guide/rules'
+        ),
+        fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz-/'), { minLength: 5, maxLength: 50 })
+      );
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            fc.integer({ min: 1, max: 100 }), // En az 1 sonuç olmalı
+            nonNullSelectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Arama bilgisi oluştur (seçilen sonuç ile)
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde selectedResult bulunmalı ve değeri doğru olmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.selectedResult).toBeDefined();
+              expect(details.selectedResult).toBe(selectedResult);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.4: Sonuçsuz Aramaların Loglanması
+   * 
+   * *For any* search operation with zero results, the log entry SHALL be created with resultsCount = 0.
+   * 
+   * **Validates: Requirements 4.4**
+   */
+  it(
+    'Property 5.4: Sonuçsuz aramalar loglanmalı (resultsCount = 0)',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            validIPv4Arbitrary,
+            async (query, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Sonuçsuz arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount: 0, // Sonuç yok
+                selectedResult: null, // Seçilen sonuç da yok
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı (sonuçsuz aramalar da loglanmalı)
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde resultsCount 0 olmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.resultsCount).toBe(0);
+              
+              // Property: selectedResult null olmalı
+              expect(details.selectedResult).toBeNull();
+
+              // Property: Query hala kaydedilmiş olmalı
+              expect(details.query).toBe(query);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.5: Başarılı Aramaların Loglanması
+   * 
+   * *For any* search operation with results (resultsCount > 0), the log entry SHALL be created.
+   * 
+   * **Validates: Requirements 4.4**
+   */
+  it(
+    'Property 5.5: Başarılı aramalar loglanmalı (resultsCount > 0)',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            fc.integer({ min: 1, max: 100 }), // En az 1 sonuç
+            selectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Başarılı arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde resultsCount > 0 olmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.resultsCount).toBeGreaterThan(0);
+              expect(details.resultsCount).toBe(resultsCount);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.6: Tüm Arama Alanları Tek Bir Log Kaydında Bulunmalı
+   * 
+   * *For any* search operation (successful or zero-result), the log entry SHALL contain 
+   * the search query, results count, and selected result (if any).
+   * 
+   * **Validates: Requirements 4.1, 4.2, 4.3, 4.4**
+   */
+  it(
+    'Property 5.6: Tüm arama alanları tek bir log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            resultsCountArbitrary,
+            selectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Tek bir log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde tüm alanlar bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              
+              // Property: Event tipi search olmalı
+              expect(details.event).toBe('search');
+              
+              // Property: Tüm zorunlu alanlar mevcut olmalı
+              expect(details.query).toBe(query);
+              expect(details.resultsCount).toBe(resultsCount);
+              expect(details.selectedResult).toBe(selectedResult);
+              
+              // Property: Timestamp bulunmalı ve geçerli olmalı
+              expect(details.timestamp).toBeDefined();
+              const timestampDate = new Date(details.timestamp);
+              expect(timestampDate.toString()).not.toBe('Invalid Date');
+
+              // Property: Action search olmalı
+              expect(log.action).toBe('search');
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+});
+
+// ============================================================================
+// Property 6: Hassas Alan Filtreleme
+// Feature: gelismis-loglama, Property 6: Hassas Alan Filtreleme
+// **Validates: Requirements 5.1, 5.2, 5.3**
+// ============================================================================
+
+// Arbitraries for Sensitive Field Filtering Tests
+
+/**
+ * Hassas alan ID'leri oluşturan arbitrary
+ * Password, kişisel veri ve finansal bilgi alanları
+ */
+const sensitiveFieldIdArbitrary = fc.constantFrom(
+  // Password alanları
+  'password',
+  'passwordConfirm',
+  'currentPassword',
+  'newPassword',
+  'passwd',
+  'pwd',
+  'parola',
+  'sifre',
+  'user_password',
+  'login_password',
+  
+  // Kişisel veri alanları
+  'ssn',
+  'socialSecurityNumber',
+  'social_security',
+  'tcKimlik',
+  'tc_kimlik_no',
+  'kimlikNo',
+  'identity_number',
+  'nationalId',
+  'national_id',
+  
+  // Finansal bilgiler
+  'creditCard',
+  'credit_card_number',
+  'cardNumber',
+  'card_number',
+  'cvv',
+  'cvc',
+  'expiry',
+  'expiryDate',
+  'iban',
+  'accountNumber',
+  'account_number',
+  'hesapNo',
+  'hesap_no',
+  
+  // İletişim bilgileri
+  'phone',
+  'phoneNumber',
+  'telefon',
+  'mobile',
+  'mobilePhone',
+  'cep',
+  'cepTelefonu',
+  
+  // Sağlık bilgileri
+  'health',
+  'healthInfo',
+  'medical',
+  'medicalHistory',
+  'saglik',
+  
+  // Güvenlik soruları
+  'securityQuestion',
+  'security_question',
+  'securityAnswer',
+  'security_answer',
+  'secret',
+  'secretAnswer',
+  'pin',
+  'pinCode',
+  
+  // Token ve API anahtarları
+  'token',
+  'accessToken',
+  'apiKey',
+  'api_key',
+  'authToken',
+  'auth_token',
+  'bearer'
+);
+
+/**
+ * Hassas form context'leri oluşturan arbitrary
+ */
+const sensitiveFormContextArbitrary = fc.constantFrom(
+  'login',
+  'loginForm',
+  'signin',
+  'signInForm',
+  'signup',
+  'signUpForm',
+  'register',
+  'registerForm',
+  'password',
+  'passwordReset',
+  'changePassword',
+  'payment',
+  'paymentForm',
+  'checkout',
+  'checkoutForm',
+  'billing',
+  'billingForm',
+  'credit',
+  'creditCardForm',
+  'bank',
+  'bankTransfer'
+);
+
+/**
+ * Normal (hassas olmayan) alan ID'leri oluşturan arbitrary
+ */
+const normalFieldIdArbitrary = fc.constantFrom(
+  'username',
+  'email',
+  'firstName',
+  'lastName',
+  'address',
+  'city',
+  'country',
+  'zipCode',
+  'comment',
+  'message',
+  'description',
+  'title',
+  'subject',
+  'content',
+  'notes',
+  'feedback',
+  'searchQuery',
+  'filterText',
+  'category',
+  'tag',
+  'displayName',
+  'company',
+  'organization',
+  'department',
+  'position',
+  'website',
+  'homepage',
+  'bio',
+  'about'
+);
+
+/**
+ * Normal (hassas olmayan) form context'leri oluşturan arbitrary
+ */
+const normalFormContextArbitrary = fc.constantFrom(
+  'contact',
+  'contactForm',
+  'feedbackForm',
+  'searchForm',
+  'profile',
+  'profileEdit',
+  'settings',
+  'preferences',
+  'commentForm',
+  'reviewForm',
+  'inquiryForm',
+  'newsletter',
+  'subscription',
+  'filterForm',
+  'reportForm'
+);
+
+/**
+ * Metin içeriği oluşturan arbitrary
+ */
+const textContentArbitrary = fc.stringOf(
+  fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '),
+  { minLength: 1, maxLength: 200 }
+);
+
+describe('Property Tests: Hassas Alan Filtreleme (Property 6)', () => {
+  /**
+   * Property 6.1: Hassas Alan ID'leri Loglanmamalı
+   * 
+   * *For any* text input from a sensitive field (password, personal data), 
+   * the Logging_System SHALL NOT create a log entry for that input.
+   * 
+   * **Validates: Requirements 5.1, 5.2, 5.3**
+   */
+  it(
+    'Property 6.1: Hassas alan ID\'leri loglanmamalı',
+    async () => {
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            sensitiveFieldIdArbitrary,
+            normalFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Hassas alan bilgisi oluştur
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: false, // Otomatik tespit edilmeli
+              };
+
+              // Log kaydı oluşturmayı dene
+              const log = await logTextInput(user.id, input, ipAddress);
+
+              // Property: Hassas alan için log kaydı oluşturulmamalı
+              expect(log).toBeNull();
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 6.2: Hassas Form Context'leri Loglanmamalı
+   * 
+   * *For any* text input from a sensitive form context (login, payment, etc.), 
+   * the Logging_System SHALL NOT create a log entry for that input.
+   * 
+   * **Validates: Requirements 5.1, 5.2, 5.3**
+   */
+  it(
+    'Property 6.2: Hassas form context\'leri loglanmamalı',
+    async () => {
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            normalFieldIdArbitrary,
+            sensitiveFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Hassas form context bilgisi oluştur
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: false, // Otomatik tespit edilmeli
+              };
+
+              // Log kaydı oluşturmayı dene
+              const log = await logTextInput(user.id, input, ipAddress);
+
+              // Property: Hassas form context için log kaydı oluşturulmamalı
+              expect(log).toBeNull();
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 6.3: isSensitive Flag'i True Olan Alanlar Loglanmamalı
+   * 
+   * *For any* text input with isSensitive = true, 
+   * the Logging_System SHALL NOT create a log entry for that input.
+   * 
+   * **Validates: Requirements 5.3**
+   */
+  it(
+    'Property 6.3: isSensitive flag\'i true olan alanlar loglanmamalı',
+    async () => {
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            normalFieldIdArbitrary,
+            normalFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // isSensitive = true olan alan bilgisi oluştur
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: true, // Açıkça hassas olarak işaretlenmiş
+              };
+
+              // Log kaydı oluşturmayı dene
+              const log = await logTextInput(user.id, input, ipAddress);
+
+              // Property: isSensitive = true için log kaydı oluşturulmamalı
+              expect(log).toBeNull();
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 6.4: Normal Alanlar Loglanmalı
+   * 
+   * *For any* text input from a non-sensitive field, 
+   * the Logging_System SHALL create a log entry with the input content.
+   * 
+   * **Validates: Requirements 5.1, 5.2**
+   */
+  it(
+    'Property 6.4: Normal alanlar loglanmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            normalFieldIdArbitrary,
+            normalFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Normal alan bilgisi oluştur
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: false,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextInput(user.id, input, ipAddress);
+              if (log) {
+                createdLogIds.push(log.id);
+              }
+
+              // Property: Normal alan için log kaydı oluşturulmalı
+              expect(log).not.toBeNull();
+              expect(log).toBeDefined();
+              expect(log!.id).toBeDefined();
+
+              // Property: Details içinde alan bilgileri bulunmalı
+              expect(log!.details).toBeDefined();
+              const details = log!.details as TextInputDetails;
+              expect(details.fieldId).toBe(fieldId);
+              expect(details.formContext).toBe(formContext);
+              
+              // Property: İçerik kaydedilmiş olmalı (truncate edilmiş olabilir)
+              const expectedContent = content.length > INPUT_TEXT_MAX_LENGTH 
+                ? content.substring(0, INPUT_TEXT_MAX_LENGTH) 
+                : content;
+              expect(details.content).toBe(expectedContent);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 6.5: Hassas ve Normal Alan Kombinasyonları
+   * 
+   * *For any* combination of sensitive field ID with sensitive form context,
+   * the Logging_System SHALL NOT create a log entry.
+   * 
+   * **Validates: Requirements 5.3**
+   */
+  it(
+    'Property 6.5: Hassas alan ve hassas form context kombinasyonu loglanmamalı',
+    async () => {
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            sensitiveFieldIdArbitrary,
+            sensitiveFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Hem hassas alan hem hassas form context
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: false, // Otomatik tespit edilmeli
+              };
+
+              // Log kaydı oluşturmayı dene
+              const log = await logTextInput(user.id, input, ipAddress);
+
+              // Property: Hassas kombinasyon için log kaydı oluşturulmamalı
+              expect(log).toBeNull();
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+});
+
+// ============================================================================
+// Unit-style Property Tests for Sensitive Field Detection Functions
+// ============================================================================
+
+describe('Property Tests: Hassas Alan Tespit Fonksiyonları', () => {
+  /**
+   * Property: isSensitiveField hassas alan ID'leri için true döndürmeli
+   */
+  it('isSensitiveField hassas alan ID\'leri için true döndürmeli', () => {
+    fc.assert(
+      fc.property(sensitiveFieldIdArbitrary, (fieldId) => {
+        return isSensitiveField(fieldId, '') === true;
+      }),
+      { numRuns: 5 }
+    );
+  });
+
+  /**
+   * Property: isSensitiveField hassas form context'leri için true döndürmeli
+   */
+  it('isSensitiveField hassas form context\'leri için true döndürmeli', () => {
+    fc.assert(
+      fc.property(sensitiveFormContextArbitrary, (formContext) => {
+        return isSensitiveField('', formContext) === true;
+      }),
+      { numRuns: 5 }
+    );
+  });
+
+  /**
+   * Property: isSensitiveField normal alanlar için false döndürmeli
+   */
+  it('isSensitiveField normal alanlar için false döndürmeli', () => {
+    fc.assert(
+      fc.property(normalFieldIdArbitrary, normalFormContextArbitrary, (fieldId, formContext) => {
+        return isSensitiveField(fieldId, formContext) === false;
+      }),
+      { numRuns: 5 }
+    );
+  });
+
+  /**
+   * Property: Boş değerler hassas kabul edilmemeli
+   */
+  it('isSensitiveField boş değerler için false döndürmeli', () => {
+    expect(isSensitiveField('', '')).toBe(false);
+  });
+});
+
+/**
+ * Property 5.1: Arama Sorgusu Kaydedilmeli
+ * 
+ * *For any* search operation, the log entry SHALL contain the search query.
+ * 
+ * **Validates: Requirements 4.1**
+ */
+describe('Property Tests: Arama Loglama Ek Testler', () => {
+  it(
+    'Property 5.1: Arama sorgusu kaydedilmeli',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            resultsCountArbitrary,
+            selectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde query bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.query).toBeDefined();
+              expect(details.query).toBe(query);
+
+              // Property: Action search olmalı
+              expect(log.action).toBe('search');
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.2: Sonuç Sayısının Kaydedilmesi
+   * 
+   * *For any* search operation, the log entry SHALL include the number of results returned.
+   * 
+   * **Validates: Requirements 4.2**
+   */
+  it(
+    'Property 5.2: Sonuç sayısı kaydedilmeli',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            resultsCountArbitrary,
+            selectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde resultsCount bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.resultsCount).toBeDefined();
+              expect(typeof details.resultsCount).toBe('number');
+              expect(details.resultsCount).toBe(resultsCount);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.3: Seçilen Sonucun Kaydedilmesi
+   * 
+   * *For any* search operation where user clicks on a result, the log entry SHALL record the selected result.
+   * 
+   * **Validates: Requirements 4.3**
+   */
+  it(
+    'Property 5.3: Seçilen sonuç kaydedilmeli (varsa)',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      // Sadece seçilen sonuç olan durumları test et
+      const nonNullSelectedResultArbitrary = fc.oneof(
+        fc.constantFrom(
+          '/guide/introduction',
+          '/penalties/traffic',
+          '/procedures/arrest',
+          '/commands/admin',
+          '/guide/rules'
+        ),
+        fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz-/'), { minLength: 5, maxLength: 50 })
+      );
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            fc.integer({ min: 1, max: 100 }), // En az 1 sonuç olmalı
+            nonNullSelectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Arama bilgisi oluştur (seçilen sonuç ile)
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde selectedResult bulunmalı ve değeri doğru olmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.selectedResult).toBeDefined();
+              expect(details.selectedResult).toBe(selectedResult);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.4: Sonuçsuz Aramaların Loglanması
+   * 
+   * *For any* search operation with zero results, the log entry SHALL be created with resultsCount = 0.
+   * 
+   * **Validates: Requirements 4.4**
+   */
+  it(
+    'Property 5.4: Sonuçsuz aramalar loglanmalı (resultsCount = 0)',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            validIPv4Arbitrary,
+            async (query, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Sonuçsuz arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount: 0, // Sonuç yok
+                selectedResult: null, // Seçilen sonuç da yok
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı (sonuçsuz aramalar da loglanmalı)
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde resultsCount 0 olmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.resultsCount).toBe(0);
+              
+              // Property: selectedResult null olmalı
+              expect(details.selectedResult).toBeNull();
+
+              // Property: Query hala kaydedilmiş olmalı
+              expect(details.query).toBe(query);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.5: Başarılı Aramaların Loglanması
+   * 
+   * *For any* search operation with results (resultsCount > 0), the log entry SHALL be created.
+   * 
+   * **Validates: Requirements 4.4**
+   */
+  it(
+    'Property 5.5: Başarılı aramalar loglanmalı (resultsCount > 0)',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            fc.integer({ min: 1, max: 100 }), // En az 1 sonuç
+            selectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Başarılı arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde resultsCount > 0 olmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              expect(details.resultsCount).toBeGreaterThan(0);
+              expect(details.resultsCount).toBe(resultsCount);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 5.6: Tüm Arama Alanları Tek Bir Log Kaydında Bulunmalı
+   * 
+   * *For any* search operation (successful or zero-result), the log entry SHALL contain 
+   * the search query, results count, and selected result (if any).
+   * 
+   * **Validates: Requirements 4.1, 4.2, 4.3, 4.4**
+   */
+  it(
+    'Property 5.6: Tüm arama alanları tek bir log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            searchQueryArbitrary,
+            resultsCountArbitrary,
+            selectedResultArbitrary,
+            validIPv4Arbitrary,
+            async (query, resultsCount, selectedResult, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Arama bilgisi oluştur
+              const search: SearchLog = {
+                query,
+                resultsCount,
+                selectedResult,
+              };
+
+              // Log kaydı oluştur
+              const log = await logSearchActivity(user.id, search, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Tek bir log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde tüm alanlar bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as SearchActivityDetails;
+              
+              // Property: Event tipi search olmalı
+              expect(details.event).toBe('search');
+              
+              // Property: Tüm zorunlu alanlar mevcut olmalı
+              expect(details.query).toBe(query);
+              expect(details.resultsCount).toBe(resultsCount);
+              expect(details.selectedResult).toBe(selectedResult);
+              
+              // Property: Timestamp bulunmalı ve geçerli olmalı
+              expect(details.timestamp).toBeDefined();
+              const timestampDate = new Date(details.timestamp);
+              expect(timestampDate.toString()).not.toBe('Invalid Date');
+
+              // Property: Action search olmalı
+              expect(log.action).toBe('search');
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 20,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+});
+
+
+// ============================================================================
+// Property 6: Hassas Alan Filtreleme
+// Feature: gelismis-loglama, Property 6: Hassas Alan Filtreleme
+// **Validates: Requirements 5.1, 5.2, 5.3**
+// ============================================================================
+
+// Arbitraries for Sensitive Field Filtering Tests
+
+/**
+ * Hassas alan ID'leri oluşturan arbitrary
+ * Password, kişisel veri ve finansal bilgi alanları
+ */
+const sensitiveFieldIdArbitrary = fc.constantFrom(
+  // Password alanları
+  'password',
+  'passwordConfirm',
+  'currentPassword',
+  'newPassword',
+  'passwd',
+  'pwd',
+  'parola',
+  'sifre',
+  'şifre',
+  'user_password',
+  'login_password',
+  
+  // Kişisel veri alanları
+  'ssn',
+  'socialSecurityNumber',
+  'social_security',
+  'tcKimlik',
+  'tc_kimlik_no',
+  'kimlikNo',
+  'identity_number',
+  'nationalId',
+  'national_id',
+  
+  // Finansal bilgiler
+  'creditCard',
+  'credit_card_number',
+  'cardNumber',
+  'card_number',
+  'cvv',
+  'cvc',
+  'expiry',
+  'expiryDate',
+  'iban',
+  'accountNumber',
+  'account_number',
+  'hesapNo',
+  'hesap_no',
+  
+  // İletişim bilgileri
+  'phone',
+  'phoneNumber',
+  'telefon',
+  'mobile',
+  'mobilePhone',
+  'cep',
+  'cepTelefonu',
+  
+  // Sağlık bilgileri
+  'health',
+  'healthInfo',
+  'medical',
+  'medicalHistory',
+  'saglik',
+  'sağlık',
+  
+  // Güvenlik soruları
+  'securityQuestion',
+  'security_question',
+  'securityAnswer',
+  'security_answer',
+  'secret',
+  'secretAnswer',
+  'pin',
+  'pinCode',
+  
+  // Token ve API anahtarları
+  'token',
+  'accessToken',
+  'apiKey',
+  'api_key',
+  'authToken',
+  'auth_token',
+  'bearer'
+);
+
+/**
+ * Hassas form context'leri oluşturan arbitrary
+ */
+const sensitiveFormContextArbitrary = fc.constantFrom(
+  'login',
+  'loginForm',
+  'signin',
+  'signInForm',
+  'signup',
+  'signUpForm',
+  'register',
+  'registerForm',
+  'password',
+  'passwordReset',
+  'changePassword',
+  'payment',
+  'paymentForm',
+  'checkout',
+  'checkoutForm',
+  'billing',
+  'billingForm',
+  'credit',
+  'creditCardForm',
+  'bank',
+  'bankTransfer'
+);
+
+/**
+ * Normal (hassas olmayan) alan ID'leri oluşturan arbitrary
+ */
+const normalFieldIdArbitrary = fc.constantFrom(
+  'username',
+  'email',
+  'firstName',
+  'lastName',
+  'address',
+  'city',
+  'country',
+  'zipCode',
+  'comment',
+  'message',
+  'description',
+  'title',
+  'subject',
+  'content',
+  'notes',
+  'feedback',
+  'search',
+  'query',
+  'filter',
+  'category',
+  'tag',
+  'name',
+  'company',
+  'organization',
+  'department',
+  'position',
+  'website',
+  'url',
+  'bio',
+  'about'
+);
+
+/**
+ * Normal (hassas olmayan) form context'leri oluşturan arbitrary
+ */
+const normalFormContextArbitrary = fc.constantFrom(
+  'contact',
+  'contactForm',
+  'feedback',
+  'feedbackForm',
+  'search',
+  'searchForm',
+  'profile',
+  'profileEdit',
+  'settings',
+  'preferences',
+  'comment',
+  'commentForm',
+  'review',
+  'reviewForm',
+  'inquiry',
+  'inquiryForm',
+  'newsletter',
+  'subscription',
+  'filter',
+  'filterForm',
+  'report',
+  'reportForm'
+);
+
+/**
+ * Metin içeriği oluşturan arbitrary
+ */
+const textContentArbitrary = fc.stringOf(
+  fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;@#$%&*()'),
+  { minLength: 1, maxLength: 500 }
+);
+
+describe('Property Tests: Hassas Alan Filtreleme (Property 6)', () => {
+  /**
+   * Property 6.1: Hassas Alan ID'leri Loglanmamalı
+   * 
+   * *For any* text input from a sensitive field (password, personal data), 
+   * the Logging_System SHALL NOT create a log entry for that input.
+   * 
+   * **Validates: Requirements 5.1, 5.2, 5.3**
+   */
+  it(
+    'Property 6.1: Hassas alan ID\'leri loglanmamalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            sensitiveFieldIdArbitrary,
+            normalFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Hassas alan bilgisi oluştur
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: false, // Otomatik tespit edilmeli
+              };
+
+              // Log kaydı oluşturmayı dene
+              const log = await logTextInput(user.id, input, ipAddress);
+
+              // Property: Hassas alan için log kaydı oluşturulmamalı
+              expect(log).toBeNull();
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 6.2: Hassas Form Context'leri Loglanmamalı
+   * 
+   * *For any* text input from a sensitive form context (login, payment, etc.), 
+   * the Logging_System SHALL NOT create a log entry for that input.
+   * 
+   * **Validates: Requirements 5.1, 5.2, 5.3**
+   */
+  it(
+    'Property 6.2: Hassas form context\'leri loglanmamalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            normalFieldIdArbitrary,
+            sensitiveFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Hassas form context bilgisi oluştur
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: false, // Otomatik tespit edilmeli
+              };
+
+              // Log kaydı oluşturmayı dene
+              const log = await logTextInput(user.id, input, ipAddress);
+
+              // Property: Hassas form context için log kaydı oluşturulmamalı
+              expect(log).toBeNull();
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 6.3: isSensitive Flag'i True Olan Alanlar Loglanmamalı
+   * 
+   * *For any* text input with isSensitive = true, 
+   * the Logging_System SHALL NOT create a log entry for that input.
+   * 
+   * **Validates: Requirements 5.3**
+   */
+  it(
+    'Property 6.3: isSensitive flag\'i true olan alanlar loglanmamalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            normalFieldIdArbitrary,
+            normalFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // isSensitive = true olan alan bilgisi oluştur
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: true, // Açıkça hassas olarak işaretlenmiş
+              };
+
+              // Log kaydı oluşturmayı dene
+              const log = await logTextInput(user.id, input, ipAddress);
+
+              // Property: isSensitive = true için log kaydı oluşturulmamalı
+              expect(log).toBeNull();
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 6.4: Normal Alanlar Loglanmalı
+   * 
+   * *For any* text input from a non-sensitive field, 
+   * the Logging_System SHALL create a log entry with the input content.
+   * 
+   * **Validates: Requirements 5.1, 5.2**
+   */
+  it(
+    'Property 6.4: Normal alanlar loglanmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            normalFieldIdArbitrary,
+            normalFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Normal alan bilgisi oluştur
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: false,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextInput(user.id, input, ipAddress);
+              if (log) {
+                createdLogIds.push(log.id);
+              }
+
+              // Property: Normal alan için log kaydı oluşturulmalı
+              expect(log).not.toBeNull();
+              expect(log).toBeDefined();
+              expect(log!.id).toBeDefined();
+
+              // Property: Details içinde alan bilgileri bulunmalı
+              expect(log!.details).toBeDefined();
+              const details = log!.details as TextInputDetails;
+              expect(details.fieldId).toBe(fieldId);
+              expect(details.formContext).toBe(formContext);
+              
+              // Property: İçerik kaydedilmiş olmalı (truncate edilmiş olabilir)
+              const expectedContent = content.length > INPUT_TEXT_MAX_LENGTH 
+                ? content.substring(0, INPUT_TEXT_MAX_LENGTH) 
+                : content;
+              expect(details.content).toBe(expectedContent);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 6.5: Hassas ve Normal Alan Kombinasyonları
+   * 
+   * *For any* combination of sensitive field ID with sensitive form context,
+   * the Logging_System SHALL NOT create a log entry.
+   * 
+   * **Validates: Requirements 5.3**
+   */
+  it(
+    'Property 6.5: Hassas alan ve hassas form context kombinasyonu loglanmamalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            sensitiveFieldIdArbitrary,
+            sensitiveFormContextArbitrary,
+            textContentArbitrary,
+            validIPv4Arbitrary,
+            async (fieldId, formContext, content, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Hem hassas alan hem hassas form context
+              const input: TextInputLog = {
+                fieldId,
+                formContext,
+                content,
+                isSensitive: false, // Otomatik tespit edilmeli
+              };
+
+              // Log kaydı oluşturmayı dene
+              const log = await logTextInput(user.id, input, ipAddress);
+
+              // Property: Hassas kombinasyon için log kaydı oluşturulmamalı
+              expect(log).toBeNull();
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+});
+
+// ============================================================================
+// Unit-style Property Tests for Sensitive Field Detection Functions
+// ============================================================================
+
+describe('Property Tests: Hassas Alan Tespit Fonksiyonları', () => {
+  /**
+   * Property: isSensitiveField hassas alan ID'leri için true döndürmeli
+   */
+  it('isSensitiveField hassas alan ID\'leri için true döndürmeli', () => {
+    fc.assert(
+      fc.property(sensitiveFieldIdArbitrary, (fieldId) => {
+        return isSensitiveField(fieldId, '') === true;
+      }),
+      { numRuns: 5 }
+    );
+  });
+
+  /**
+   * Property: isSensitiveField hassas form context'leri için true döndürmeli
+   */
+  it('isSensitiveField hassas form context\'leri için true döndürmeli', () => {
+    fc.assert(
+      fc.property(sensitiveFormContextArbitrary, (formContext) => {
+        return isSensitiveField('', formContext) === true;
+      }),
+      { numRuns: 5 }
+    );
+  });
+
+  /**
+   * Property: isSensitiveField normal alanlar için false döndürmeli
+   */
+  it('isSensitiveField normal alanlar için false döndürmeli', () => {
+    fc.assert(
+      fc.property(normalFieldIdArbitrary, normalFormContextArbitrary, (fieldId, formContext) => {
+        return isSensitiveField(fieldId, formContext) === false;
+      }),
+      { numRuns: 5 }
+    );
+  });
+
+  /**
+   * Property: Boş değerler hassas kabul edilmemeli
+   */
+  it('isSensitiveField boş değerler için false döndürmeli', () => {
+    expect(isSensitiveField('', '')).toBe(false);
+  });
+});
+
+
+// ============================================================================
+// Property 3: Metin Truncation
+// Feature: gelismis-loglama, Property 3: Metin Truncation
+// **Validates: Requirements 2.4, 5.4, 10.3**
+// ============================================================================
+
+// Arbitraries for Truncation Tests
+
+/**
+ * AI metni için uzun metin oluşturan arbitrary (2000+ karakter)
+ * Requirement 2.4: AI metinleri için 2000 karakter limiti
+ */
+const longAITextArbitrary = fc.stringOf(
+  fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'),
+  { minLength: 2001, maxLength: 3000 }
+);
+
+/**
+ * AI metni için kısa metin oluşturan arbitrary (2000 veya daha az karakter)
+ */
+const shortAITextArbitrary = fc.stringOf(
+  fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'),
+  { minLength: 1, maxLength: 2000 }
+);
+
+/**
+ * Input metni için uzun metin oluşturan arbitrary (1000+ karakter)
+ * Requirement 5.4: Input metinleri için 1000 karakter limiti
+ */
+const longInputTextArbitrary = fc.stringOf(
+  fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'),
+  { minLength: 1001, maxLength: 2000 }
+);
+
+/**
+ * Input metni için kısa metin oluşturan arbitrary (1000 veya daha az karakter)
+ */
+const shortInputTextArbitrary = fc.stringOf(
+  fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'),
+  { minLength: 1, maxLength: 1000 }
+);
+
+/**
+ * Copy metni için uzun metin oluşturan arbitrary (500+ karakter)
+ * Requirement 10.3: Kopyalanan metin için 500 karakter limiti
+ */
+const longCopyTextArbitrary = fc.stringOf(
+  fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'),
+  { minLength: 501, maxLength: 1000 }
+);
+
+/**
+ * Copy metni için kısa metin oluşturan arbitrary (500 veya daha az karakter)
+ */
+const shortCopyTextArbitrary = fc.stringOf(
+  fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'),
+  { minLength: 1, maxLength: 500 }
+);
+
+describe('Property Tests: Metin Truncation (Property 3)', () => {
+  /**
+   * Property 3.1: AI Metinleri 2000 Karaktere Kısaltılmalı
+   * 
+   * *For any* AI text exceeding 2000 characters, the logged text SHALL be truncated to exactly 2000 characters.
+   * 
+   * **Validates: Requirements 2.4**
+   */
+  it(
+    'Property 3.1: AI metinleri 2000 karakteri aşarsa tam olarak 2000 karaktere kısaltılmalı',
+    () => {
+      fc.assert(
+        fc.property(longAITextArbitrary, (text) => {
+          // Truncate işlemi uygula
+          const truncated = truncateAIText(text);
+          
+          // Property: Sonuç tam olarak 2000 karakter olmalı
+          expect(truncated.length).toBe(AI_TEXT_MAX_LENGTH);
+          
+          // Property: Kısaltılmış metin orijinal metnin başlangıcı olmalı
+          expect(text.startsWith(truncated)).toBe(true);
+          
+          return true;
+        }),
+        { numRuns: 5 }
+      );
+    }
+  );
+
+  /**
+   * Property 3.2: 2000 Karakter veya Daha Kısa AI Metinleri Değiştirilmemeli
+   * 
+   * *For any* AI text with 2000 or fewer characters, the logged text SHALL remain unchanged.
+   * 
+   * **Validates: Requirements 2.4**
+   */
+  it(
+    'Property 3.2: 2000 karakter veya daha kısa AI metinleri değiştirilmemeli',
+    () => {
+      fc.assert(
+        fc.property(shortAITextArbitrary, (text) => {
+          // Truncate işlemi uygula
+          const truncated = truncateAIText(text);
+          
+          // Property: Metin değişmemiş olmalı
+          expect(truncated).toBe(text);
+          expect(truncated.length).toBe(text.length);
+          
+          return true;
+        }),
+        { numRuns: 5 }
+      );
+    }
+  );
+
+  /**
+   * Property 3.3: Input Metinleri 1000 Karaktere Kısaltılmalı
+   * 
+   * *For any* input text exceeding 1000 characters, the logged text SHALL be truncated to exactly 1000 characters.
+   * 
+   * **Validates: Requirements 5.4**
+   */
+  it(
+    'Property 3.3: Input metinleri 1000 karakteri aşarsa tam olarak 1000 karaktere kısaltılmalı',
+    () => {
+      fc.assert(
+        fc.property(longInputTextArbitrary, (text) => {
+          // Truncate işlemi uygula
+          const truncated = truncateInputText(text);
+          
+          // Property: Sonuç tam olarak 1000 karakter olmalı
+          expect(truncated.length).toBe(INPUT_TEXT_MAX_LENGTH);
+          
+          // Property: Kısaltılmış metin orijinal metnin başlangıcı olmalı
+          expect(text.startsWith(truncated)).toBe(true);
+          
+          return true;
+        }),
+        { numRuns: 5 }
+      );
+    }
+  );
+
+  /**
+   * Property 3.4: 1000 Karakter veya Daha Kısa Input Metinleri Değiştirilmemeli
+   * 
+   * *For any* input text with 1000 or fewer characters, the logged text SHALL remain unchanged.
+   * 
+   * **Validates: Requirements 5.4**
+   */
+  it(
+    'Property 3.4: 1000 karakter veya daha kısa input metinleri değiştirilmemeli',
+    () => {
+      fc.assert(
+        fc.property(shortInputTextArbitrary, (text) => {
+          // Truncate işlemi uygula
+          const truncated = truncateInputText(text);
+          
+          // Property: Metin değişmemiş olmalı
+          expect(truncated).toBe(text);
+          expect(truncated.length).toBe(text.length);
+          
+          return true;
+        }),
+        { numRuns: 5 }
+      );
+    }
+  );
+
+  /**
+   * Property 3.5: Kopyalanan Metinler 500 Karaktere Kısaltılmalı
+   * 
+   * *For any* copied text exceeding 500 characters, the logged text SHALL be truncated to exactly 500 characters.
+   * 
+   * **Validates: Requirements 10.3**
+   */
+  it(
+    'Property 3.5: Kopyalanan metinler 500 karakteri aşarsa tam olarak 500 karaktere kısaltılmalı',
+    () => {
+      fc.assert(
+        fc.property(longCopyTextArbitrary, (text) => {
+          // Truncate işlemi uygula
+          const truncated = truncateCopyText(text);
+          
+          // Property: Sonuç tam olarak 500 karakter olmalı
+          expect(truncated.length).toBe(COPY_TEXT_MAX_LENGTH);
+          
+          // Property: Kısaltılmış metin orijinal metnin başlangıcı olmalı
+          expect(text.startsWith(truncated)).toBe(true);
+          
+          return true;
+        }),
+        { numRuns: 5 }
+      );
+    }
+  );
+
+  /**
+   * Property 3.6: 500 Karakter veya Daha Kısa Kopyalanan Metinler Değiştirilmemeli
+   * 
+   * *For any* copied text with 500 or fewer characters, the logged text SHALL remain unchanged.
+   * 
+   * **Validates: Requirements 10.3**
+   */
+  it(
+    'Property 3.6: 500 karakter veya daha kısa kopyalanan metinler değiştirilmemeli',
+    () => {
+      fc.assert(
+        fc.property(shortCopyTextArbitrary, (text) => {
+          // Truncate işlemi uygula
+          const truncated = truncateCopyText(text);
+          
+          // Property: Metin değişmemiş olmalı
+          expect(truncated).toBe(text);
+          expect(truncated.length).toBe(text.length);
+          
+          return true;
+        }),
+        { numRuns: 5 }
+      );
+    }
+  );
+});
+
+// ============================================================================
+// Unit-style Property Tests for Truncation Functions
+// ============================================================================
+
+describe('Property Tests: Truncation Fonksiyonları', () => {
+  /**
+   * Property: truncateText genel fonksiyonu doğru çalışmalı
+   */
+  it('truncateText herhangi bir limit için doğru çalışmalı', () => {
+    fc.assert(
+      fc.property(
+        fc.string({ minLength: 1, maxLength: 5000 }),
+        fc.integer({ min: 1, max: 3000 }),
+        (text, maxLength) => {
+          const truncated = truncateText(text, maxLength);
+          
+          // Property: Sonuç hiçbir zaman maxLength'i aşmamalı
+          expect(truncated.length).toBeLessThanOrEqual(maxLength);
+          
+          // Property: Eğer orijinal metin maxLength'den kısa veya eşitse, değişmemeli
+          if (text.length <= maxLength) {
+            expect(truncated).toBe(text);
+          } else {
+            // Property: Eğer orijinal metin maxLength'den uzunsa, tam olarak maxLength olmalı
+            expect(truncated.length).toBe(maxLength);
+            // Property: Kısaltılmış metin orijinal metnin başlangıcı olmalı
+            expect(text.startsWith(truncated)).toBe(true);
+          }
+          
+          return true;
+        }
+      ),
+      { numRuns: 5 }
+    );
+  });
+
+  /**
+   * Property: Boş metin için truncate fonksiyonları boş string döndürmeli
+   */
+  it('Boş metin için truncate fonksiyonları boş string döndürmeli', () => {
+    expect(truncateAIText('')).toBe('');
+    expect(truncateInputText('')).toBe('');
+    expect(truncateCopyText('')).toBe('');
+    expect(truncateText('', 100)).toBe('');
+  });
+
+  /**
+   * Property: Null/undefined için truncate fonksiyonları boş string döndürmeli
+   */
+  it('Null/undefined için truncate fonksiyonları boş string döndürmeli', () => {
+    expect(truncateText(null as unknown as string, 100)).toBe('');
+    expect(truncateText(undefined as unknown as string, 100)).toBe('');
+  });
+
+  /**
+   * Property: Truncation sabitleri doğru değerlere sahip olmalı
+   */
+  it('Truncation sabitleri doğru değerlere sahip olmalı', () => {
+    // Requirement 2.4: AI metinleri için 2000 karakter
+    expect(AI_TEXT_MAX_LENGTH).toBe(2000);
+    
+    // Requirement 5.4: Input metinleri için 1000 karakter
+    expect(INPUT_TEXT_MAX_LENGTH).toBe(1000);
+    
+    // Requirement 10.3: Kopyalanan metin için 500 karakter
+    expect(COPY_TEXT_MAX_LENGTH).toBe(500);
+  });
+});
+
+
+// ============================================================================
+// Property 12: Metin Kopyalama Loglama
+// Feature: gelismis-loglama, Property 12: Metin Kopyalama Loglama
+// **Validates: Requirements 10.1, 10.2, 10.4**
+// ============================================================================
+
+// Arbitraries for Text Copy Tests
+
+/**
+ * Kopyalanan metin oluşturan arbitrary
+ * Çeşitli uzunluklarda metinler
+ */
+const copiedTextArbitrary = fc.oneof(
+  // Kısa metinler
+  fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'), {
+    minLength: 1,
+    maxLength: 100,
+  }),
+  // Orta uzunlukta metinler
+  fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'), {
+    minLength: 100,
+    maxLength: 400,
+  }),
+  // Uzun metinler (truncation test için)
+  fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'), {
+    minLength: 500,
+    maxLength: 800,
+  })
+);
+
+/**
+ * Kaynak sayfa URL'si oluşturan arbitrary
+ */
+const sourcePageArbitrary = fc.constantFrom(
+  '/guide',
+  '/guide/introduction',
+  '/penalties',
+  '/penalties/category-1',
+  '/procedures',
+  '/procedures/step-1',
+  '/commands',
+  '/commands/admin',
+  '/search',
+  '/'
+);
+
+/**
+ * Element context oluşturan arbitrary
+ * Kopyalamanın yapıldığı HTML element bilgisi
+ */
+const elementContextArbitrary = fc.constantFrom(
+  'p.content-text',
+  'div.article-body',
+  'span.highlight',
+  'code.code-block',
+  'li.list-item',
+  'h1.title',
+  'h2.subtitle',
+  'blockquote.quote',
+  'td.table-cell',
+  'pre.code-snippet'
+);
+
+/**
+ * Selection pozisyonları oluşturan arbitrary
+ * Start her zaman end'den küçük veya eşit olmalı
+ */
+const selectionPositionsArbitrary = fc
+  .tuple(
+    fc.integer({ min: 0, max: 10000 }),
+    fc.integer({ min: 0, max: 10000 })
+  )
+  .map(([a, b]) => ({
+    start: Math.min(a, b),
+    end: Math.max(a, b),
+  }));
+
+/**
+ * Geçerli IPv4 adresi oluşturan arbitrary (Property 12 için)
+ */
+const validIPv4ArbitraryP12 = fc
+  .tuple(
+    fc.integer({ min: 0, max: 255 }),
+    fc.integer({ min: 0, max: 255 }),
+    fc.integer({ min: 0, max: 255 }),
+    fc.integer({ min: 0, max: 255 })
+  )
+  .map(([a, b, c, d]) => `${a}.${b}.${c}.${d}`);
+
+describe('Property Tests: Metin Kopyalama Loglama (Property 12)', () => {
+  /**
+   * Property 12.1: Kopyalanan Metin Kaydedilmeli
+   * 
+   * *For any* text copy event, the log entry SHALL contain the copied text.
+   * 
+   * **Validates: Requirements 10.1**
+   */
+  it(
+    'Property 12.1: Kopyalanan metin log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            copiedTextArbitrary,
+            sourcePageArbitrary,
+            elementContextArbitrary,
+            selectionPositionsArbitrary,
+            validIPv4ArbitraryP12,
+            async (copiedText, sourcePage, elementContext, positions, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Text copy bilgisi oluştur
+              const copyInfo: TextCopyLog = {
+                copiedText,
+                sourcePage,
+                elementContext,
+                selectionStart: positions.start,
+                selectionEnd: positions.end,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextCopy(user.id, copyInfo, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde kopyalanan metin bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as TextCopyDetails;
+              expect(details.copiedText).toBeDefined();
+
+              // Property: Kopyalanan metin doğru şekilde kaydedilmeli (truncation dahil)
+              const expectedText = copiedText.length > COPY_TEXT_MAX_LENGTH
+                ? copiedText.substring(0, COPY_TEXT_MAX_LENGTH)
+                : copiedText;
+              expect(details.copiedText).toBe(expectedText);
+
+              // Property: Action text_copy olmalı
+              expect(log.action).toBe('text_copy');
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 12.2: Kaynak Sayfa ve Element Context Kaydedilmeli
+   * 
+   * *For any* text copy event, the log entry SHALL include the source page and element context.
+   * 
+   * **Validates: Requirements 10.2**
+   */
+  it(
+    'Property 12.2: Kaynak sayfa ve element context log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            copiedTextArbitrary,
+            sourcePageArbitrary,
+            elementContextArbitrary,
+            selectionPositionsArbitrary,
+            validIPv4ArbitraryP12,
+            async (copiedText, sourcePage, elementContext, positions, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Text copy bilgisi oluştur
+              const copyInfo: TextCopyLog = {
+                copiedText,
+                sourcePage,
+                elementContext,
+                selectionStart: positions.start,
+                selectionEnd: positions.end,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextCopy(user.id, copyInfo, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde kaynak sayfa bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as TextCopyDetails;
+              expect(details.sourcePage).toBeDefined();
+              expect(details.sourcePage).toBe(sourcePage);
+
+              // Property: Details içinde element context bulunmalı
+              expect(details.elementContext).toBeDefined();
+              expect(details.elementContext).toBe(elementContext);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 12.3: Selection Start ve End Pozisyonları Kaydedilmeli
+   * 
+   * *For any* text copy event, the log entry SHALL record the selection start and end positions.
+   * 
+   * **Validates: Requirements 10.4**
+   */
+  it(
+    'Property 12.3: Selection start ve end pozisyonları log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            copiedTextArbitrary,
+            sourcePageArbitrary,
+            elementContextArbitrary,
+            selectionPositionsArbitrary,
+            validIPv4ArbitraryP12,
+            async (copiedText, sourcePage, elementContext, positions, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Text copy bilgisi oluştur
+              const copyInfo: TextCopyLog = {
+                copiedText,
+                sourcePage,
+                elementContext,
+                selectionStart: positions.start,
+                selectionEnd: positions.end,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextCopy(user.id, copyInfo, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde selection pozisyonları bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as TextCopyDetails;
+              
+              // Property: selectionStart kaydedilmeli
+              expect(details.selectionStart).toBeDefined();
+              expect(typeof details.selectionStart).toBe('number');
+              expect(details.selectionStart).toBe(positions.start);
+
+              // Property: selectionEnd kaydedilmeli
+              expect(details.selectionEnd).toBeDefined();
+              expect(typeof details.selectionEnd).toBe('number');
+              expect(details.selectionEnd).toBe(positions.end);
+
+              // Property: selectionStart <= selectionEnd olmalı
+              expect(details.selectionStart).toBeLessThanOrEqual(details.selectionEnd);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 12.4: Tüm Gerekli Alanlar Tek Bir Log Kaydında Bulunmalı
+   * 
+   * *For any* text copy event, the log entry SHALL contain ALL required fields:
+   * copied text, source page, element context, and selection positions.
+   * 
+   * **Validates: Requirements 10.1, 10.2, 10.4**
+   */
+  it(
+    'Property 12.4: Tüm gerekli alanlar tek bir log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            copiedTextArbitrary,
+            sourcePageArbitrary,
+            elementContextArbitrary,
+            selectionPositionsArbitrary,
+            validIPv4ArbitraryP12,
+            async (copiedText, sourcePage, elementContext, positions, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Text copy bilgisi oluştur
+              const copyInfo: TextCopyLog = {
+                copiedText,
+                sourcePage,
+                elementContext,
+                selectionStart: positions.start,
+                selectionEnd: positions.end,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextCopy(user.id, copyInfo, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details tüm gerekli alanları içermeli
+              expect(log.details).toBeDefined();
+              const details = log.details as TextCopyDetails;
+
+              // Property: Event türü doğru olmalı
+              expect(details.event).toBe('text_copy');
+
+              // Property: Kopyalanan metin bulunmalı (Requirement 10.1)
+              expect(details.copiedText).toBeDefined();
+
+              // Property: Kaynak sayfa bulunmalı (Requirement 10.2)
+              expect(details.sourcePage).toBeDefined();
+              expect(details.sourcePage).toBe(sourcePage);
+
+              // Property: Element context bulunmalı (Requirement 10.2)
+              expect(details.elementContext).toBeDefined();
+              expect(details.elementContext).toBe(elementContext);
+
+              // Property: Selection start bulunmalı (Requirement 10.4)
+              expect(details.selectionStart).toBeDefined();
+              expect(details.selectionStart).toBe(positions.start);
+
+              // Property: Selection end bulunmalı (Requirement 10.4)
+              expect(details.selectionEnd).toBeDefined();
+              expect(details.selectionEnd).toBe(positions.end);
+
+              // Property: Timestamp bulunmalı
+              expect(details.timestamp).toBeDefined();
+              expect(typeof details.timestamp).toBe('string');
+
+              // Property: IP adresi kaydedilmeli
+              expect(log.ipAddress).toBeDefined();
+              expect(log.ipAddress).toBe(ipAddress);
+
+              // Property: User ID kaydedilmeli
+              expect(log.userId).toBe(user.id);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+});
+
+
+// ============================================================================
+// Property 12: Metin Kopyalama Loglama
+// Feature: gelismis-loglama, Property 12: Metin Kopyalama Loglama
+// **Validates: Requirements 10.1, 10.2, 10.4**
+// ============================================================================
+
+// Arbitraries for Text Copy Tests
+
+/**
+ * Kopyalanan metin oluşturan arbitrary
+ * Çeşitli uzunluklarda metinler
+ */
+const copiedTextArbitrary = fc.oneof(
+  // Kısa metinler
+  fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'), {
+    minLength: 1,
+    maxLength: 100,
+  }),
+  // Orta uzunlukta metinler
+  fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'), {
+    minLength: 100,
+    maxLength: 400,
+  }),
+  // Uzun metinler (truncation test için)
+  fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?-:;'), {
+    minLength: 500,
+    maxLength: 800,
+  })
+);
+
+/**
+ * Kaynak sayfa URL'si oluşturan arbitrary
+ */
+const sourcePageArbitrary = fc.constantFrom(
+  '/guide',
+  '/guide/introduction',
+  '/penalties',
+  '/penalties/category-1',
+  '/procedures',
+  '/procedures/step-1',
+  '/commands',
+  '/commands/admin',
+  '/search',
+  '/'
+);
+
+/**
+ * Element context oluşturan arbitrary
+ * Kopyalamanın yapıldığı HTML element bilgisi
+ */
+const elementContextArbitrary = fc.constantFrom(
+  'p.content-text',
+  'div.article-body',
+  'span.highlight',
+  'code.code-block',
+  'li.list-item',
+  'h1.title',
+  'h2.subtitle',
+  'blockquote.quote',
+  'td.table-cell',
+  'pre.code-snippet'
+);
+
+/**
+ * Selection pozisyonları oluşturan arbitrary
+ * Start her zaman end'den küçük veya eşit olmalı
+ */
+const selectionPositionsArbitrary = fc
+  .tuple(
+    fc.integer({ min: 0, max: 10000 }),
+    fc.integer({ min: 0, max: 10000 })
+  )
+  .map(([a, b]) => ({
+    start: Math.min(a, b),
+    end: Math.max(a, b),
+  }));
+
+/**
+ * Geçerli IPv4 adresi oluşturan arbitrary (Property 12 için)
+ */
+const validIPv4ArbitraryP12 = fc
+  .tuple(
+    fc.integer({ min: 0, max: 255 }),
+    fc.integer({ min: 0, max: 255 }),
+    fc.integer({ min: 0, max: 255 }),
+    fc.integer({ min: 0, max: 255 })
+  )
+  .map(([a, b, c, d]) => `${a}.${b}.${c}.${d}`);
+
+describe('Property Tests: Metin Kopyalama Loglama (Property 12)', () => {
+  /**
+   * Property 12.1: Kopyalanan Metin Kaydedilmeli
+   * 
+   * *For any* text copy event, the log entry SHALL contain the copied text.
+   * 
+   * **Validates: Requirements 10.1**
+   */
+  it(
+    'Property 12.1: Kopyalanan metin log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            copiedTextArbitrary,
+            sourcePageArbitrary,
+            elementContextArbitrary,
+            selectionPositionsArbitrary,
+            validIPv4ArbitraryP12,
+            async (copiedText, sourcePage, elementContext, positions, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Text copy bilgisi oluştur
+              const copyInfo: TextCopyLog = {
+                copiedText,
+                sourcePage,
+                elementContext,
+                selectionStart: positions.start,
+                selectionEnd: positions.end,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextCopy(user.id, copyInfo, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde kopyalanan metin bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as TextCopyDetails;
+              expect(details.copiedText).toBeDefined();
+
+              // Property: Kopyalanan metin doğru şekilde kaydedilmeli (truncation dahil)
+              const expectedText = copiedText.length > COPY_TEXT_MAX_LENGTH
+                ? copiedText.substring(0, COPY_TEXT_MAX_LENGTH)
+                : copiedText;
+              expect(details.copiedText).toBe(expectedText);
+
+              // Property: Action text_copy olmalı
+              expect(log.action).toBe('text_copy');
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 12.2: Kaynak Sayfa ve Element Context Kaydedilmeli
+   * 
+   * *For any* text copy event, the log entry SHALL include the source page and element context.
+   * 
+   * **Validates: Requirements 10.2**
+   */
+  it(
+    'Property 12.2: Kaynak sayfa ve element context log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            copiedTextArbitrary,
+            sourcePageArbitrary,
+            elementContextArbitrary,
+            selectionPositionsArbitrary,
+            validIPv4ArbitraryP12,
+            async (copiedText, sourcePage, elementContext, positions, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Text copy bilgisi oluştur
+              const copyInfo: TextCopyLog = {
+                copiedText,
+                sourcePage,
+                elementContext,
+                selectionStart: positions.start,
+                selectionEnd: positions.end,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextCopy(user.id, copyInfo, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde kaynak sayfa bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as TextCopyDetails;
+              expect(details.sourcePage).toBeDefined();
+              expect(details.sourcePage).toBe(sourcePage);
+
+              // Property: Details içinde element context bulunmalı
+              expect(details.elementContext).toBeDefined();
+              expect(details.elementContext).toBe(elementContext);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 12.3: Selection Start ve End Pozisyonları Kaydedilmeli
+   * 
+   * *For any* text copy event, the log entry SHALL record the selection start and end positions.
+   * 
+   * **Validates: Requirements 10.4**
+   */
+  it(
+    'Property 12.3: Selection start ve end pozisyonları log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            copiedTextArbitrary,
+            sourcePageArbitrary,
+            elementContextArbitrary,
+            selectionPositionsArbitrary,
+            validIPv4ArbitraryP12,
+            async (copiedText, sourcePage, elementContext, positions, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Text copy bilgisi oluştur
+              const copyInfo: TextCopyLog = {
+                copiedText,
+                sourcePage,
+                elementContext,
+                selectionStart: positions.start,
+                selectionEnd: positions.end,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextCopy(user.id, copyInfo, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details içinde selection pozisyonları bulunmalı
+              expect(log.details).toBeDefined();
+              const details = log.details as TextCopyDetails;
+              
+              // Property: selectionStart kaydedilmeli
+              expect(details.selectionStart).toBeDefined();
+              expect(typeof details.selectionStart).toBe('number');
+              expect(details.selectionStart).toBe(positions.start);
+
+              // Property: selectionEnd kaydedilmeli
+              expect(details.selectionEnd).toBeDefined();
+              expect(typeof details.selectionEnd).toBe('number');
+              expect(details.selectionEnd).toBe(positions.end);
+
+              // Property: selectionStart <= selectionEnd olmalı
+              expect(details.selectionStart).toBeLessThanOrEqual(details.selectionEnd);
+
+              return true;
+            }
+          ),
+          {
+            numRuns: 5,
+            verbose: false,
+          }
+        );
+      } finally {
+        // Temizlik
+        if (createdLogIds.length > 0) {
+          await prisma.activityLog.deleteMany({
+            where: { id: { in: createdLogIds } },
+          });
+        }
+        if (createdUserIds.length > 0) {
+          await prisma.user.deleteMany({
+            where: { id: { in: createdUserIds } },
+          });
+        }
+      }
+    },
+    60000
+  );
+
+  /**
+   * Property 12.4: Tüm Gerekli Alanlar Tek Bir Log Kaydında Bulunmalı
+   * 
+   * *For any* text copy event, the log entry SHALL contain ALL required fields:
+   * copied text, source page, element context, and selection positions.
+   * 
+   * **Validates: Requirements 10.1, 10.2, 10.4**
+   */
+  it(
+    'Property 12.4: Tüm gerekli alanlar tek bir log kaydında bulunmalı',
+    async () => {
+      const createdLogIds: string[] = [];
+      const createdUserIds: string[] = [];
+
+      try {
+        await fc.assert(
+          fc.asyncProperty(
+            copiedTextArbitrary,
+            sourcePageArbitrary,
+            elementContextArbitrary,
+            selectionPositionsArbitrary,
+            validIPv4ArbitraryP12,
+            async (copiedText, sourcePage, elementContext, positions, ipAddress) => {
+              // Test kullanıcısı oluştur
+              const passwordHash = await hashPassword('TestPassword123');
+              const user = await prisma.user.create({
+                data: {
+                  username: `testuser_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  email: `test_${testRunId}_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`,
+                  passwordHash,
+                  status: 'approved',
+                },
+              });
+              createdUserIds.push(user.id);
+
+              // Text copy bilgisi oluştur
+              const copyInfo: TextCopyLog = {
+                copiedText,
+                sourcePage,
+                elementContext,
+                selectionStart: positions.start,
+                selectionEnd: positions.end,
+              };
+
+              // Log kaydı oluştur
+              const log = await logTextCopy(user.id, copyInfo, ipAddress);
+              createdLogIds.push(log.id);
+
+              // Property: Log kaydı oluşturulmuş olmalı
+              expect(log).toBeDefined();
+              expect(log.id).toBeDefined();
+
+              // Property: Details tüm gerekli alanları içermeli
+              expect(log.details).toBeDefined();
+              const details = log.details as TextCopyDetails;
+
+              // Property: Event türü doğru olmalı
+              expect(details.event).toBe('text_copy');
+
+              // Property: Kopyalanan metin bulunmalı (Requirement 10.1)
+              expect(details.copiedText).toBeDefined();
+
+              // Property: Kaynak sayfa bulunmalı (Requirement 10.2)
+              expect(details.sourcePage).toBeDefined();
+              expect(details.sourcePage).toBe(sourcePage);
+
+              // Property: Element context bulunmalı (Requirement 10.2)
+              expect(details.elementContext).toBeDefined();
+              expect(details.elementContext).toBe(elementContext);
+
+              // Property: Selection start bulunmalı (Requirement 10.4)
+              expect(details.selectionStart).toBeDefined();
+              expect(details.selectionStart).toBe(positions.start);
+
+              // Property: Selection end bulunmalı (Requirement 10.4)
+              expect(details.selectionEnd).toBeDefined();
+              expect(details.selectionEnd).toBe(positions.end);
+
+              // Property: Timestamp bulunmalı
+              expect(details.timestamp).toBeDefined();
+              expect(typeof details.timestamp).toBe('string');
+
+              // Property: IP adresi kaydedilmeli
+              expect(log.ipAddress).toBeDefined();
+              expect(log.ipAddress).toBe(ipAddress);
+
+              // Property: User ID kaydedilmeli
+              expect(log.userId).toBe(user.id);
 
               return true;
             }
