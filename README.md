@@ -1,25 +1,24 @@
-# Discord Yetkili Kılavuzu ve Ceza Danışman Sistemi
+# Discord Yetkili Kılavuzu
 
-SANIYE MODLARI Discord sunucusu için özel Yetkili Kılavuzu ve AI destekli Ceza Danışman Sistemi.
+SANIYE MODLARI Discord sunucusu için Yetkili Kılavuzu ve Ceza Danışman Sistemi.
 
 ## Özellikler
 
-- 🔐 Rol tabanlı erişim kontrolü (Mod, Admin, Üst Yetkili)
-- 📚 Yetkili Kılavuzu içerik yönetimi
+- 🔐 Şifre korumalı erişim
+- 📚 Yetkili kılavuzu içerikleri
 - ⚖️ Ceza tanımları ve kategorileri
-- 🤖 AI destekli ceza danışmanı (RAG tabanlı)
-- 🔍 Gelişmiş arama sistemi
-- 📝 İçerik düzenleme (sadece Üst Yetkili)
-- 📊 Aktivite loglama
+- 🔍 İçerik arama
+- 📋 Ceza şablonları (kopyala-yapıştır)
+- 💻 Bot komutları referansı
+- 📝 Prosedür kılavuzları
 
 ## Teknolojiler
 
-- Next.js 14
+- Next.js 14 (Static Export)
 - TypeScript
-- Prisma ORM
 - Tailwind CSS
 - Shadcn/ui
-- OpenAI API
+- GitHub Pages
 
 ## Kurulum
 
@@ -34,27 +33,23 @@ cd Discord-adil-kuralar
 npm install
 ```
 
-3. `.env.example` dosyasını `.env` olarak kopyala ve değerleri doldur:
-```bash
-cp .env.example .env
-```
-
-4. Veritabanını oluştur:
-```bash
-npx prisma db push
-```
-
-5. Geliştirme sunucusunu başlat:
+3. Geliştirme sunucusunu başlat:
 ```bash
 npm run dev
 ```
 
-## Environment Variables
+4. Production build:
+```bash
+npm run build
+```
 
-| Değişken | Açıklama |
-|----------|----------|
-| `DATABASE_URL` | Veritabanı bağlantı URL'i |
-| `OPENAI_API_KEY` | OpenAI API anahtarı (AI asistan için) |
+Build çıktısı `out/` klasörüne oluşturulur.
+
+## Deploy
+
+Site otomatik olarak GitHub Pages üzerinden deploy edilir. `main` branch'e push yapıldığında GitHub Actions workflow tetiklenir.
+
+Site adresi: https://aderimo.github.io/Discord-adil-kuralar/
 
 ## Lisans
 

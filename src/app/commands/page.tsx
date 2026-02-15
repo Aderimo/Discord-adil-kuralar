@@ -1,89 +1,36 @@
 'use client';
 
-import React, { Suspense, useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { BackButton } from '@/components/navigation/BackButton';
 import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 import { loadCommands } from '@/lib/content';
-import { useAuth } from '@/hooks/useAuth';
-import { hasRole } from '@/lib/rbac';
 import { Gavel, Info, Mic, Shield, ChevronRight } from 'lucide-react';
 import type { CommandCategory } from '@/types/content';
 
-const categoryConfig: Record<CommandCategory, { 
-  label: string; 
-  description: string;
-  icon: React.ReactNode; 
-  color: string;
-  requiredRole: string;
-}> = {
-  ceza: { 
-    label: 'Ceza Komutları', 
-    description: 'Mute, timeout, temprole ve diğer ceza komutları.',
-    icon: <Gavel className="h-6 w-6" />,
-    color: 'text-discord-red bg-discord-red/10',
-    requiredRole: 'reg'
-  },
-  bilgi: { 
-    label: 'Bilgi Komutları', 
-    description: 'Kullanıcı bilgisi, sicil ve geçmiş sorgulama.',
-    icon: <Info className="h-6 w-6" />,
-    color: 'text-discord-accent bg-discord-accent/10',
-    requiredRole: 'reg'
-  },
-  sesli: { 
-    label: 'Sesli Kanal Komutları', 
-    description: 'Voice channel yönetimi ve kullanıcı çekme.',
-    icon: <Mic className="h-6 w-6" />,
-    color: 'text-discord-green bg-discord-green/10',
-    requiredRole: 'reg'
-  },
-  'gk-plus': { 
-    label: 'GK+ Komutları', 
-    description: 'Genel Koordinatör ve üstü için ban/unban komutları.',
-    icon: <Shield className="h-6 w-6" />,
-    color: 'text-discord-yellow bg-discord-yellow/10',
-    requiredRole: 'gk'
-  },
+const categoryConfig: Record<CommandCategory, { label: string; description: string; icon: React.ReactNode; color: string }> = {
+  ceza: { label: 'Ceza Komutları', description: 'Mute, timeout, temprole komutları.', icon: <Gavel className="h-6 w-6" />, color: 'text-discord-red bg-discord-red/10' },
+  bilgi: { label: 'Bilgi Komutları', description: 'Kullanıcı bilgisi ve sicil sorgulama.', icon: <Info className="h-6 w-6" />, color: 'text-discord-accent bg-discord-accent/10' },
+  sesli: { label: 'Sesli Kanal Komutları', description: 'Voice channel yönetimi.', icon: <Mic className="h-6 w-6" />, color: 'text-discord-green bg-discord-green/10' },
+  'gk-plus': { label: 'GK+ Komutları', description: 'Ban/unban komutları.', icon: <Shield className="h-6 w-6" />, color: 'text-discord-yellow bg-discord-yellow/10' },
 };
 
-function CommandsPageContent(): React.ReactElement {
-  const commands = useMemo(() => loadCommands(), []);
+export default function CommandsPage() {
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { user } = useAuth();
+  useEffect(() => { if (!isAuthenticated) router.push('/login'); }, [isAuthenticated, router]);
+  if (!isAuthenticated) return null;
 
-  // URL'den ?add=true parametresini kontrol et - varsayılan olarak ceza kategorisine yönlendir
-  useEffect(() => {
-    if (searchParams.get('add') === 'true' && user?.role && hasRole(user.role, 'gm_plus')) {
-      router.push('/commands/ceza?add=true');
-    }
-  }, [searchParams, user?.role, router]);
-
-  // Her kategorideki komut sayısını hesapla
+  const commands = loadCommands();
   const categoryCounts = useMemo(() => {
-    const counts: Record<CommandCategory, number> = {
-      ceza: 0,
-      bilgi: 0,
-      sesli: 0,
-      'gk-plus': 0,
-    };
-    commands.forEach((cmd) => {
-      const cat = cmd.category || 'bilgi';
-      if (counts[cat] !== undefined) {
-        counts[cat]++;
-      }
-    });
-    return counts;
+    const c: Record<string, number> = {};
+    commands.forEach(cmd => { const cat = cmd.category || 'bilgi'; c[cat] = (c[cat] || 0) + 1; });
+    return c;
   }, [commands]);
-
-  const breadcrumbItems = useMemo(() => [
-    { label: 'Ana Sayfa', href: '/' },
-    { label: 'Komutlar', href: '/commands' },
-  ], []);
 
   const categories: CommandCategory[] = ['ceza', 'bilgi', 'sesli', 'gk-plus'];
 
@@ -92,51 +39,25 @@ function CommandsPageContent(): React.ReactElement {
       <div className="max-w-4xl mx-auto space-y-6 p-6">
         <div className="space-y-3">
           <BackButton fallbackUrl="/" label="Geri" />
-          <Breadcrumb items={breadcrumbItems} />
+          <Breadcrumb items={[{ label: 'Ana Sayfa', href: '/' }, { label: 'Komutlar', href: '/commands' }]} />
         </div>
-
         <div>
-          <h1 className="text-2xl font-bold text-discord-text mb-2">
-            Moderasyon Komutları
-          </h1>
-          <p className="text-discord-muted">
-            Tüm bot komutları ve kullanım örnekleri. Toplam {commands.length} komut.
-          </p>
+          <h1 className="text-2xl font-bold text-discord-text mb-2">Moderasyon Komutları</h1>
+          <p className="text-discord-muted">Toplam {commands.length} komut.</p>
         </div>
-
         <div className="grid gap-4 sm:grid-cols-2">
-          {categories.map((category) => {
-            const config = categoryConfig[category];
-            const count = categoryCounts[category];
-            
+          {categories.map(cat => {
+            const cfg = categoryConfig[cat];
             return (
-              <Link
-                key={category}
-                href={`/commands/${category}` as never}
-                className="block bg-discord-dark border border-discord-light rounded-lg p-4 hover:border-discord-accent/50 transition-colors group"
-              >
+              <Link key={cat} href={`/commands/${cat}`}
+                className="block bg-discord-dark border border-discord-light rounded-lg p-4 hover:border-discord-accent/50 transition-colors group">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <div className={`p-2 rounded-lg ${config.color}`}>
-                      {config.icon}
-                    </div>
+                    <div className={`p-2 rounded-lg ${cfg.color}`}>{cfg.icon}</div>
                     <div>
-                      <h3 className="font-semibold text-discord-text group-hover:text-discord-accent transition-colors">
-                        {config.label}
-                      </h3>
-                      <p className="text-sm text-discord-muted mt-1">
-                        {config.description}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-xs bg-discord-lighter px-2 py-1 rounded text-discord-muted">
-                          {count} komut
-                        </span>
-                        {config.requiredRole !== 'reg' && (
-                          <span className="text-xs bg-discord-yellow/20 px-2 py-1 rounded text-discord-yellow">
-                            {config.requiredRole === 'gk' ? 'GK+' : config.requiredRole.toUpperCase()}
-                          </span>
-                        )}
-                      </div>
+                      <h3 className="font-semibold text-discord-text group-hover:text-discord-accent transition-colors">{cfg.label}</h3>
+                      <p className="text-sm text-discord-muted mt-1">{cfg.description}</p>
+                      <span className="inline-block mt-2 text-xs bg-discord-lighter px-2 py-1 rounded text-discord-muted">{categoryCounts[cat] || 0} komut</span>
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-discord-muted group-hover:text-discord-accent transition-colors flex-shrink-0" />
@@ -147,13 +68,5 @@ function CommandsPageContent(): React.ReactElement {
         </div>
       </div>
     </MainLayout>
-  );
-}
-
-export default function CommandsPage(): React.ReactElement {
-  return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-discord-muted">Yükleniyor...</div></div>}>
-      <CommandsPageContent />
-    </Suspense>
   );
 }

@@ -1,23 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   reactStrictMode: true,
   poweredByHeader: false,
-  // Netlify deployment için image optimization
   images: {
-    unoptimized: false,
+    unoptimized: true,
   },
-  // Build sırasında type check hatalarını ignore et (Netlify uyumluluğu)
   typescript: {
     ignoreBuildErrors: false,
   },
-  // ESLint uyarılarını build'i durdurmaktan çıkar
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    typedRoutes: true,
-    missingSuspenseWithCSRBailout: false,
-  },
+  // GitHub Pages repo adı
+  basePath: '/Discord-adil-kuralar',
 };
 
 module.exports = nextConfig;

@@ -4,19 +4,18 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
 
-
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Saniye Yetkili Kılavuzu - SANIYE MODLARI',
-  description: 'SANIYE MODLARI Discord sunucusu için Saniye Yetkili Kılavuzu ve Ceza Danışman Sistemi',
+  title: 'Saniye Yetkili Kılavuzu',
+  description: 'SANIYE MODLARI Discord sunucusu için Yetkili Kılavuzu ve Ceza Danışman Sistemi',
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>): React.ReactElement {
+}>) {
   return (
     <html lang="tr" className="dark">
       <body className={`${inter.className} bg-discord-darker text-discord-text antialiased`}>
@@ -24,7 +23,6 @@ export default function RootLayout({
           {children}
         </AuthProvider>
         <Toaster />
-
       </body>
     </html>
   );
