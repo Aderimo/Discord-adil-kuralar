@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { Suspense, useMemo, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -16,7 +16,7 @@ import { Plus, Book, ChevronRight, Trash2, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { GuideContent, PenaltyDefinition, CommandDefinition, ProcedureDefinition } from '@/types/content';
 
-export default function GuidePage(): React.ReactElement {
+function GuidePageContent(): React.ReactElement {
   const allGuideContent = useMemo(() => loadGuideContent(), []);
   const { user } = useAuth();
   const searchParams = useSearchParams();
@@ -223,5 +223,13 @@ export default function GuidePage(): React.ReactElement {
         )}
       </div>
     </MainLayout>
+  );
+}
+
+export default function GuidePage(): React.ReactElement {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-discord-muted">Yükleniyor...</div></div>}>
+      <GuidePageContent />
+    </Suspense>
   );
 }

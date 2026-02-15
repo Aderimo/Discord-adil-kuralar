@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect } from 'react';
+import React, { Suspense, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -50,7 +50,7 @@ const categoryConfig: Record<CommandCategory, {
   },
 };
 
-export default function CommandsPage(): React.ReactElement {
+function CommandsPageContent(): React.ReactElement {
   const commands = useMemo(() => loadCommands(), []);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -147,5 +147,13 @@ export default function CommandsPage(): React.ReactElement {
         </div>
       </div>
     </MainLayout>
+  );
+}
+
+export default function CommandsPage(): React.ReactElement {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-discord-muted">Yükleniyor...</div></div>}>
+      <CommandsPageContent />
+    </Suspense>
   );
 }
