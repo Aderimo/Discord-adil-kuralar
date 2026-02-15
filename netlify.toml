@@ -4,6 +4,15 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  NEXT_TELEMETRY_DISABLED = "1"
 
+# Next.js SSR ve API rotaları için
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# SPA fallback - client-side routing için
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"]}

@@ -2,7 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // API tabanlı backend mimarisi için
+  // Netlify deployment için image optimization
+  images: {
+    unoptimized: false,
+  },
   experimental: {
     typedRoutes: true,
   },
