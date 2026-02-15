@@ -109,6 +109,15 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   export_logs: 'Log Dışa Aktardı',
   view_notifications: 'Bildirim Görüntüledi',
   mark_notification_read: 'Bildirim Okundu',
+  visitor_access: 'Ziyaretçi Erişimi',
+  page_access: 'Sayfa Erişimi',
+  ai_interaction: 'AI Etkileşimi',
+  text_input: 'Metin Girişi',
+  text_copy: 'Metin Kopyaladı',
+  referrer_track: 'Referrer Takibi',
+  url_copy: 'URL Kopyaladı',
+  log_download: 'Log İndirdi',
+  log_delete: 'Log Sildi',
 };
 
 const ACTION_ICONS: Record<ActivityAction, React.ReactNode> = {
@@ -131,6 +140,15 @@ const ACTION_ICONS: Record<ActivityAction, React.ReactNode> = {
   export_logs: <Eye className="h-4 w-4" />,
   view_notifications: <Eye className="h-4 w-4" />,
   mark_notification_read: <Eye className="h-4 w-4" />,
+  visitor_access: <Eye className="h-4 w-4" />,
+  page_access: <Eye className="h-4 w-4" />,
+  ai_interaction: <MessageSquare className="h-4 w-4" />,
+  text_input: <Eye className="h-4 w-4" />,
+  text_copy: <Eye className="h-4 w-4" />,
+  referrer_track: <Eye className="h-4 w-4" />,
+  url_copy: <Eye className="h-4 w-4" />,
+  log_download: <Eye className="h-4 w-4" />,
+  log_delete: <Eye className="h-4 w-4" />,
 };
 
 const ACTION_COLORS: Record<ActivityAction, string> = {
@@ -153,6 +171,15 @@ const ACTION_COLORS: Record<ActivityAction, string> = {
   export_logs: 'bg-gray-500/20 text-gray-400',
   view_notifications: 'bg-gray-500/20 text-gray-400',
   mark_notification_read: 'bg-gray-500/20 text-gray-400',
+  visitor_access: 'bg-gray-500/20 text-gray-400',
+  page_access: 'bg-blue-500/20 text-blue-400',
+  ai_interaction: 'bg-cyan-500/20 text-cyan-400',
+  text_input: 'bg-purple-500/20 text-purple-400',
+  text_copy: 'bg-blue-500/20 text-blue-400',
+  referrer_track: 'bg-gray-500/20 text-gray-400',
+  url_copy: 'bg-blue-500/20 text-blue-400',
+  log_download: 'bg-yellow-500/20 text-yellow-400',
+  log_delete: 'bg-red-500/20 text-red-400',
 };
 
 export default function UserDetailPage(): React.ReactElement {
