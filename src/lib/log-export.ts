@@ -79,7 +79,7 @@ export function toExportLogEntry(log: PrismaActivityLog): ExportLogEntry {
     action: log.action,
     details: log.details,
     ipAddress: log.ipAddress,
-    createdAt: log.createdAt.toISOString(),
+    createdAt: log.timestamp.toISOString(),
   };
 }
 
@@ -218,7 +218,7 @@ export function logsToJSON(entries: ExportLogEntry[]): string {
 export async function exportLogs(options: ExportOptions): Promise<ExportResult> {
   // Filtre koşullarını oluştur
   const whereClause: {
-    createdAt?: {
+    timestamp?: {
       gte?: Date;
       lte?: Date;
     };
@@ -229,14 +229,14 @@ export async function exportLogs(options: ExportOptions): Promise<ExportResult> 
 
   // Tarih filtreleri
   if (options.startDate || options.endDate) {
-    whereClause.createdAt = {};
+    whereClause.timestamp = {};
     
     if (options.startDate) {
-      whereClause.createdAt.gte = options.startDate;
+      whereClause.timestamp.gte = options.startDate;
     }
     
     if (options.endDate) {
-      whereClause.createdAt.lte = options.endDate;
+      whereClause.timestamp.lte = options.endDate;
     }
   }
 
@@ -256,7 +256,7 @@ export async function exportLogs(options: ExportOptions): Promise<ExportResult> 
   // Logları veritabanından çek (kronolojik sırada)
   const logs = await prisma.activityLog.findMany({
     where: whereClause,
-    orderBy: { createdAt: 'asc' },
+    orderBy: { timestamp: 'asc' },
   });
 
   // Prisma loglarını export formatına dönüştür
