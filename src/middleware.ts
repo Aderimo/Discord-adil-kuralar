@@ -402,11 +402,11 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
+     * - _next (all Next.js internal files: static, image, data)
      * - favicon.ico (favicon file)
      * - public folder
+     * - static file extensions
      */
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+    '/((?!_next|favicon\\.ico|public/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|css|js|woff|woff2|ttf|eot)$).*)',
   ],
 };
