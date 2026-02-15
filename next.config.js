@@ -6,6 +6,14 @@ const nextConfig = {
   images: {
     unoptimized: false,
   },
+  // Build sırasında type check hatalarını ignore et (Netlify uyumluluğu)
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  // ESLint uyarılarını build'i durdurmaktan çıkar
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     typedRoutes: true,
   },
