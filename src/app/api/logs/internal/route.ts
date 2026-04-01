@@ -106,20 +106,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Normal aktivite logu
     if (data.userId) {
       const activityAction = determineActivityAction(data.path, data.method);
-      
-      await logActivity(
-        data.userId,
-        activityAction,
-        {
-          event: data.action,
-          path: data.path,
-          method: data.method,
-          userAgent: data.userAgent,
-          timestamp: data.timestamp,
-        },
-        data.ipAddress
-      );
-      
+
+      try {
+        await logActivity(
+          data.userId,
+          activityAction,
+          {
+            event: data.action,
+            path: data.path,
+            method: data.method,
+            userAgent: data.userAgent,
+            timestamp: data.timestamp,
+          },
+          data.ipAddress
+        );
+      } catch (logErr: unknown) {
+        // P2003: userId veritabanında yok (eski session) - sessizce atla
+        const code = (logErr as { code?: string })?.code;
+        if (code !== 'P2003') {
+          throw logErr;
+        }
+        return NextResponse.json({ success: true, logged: 'skipped_unknown_user' });
+      }
+
       return NextResponse.json({ success: true, logged: activityAction });
     }
 
