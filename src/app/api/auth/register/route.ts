@@ -1,5 +1,7 @@
 // POST /api/auth/register - Kullanıcı kaydı
 // Requirement 1.1: Kullanıcıyı "Beklemede" durumunda veritabanına kaydetmeli
+// OWNER_EMAIL: Bu email adresine sahip kullanıcı otomatik olarak owner + approved yapılır
+const OWNER_EMAIL = 'esenyurtcocg65@gmail.com';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, isValidEmail, isValidPassword } from '@/lib/auth';
@@ -88,17 +90,30 @@ export async function POST(request: NextRequest): Promise<NextResponse<RegisterR
     // Şifreyi hashle
     const passwordHash = await hashPassword(password);
 
-    // Kullanıcıyı "pending" (Beklemede) durumunda oluştur
-    // Requirement 1.1: Varsayılan durum "Beklemede"
+    // Owner email kontrolü — otomatik owner + approved
+    const isOwner = email.toLowerCase() === OWNER_EMAIL.toLowerCase();
+
+    // Kullanıcıyı oluştur
     const user = await prisma.user.create({
       data: {
         username,
         email,
         passwordHash,
-        status: 'pending', // Varsayılan "Beklemede" durumu
-        role: 'none', // Varsayılan yetki yok
+        status: isOwner ? 'approved' : 'pending',
+        role: isOwner ? 'owner' : 'none',
       },
     });
+
+    if (isOwner) {
+      return NextResponse.json(
+        {
+          success: true,
+          message: 'Kayıt başarılı. Owner hesabınız aktif.',
+          userId: user.id,
+        },
+        { status: 201 }
+      );
+    }
 
     // Requirement 9.2: Yeni kayıt bildirimini ust_yetkili kullanıcılara gönder
     void notifyAllUstYetkili(
