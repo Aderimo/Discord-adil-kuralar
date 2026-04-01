@@ -78,7 +78,7 @@ export default function SettingsPage(): React.ReactElement {
       .then(r => r.json())
       .then((data: { success: boolean; permissions?: Record<string, string> | null }) => {
         if (data.success && data.permissions) {
-          setPermissions({ ...buildDefault(), ...data.permissions });
+          setPermissions({ ...buildDefault(), ...(data.permissions as PermissionMap) });
         }
       })
       .catch(() => { /* use defaults */ })
