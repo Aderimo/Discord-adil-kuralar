@@ -8,6 +8,13 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Prisma native binaries'i serverless bundle'a dahil et (Netlify/Lambda için gerekli)
+  outputFileTracingIncludes: {
+    '/api/**': [
+      './node_modules/@prisma/client/**/*',
+      './node_modules/.prisma/**/*',
+    ],
+  },
   experimental: {
     typedRoutes: true,
   },
