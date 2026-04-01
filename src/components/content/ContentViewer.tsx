@@ -8,9 +8,9 @@
  * Requirements: 4.2
  */
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Copy, Check, List } from 'lucide-react';
 import type {
   GuideContent,
   PenaltyDefinition,
@@ -37,6 +37,37 @@ export interface ContentViewerProps {
   onNavigate?: (href: string) => void;
 }
 
+// Heading metninden URL-friendly ID üret
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+}
+
+interface TocItem {
+  level: 1 | 2 | 3;
+  text: string;
+  id: string;
+}
+
+// Markdown'dan başlıkları çıkar
+function extractTOC(markdown: string): TocItem[] {
+  const items: TocItem[] = [];
+  const lines = markdown.split('\n');
+  for (const line of lines) {
+    const m3 = line.match(/^### (.+)$/);
+    if (m3) { items.push({ level: 3, text: m3[1], id: slugify(m3[1]) }); continue; }
+    const m2 = line.match(/^## (.+)$/);
+    if (m2) { items.push({ level: 2, text: m2[1], id: slugify(m2[1]) }); continue; }
+    const m1 = line.match(/^# (.+)$/);
+    if (m1) { items.push({ level: 1, text: m1[1], id: slugify(m1[1]) }); }
+  }
+  return items;
+}
+
 // Basit markdown parser
 function parseMarkdown(markdown: string): string {
   let html = markdown;
@@ -47,57 +78,65 @@ function parseMarkdown(markdown: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // Headers
-  html = html.replace(/^### (.+)$/gm, '<h3 class="text-lg font-semibold text-discord-text mt-6 mb-3">$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2 class="text-xl font-semibold text-discord-text mt-8 mb-4">$1</h2>');
-  html = html.replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold text-discord-text mt-8 mb-4">$1</h1>');
+  // Code blocks (önce işle, içerikleri bozulmasın)
+  const codeBlocks: string[] = [];
+  html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, _lang, code) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push(`<pre class="bg-discord-darker rounded-lg p-4 my-5 overflow-x-auto border border-discord-lighter"><code class="text-sm font-mono text-discord-text">${code.trim()}</code></pre>`);
+    return `__CODEBLOCK_${idx}__`;
+  });
+
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code class="bg-discord-darker px-1.5 py-0.5 rounded text-sm font-mono text-discord-accent">$1</code>');
+
+  // Headers (with IDs for TOC anchoring)
+  html = html.replace(/^### (.+)$/gm, (_, t) => `<h3 id="${slugify(t)}" class="text-base font-semibold text-discord-text mt-6 mb-2">${t}</h3>`);
+  html = html.replace(/^## (.+)$/gm, (_, t) => `<h2 id="${slugify(t)}" class="text-lg font-bold text-discord-text mt-8 mb-3 pb-1 border-b border-discord-lighter">${t}</h2>`);
+  html = html.replace(/^# (.+)$/gm, (_, t) => `<h1 id="${slugify(t)}" class="text-2xl font-bold text-discord-text mt-6 mb-5">${t}</h1>`);
 
   // Bold and italic
   html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong class="text-discord-text font-semibold">$1</strong>');
   html = html.replace(/\*(.+?)\*/g, '<em class="italic">$1</em>');
   html = html.replace(/__(.+?)__/g, '<strong class="text-discord-text font-semibold">$1</strong>');
-  html = html.replace(/_(.+?)_/g, '<em class="italic">$1</em>');
-
-  // Inline code
-  html = html.replace(/`([^`]+)`/g, '<code class="bg-discord-darker px-1.5 py-0.5 rounded text-sm font-mono text-discord-accent">$1</code>');
-
-  // Code blocks
-  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, _lang, code) => {
-    return `<pre class="bg-discord-darker rounded-lg p-4 my-4 overflow-x-auto"><code class="text-sm font-mono text-discord-text">${code.trim()}</code></pre>`;
-  });
 
   // Blockquotes
-  html = html.replace(/^&gt; (.+)$/gm, '<blockquote class="border-l-4 border-discord-accent pl-4 my-4 text-discord-muted italic">$1</blockquote>');
+  html = html.replace(/^&gt; (.+)$/gm, '<blockquote class="border-l-4 border-discord-accent pl-4 my-4 text-discord-muted italic bg-discord-darker/30 py-2 rounded-r">$1</blockquote>');
+
+  // Ordered lists (önce işle)
+  html = html.replace(/^\d+\. (.+)$/gm, '<li class="ml-5 list-decimal text-discord-text leading-relaxed">$1</li>');
 
   // Unordered lists
-  html = html.replace(/^- (.+)$/gm, '<li class="ml-4 list-disc text-discord-text">$1</li>');
-  html = html.replace(/^\* (.+)$/gm, '<li class="ml-4 list-disc text-discord-text">$1</li>');
+  html = html.replace(/^- (.+)$/gm, '<li class="ml-5 list-disc text-discord-text leading-relaxed">$1</li>');
+  html = html.replace(/^\* (.+)$/gm, '<li class="ml-5 list-disc text-discord-text leading-relaxed">$1</li>');
 
-  // Ordered lists
-  html = html.replace(/^\d+\. (.+)$/gm, '<li class="ml-4 list-decimal text-discord-text">$1</li>');
-
-  // Wrap consecutive list items
-  html = html.replace(/(<li[^>]*>.*<\/li>\n?)+/g, (match) => {
-    return `<ul class="my-4 space-y-2">${match}</ul>`;
+  // Wrap consecutive list items in <ul> or <ol>
+  html = html.replace(/(<li[^>]*>[\s\S]*?<\/li>(\n|$))+/g, (match) => {
+    return `<ul class="my-4 space-y-1.5 pl-1">${match}</ul>`;
   });
 
   // Horizontal rule
-  html = html.replace(/^---$/gm, '<hr class="my-6 border-discord-light" />');
+  html = html.replace(/^---$/gm, '<hr class="my-6 border-discord-lighter" />');
 
   // Links
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-discord-accent hover:underline">$1</a>');
 
-  // Paragraphs - wrap remaining text
-  html = html.split('\n\n').map(block => {
-    if (block.trim() && !block.startsWith('<')) {
-      return `<p class="text-discord-text leading-relaxed mb-4">${block}</p>`;
-    }
-    return block;
-  }).join('\n');
+  // Paragraphs - çift satır boşluğu ile ayrılmış bloklar
+  html = html.split(/\n{2,}/).map(block => {
+    const trimmed = block.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('<')) return trimmed;
+    if (trimmed.startsWith('__CODEBLOCK_')) return trimmed;
+    return `<p class="text-discord-text leading-7 mb-4">${trimmed.replace(/\n/g, ' ')}</p>`;
+  }).filter(Boolean).join('\n');
 
-  // Line breaks
-  html = html.replace(/\n/g, '<br />');
+  // Tek satır sonlarını koru (liste aralarında değilse boşluk bırak)
+  html = html.replace(/\n(?!<)/g, '\n');
+
+  // Code block'ları geri koy
+  codeBlocks.forEach((block, idx) => {
+    html = html.replace(`__CODEBLOCK_${idx}__`, block);
+  });
 
   return html;
 }
@@ -241,38 +280,37 @@ function renderCommandContent(command: CommandDefinition, highlightTerms?: strin
 // Procedure içerik render
 function renderProcedureContent(procedure: ProcedureDefinition, highlightTerms?: string[]): string {
   const stepsHtml = parseMarkdown(procedure.steps);
-  
+
   const sections = [
-    `<div class="mb-6">
-      <h1 class="text-2xl font-bold text-discord-text">${procedure.title}</h1>
-      <p class="text-discord-muted mt-2">${procedure.description}</p>
+    `<div class="mb-8">
+      <h1 class="text-2xl font-bold text-discord-text mb-3">${procedure.title}</h1>
+      <p class="text-discord-muted text-base leading-relaxed">${procedure.description}</p>
     </div>`,
   ];
 
   if (procedure.requiredPermissions.length > 0) {
     sections.push(`
-      <div class="bg-discord-light rounded-lg p-4 mb-6">
-        <h2 class="text-sm font-semibold text-discord-muted mb-2">Gerekli Yetkiler</h2>
+      <div class="bg-discord-light rounded-lg p-4 mb-7 border border-discord-lighter">
+        <h2 class="text-xs font-semibold text-discord-muted uppercase tracking-wider mb-3">Gerekli Yetkiler</h2>
         <div class="flex flex-wrap gap-2">
-          ${procedure.requiredPermissions.map(p => `<span class="bg-discord-darker px-2 py-1 rounded text-sm text-discord-accent">${p}</span>`).join('')}
+          ${procedure.requiredPermissions.map(p => `<span class="bg-discord-accent/10 border border-discord-accent/30 text-discord-accent px-3 py-1 rounded-full text-sm font-medium">${p}</span>`).join('')}
         </div>
       </div>
     `);
   }
 
   sections.push(`
-    <div class="mb-6">
-      <h2 class="text-lg font-semibold text-discord-text mb-4">Adımlar</h2>
-      <div class="prose-discord">${stepsHtml}</div>
+    <div class="mb-7">
+      <div class="space-y-1">${stepsHtml}</div>
     </div>
   `);
 
   if (procedure.relatedCommands.length > 0) {
     sections.push(`
-      <div class="mb-6">
-        <h2 class="text-lg font-semibold text-discord-text mb-3">İlgili Komutlar</h2>
+      <div class="mb-7 bg-discord-darker rounded-lg p-5 border border-discord-lighter">
+        <h2 class="text-sm font-semibold text-discord-muted uppercase tracking-wider mb-3">İlgili Komutlar</h2>
         <div class="flex flex-wrap gap-2">
-          ${procedure.relatedCommands.map(c => `<span class="bg-discord-accent/20 text-discord-accent px-2 py-1 rounded text-sm font-mono">${c}</span>`).join('')}
+          ${procedure.relatedCommands.map(c => `<span class="bg-discord-accent/20 text-discord-accent px-3 py-1.5 rounded text-sm font-mono border border-discord-accent/20">${c}</span>`).join('')}
         </div>
       </div>
     `);
@@ -280,10 +318,10 @@ function renderProcedureContent(procedure: ProcedureDefinition, highlightTerms?:
 
   if (procedure.relatedPenalties.length > 0) {
     sections.push(`
-      <div class="mb-6">
-        <h2 class="text-lg font-semibold text-discord-text mb-3">İlgili Cezalar</h2>
+      <div class="mb-7 bg-discord-darker rounded-lg p-5 border border-discord-lighter">
+        <h2 class="text-sm font-semibold text-discord-muted uppercase tracking-wider mb-3">İlgili Cezalar</h2>
         <div class="flex flex-wrap gap-2">
-          ${procedure.relatedPenalties.map(p => `<span class="bg-discord-red/20 text-discord-red px-2 py-1 rounded text-sm">${p}</span>`).join('')}
+          ${procedure.relatedPenalties.map(p => `<span class="bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-1.5 rounded text-sm">${p}</span>`).join('')}
         </div>
       </div>
     `);
@@ -307,6 +345,9 @@ export function ContentViewer({
   onNavigate,
 }: ContentViewerProps): React.ReactElement {
   const [copied, setCopied] = React.useState(false);
+  const [tocOpen, setTocOpen] = useState(false);
+  const [activeId, setActiveId] = useState<string>('');
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // İçeriği render et
   const renderedContent = useMemo(() => {
@@ -339,6 +380,38 @@ export function ContentViewer({
         return 'İçerik';
     }
   }, [type, content]);
+
+  // TOC - sadece guide ve procedure için
+  const tocItems = useMemo((): TocItem[] => {
+    if (type === 'guide') {
+      return extractTOC((content as GuideContent).content);
+    }
+    if (type === 'procedure') {
+      return extractTOC((content as ProcedureDefinition).steps);
+    }
+    return [];
+  }, [type, content]);
+
+  const hasToc = tocItems.length > 0;
+
+  // Scroll'da aktif başlığı izle
+  useEffect(() => {
+    if (!hasToc || !contentRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+            break;
+          }
+        }
+      },
+      { rootMargin: '-10% 0px -80% 0px', threshold: 0 }
+    );
+    const headings = contentRef.current.querySelectorAll('h1[id], h2[id], h3[id]');
+    headings.forEach(h => observer.observe(h));
+    return () => observer.disconnect();
+  }, [hasToc, renderedContent]);
 
   // Navigasyon handler
   const handleNavigate = useCallback(
@@ -376,38 +449,85 @@ export function ContentViewer({
           <h1 className="text-lg sm:text-xl font-semibold text-discord-text truncate flex-1 min-w-0">
             {title}
           </h1>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCopy}
-            className="text-discord-muted hover:text-discord-text flex-shrink-0"
-          >
-            {copied ? (
-              <>
-                <Check className="h-4 w-4 sm:mr-2 text-discord-green" />
-                <span className="hidden sm:inline">Kopyalandı</span>
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Kopyala</span>
-              </>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {hasToc && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTocOpen(v => !v)}
+                className={`text-discord-muted hover:text-discord-text ${tocOpen ? 'bg-discord-light text-discord-text' : ''}`}
+                title="İçindekiler"
+              >
+                <List className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">İçindekiler</span>
+              </Button>
             )}
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="text-discord-muted hover:text-discord-text"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4 sm:mr-2 text-discord-green" />
+                  <span className="hidden sm:inline">Kopyalandı</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Kopyala</span>
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* İçerik - Responsive padding ve max-width */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6">
-        <article
-          className="max-w-full sm:max-w-2xl lg:max-w-3xl mx-auto prose-sm sm:prose"
-          dangerouslySetInnerHTML={{ __html: renderedContent }}
-        />
+      {/* İçerik + TOC yan panel */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Ana içerik */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 sm:py-8" ref={contentRef}>
+          <article
+            className="max-w-full sm:max-w-2xl lg:max-w-3xl mx-auto"
+            style={{ lineHeight: '1.75' }}
+            dangerouslySetInnerHTML={{ __html: renderedContent }}
+          />
+        </div>
+
+        {/* TOC Panel */}
+        {hasToc && tocOpen && (
+          <aside className="hidden lg:flex flex-col w-56 xl:w-64 flex-shrink-0 border-l border-discord-lighter bg-discord-darker overflow-y-auto py-6 px-4">
+            <p className="text-xs font-semibold text-discord-muted uppercase tracking-wider mb-3">İçindekiler</p>
+            <nav className="space-y-0.5">
+              {tocItems.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const el = contentRef.current?.querySelector(`#${item.id}`);
+                    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className={`block text-xs py-1 rounded transition-colors truncate ${
+                    item.level === 1 ? 'font-semibold' : item.level === 2 ? 'pl-3' : 'pl-6'
+                  } ${
+                    activeId === item.id
+                      ? 'text-discord-accent'
+                      : 'text-discord-muted hover:text-discord-text'
+                  }`}
+                >
+                  {item.text}
+                </a>
+              ))}
+            </nav>
+          </aside>
+        )}
       </div>
 
       {/* Navigasyon - Responsive */}
       {(prevContent || nextContent) && (
-        <div className="sticky bottom-0 bg-discord-darker border-t border-discord-light px-4 sm:px-6 py-3 sm:py-4">
+        <div className="bg-discord-darker border-t border-discord-light px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between max-w-full sm:max-w-2xl lg:max-w-3xl mx-auto gap-2">
             {/* Önceki */}
             {prevContent ? (

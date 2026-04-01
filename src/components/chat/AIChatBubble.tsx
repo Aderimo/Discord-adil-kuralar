@@ -45,6 +45,8 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   penaltyRecord?: PenaltyRecord | undefined;
+  /** Cevap bulunamadıysa true — bot avatar kırmızı gösterilir */
+  noAnswer?: boolean;
 }
 
 /**
@@ -109,9 +111,11 @@ function ChatMessageItem({
     <div
       className={cn(
         "flex gap-3 p-3 rounded-lg transition-colors",
-        isUser 
-          ? "bg-discord-accent/10 ml-8 border-l-2 border-discord-accent" 
-          : "bg-discord-light mr-8 border-l-2 border-discord-green"
+        isUser
+          ? "bg-discord-accent/10 ml-8 border-l-2 border-discord-accent"
+          : message.noAnswer
+            ? "bg-red-500/5 mr-8 border-l-2 border-red-500/60"
+            : "bg-discord-light mr-8 border-l-2 border-discord-green"
       )}
       data-testid={isUser ? "user-message" : "assistant-message"}
     >
@@ -119,7 +123,7 @@ function ChatMessageItem({
       <div
         className={cn(
           "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md",
-          isUser ? "bg-discord-accent" : "bg-discord-green"
+          isUser ? "bg-discord-accent" : message.noAnswer ? "bg-red-500" : "bg-discord-green"
         )}
         aria-label={isUser ? "Kullanıcı avatarı" : "Bot avatarı"}
       >
@@ -135,9 +139,9 @@ function ChatMessageItem({
         <div className="flex items-center gap-2 mb-1">
           <span className={cn(
             "text-sm font-medium",
-            isUser ? "text-discord-accent" : "text-discord-green"
+            isUser ? "text-discord-accent" : message.noAnswer ? "text-red-400" : "text-discord-green"
           )}>
-            {isUser ? "Sen" : "AI Asistan"}
+            {isUser ? "Sen" : "Ahraz"}
           </span>
           <span className="text-xs text-discord-muted">
             {message.timestamp.toLocaleTimeString("tr-TR", {
@@ -323,7 +327,7 @@ export function AIChatBubble({
             ? "bg-discord-red hover:bg-discord-red/90"
             : "bg-discord-accent hover:bg-discord-accent/90"
         )}
-        aria-label={isOpen ? "Sohbeti kapat" : "AI Asistan'ı aç"}
+        aria-label={isOpen ? "Sohbeti kapat" : "Ahraz'ı aç"}
       >
         {isOpen ? (
           <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -361,10 +365,10 @@ export function AIChatBubble({
             </div>
             <div>
               <h3 className="text-sm font-semibold text-discord-text">
-                AI Ceza Danışmanı
+                Ahraz Asistan
               </h3>
               <p className="text-xs text-discord-muted">
-                Yetkili Kılavuzu v2 tabanlı
+                Yetkili Kılavuzu v2 — Ahraz Bot
               </p>
             </div>
           </div>
@@ -387,11 +391,11 @@ export function AIChatBubble({
                 <Bot className="w-8 h-8 text-discord-accent" />
               </div>
               <h4 className="text-sm font-medium text-discord-text mb-2">
-                AI Ceza Danışmanı
+                Ahraz Asistan Bot
               </h4>
               <p className="text-xs text-discord-muted max-w-[250px]">
-                Ceza soruları sorun, olay anlatın veya kılavuz hakkında bilgi
-                isteyin. Yanıtlar Yetkili Kılavuzu v2&apos;ye dayanır.
+                Ceza soruları sorun, komut sor, kılavuz hakkında bilgi isteyin.
+                Yanıtlar Yetkili Kılavuzu v2&apos;ye dayanır.
               </p>
               <div className="mt-4 space-y-2 w-full">
                 <p className="text-xs text-discord-muted">Örnek sorular:</p>

@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Yetkili Kılavuzu - SANIYE MODLARI',
   description: 'SANIYE MODLARI Discord sunucusu için Yetkili Kılavuzu ve Ceza Danışman Sistemi',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

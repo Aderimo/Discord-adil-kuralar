@@ -6,9 +6,43 @@
 import React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { Users, ScrollText, Settings, Shield, LogOut, Home } from 'lucide-react';
+import { Users, ScrollText, Settings, Shield, LogOut, Home, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+
+function AdminBreadcrumb({ pathname }: { pathname: string }): React.ReactElement {
+  interface Crumb { label: string; href?: string }
+  const crumbs: Crumb[] = [{ label: 'Admin Panel', href: '/admin' }];
+
+  if (pathname === '/admin/logs') {
+    crumbs.push({ label: 'Aktivite Logları' });
+  } else if (pathname === '/admin/settings') {
+    crumbs.push({ label: 'Ayarlar' });
+  } else if (pathname.startsWith('/admin/users/')) {
+    crumbs.push({ label: 'Kullanıcılar', href: '/admin' });
+    crumbs.push({ label: 'Kullanıcı Detayı' });
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2.5 border-b border-discord-light bg-discord-dark/50 text-xs text-discord-muted">
+      <Home className="h-3 w-3 text-discord-muted" />
+      {crumbs.map((crumb, i) => (
+        <React.Fragment key={i}>
+          <ChevronRight className="h-3 w-3 text-discord-muted/50" />
+          {crumb.href && i < crumbs.length - 1 ? (
+            <a href={crumb.href} className="hover:text-discord-text transition-colors">
+              {crumb.label}
+            </a>
+          ) : (
+            <span className={i === crumbs.length - 1 ? 'text-discord-text font-medium' : ''}>
+              {crumb.label}
+            </span>
+          )}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
 
 export default function AdminLayout({
   children,
@@ -31,8 +65,11 @@ export default function AdminLayout({
     );
   }
 
+  const isOwner = user?.role === 'ust_yetkili' || user?.role === 'owner';
+  const canManageUsers = user && (user.role === 'ust_yetkili' || user.role === 'owner');
+
   // Yetkisiz erişim kontrolü
-  if (!user || (user.role !== 'admin' && user.role !== 'ust_yetkili')) {
+  if (!user || (user.role !== 'ust_yetkili' && user.role !== 'owner')) {
     return (
       <div className="flex h-screen items-center justify-center bg-discord-darker">
         <div className="text-center">
@@ -74,42 +111,48 @@ export default function AdminLayout({
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 p-3">
-            <button
-              onClick={() => navigateTo('/admin')}
-              className={cn(
-                'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
-                pathname === '/admin'
-                  ? 'bg-discord-accent/20 text-discord-accent'
-                  : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
-              )}
-            >
-              <Users className="h-5 w-5" />
-              Kullanıcılar
-            </button>
-            <button
-              onClick={() => navigateTo('/admin/logs')}
-              className={cn(
-                'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
-                pathname === '/admin/logs'
-                  ? 'bg-discord-accent/20 text-discord-accent'
-                  : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
-              )}
-            >
-              <ScrollText className="h-5 w-5" />
-              Aktivite Logları
-            </button>
-            <button
-              onClick={() => navigateTo('/admin/settings')}
-              className={cn(
-                'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
-                pathname === '/admin/settings'
-                  ? 'bg-discord-accent/20 text-discord-accent'
-                  : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
-              )}
-            >
-              <Settings className="h-5 w-5" />
-              Ayarlar
-            </button>
+            {canManageUsers && (
+              <button
+                onClick={() => navigateTo('/admin')}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
+                  pathname === '/admin'
+                    ? 'bg-discord-accent/20 text-discord-accent'
+                    : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
+                )}
+              >
+                <Users className="h-5 w-5" />
+                Kullanıcılar
+              </button>
+            )}
+            {isOwner && (
+              <button
+                onClick={() => navigateTo('/admin/logs')}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
+                  pathname === '/admin/logs'
+                    ? 'bg-discord-accent/20 text-discord-accent'
+                    : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
+                )}
+              >
+                <ScrollText className="h-5 w-5" />
+                Aktivite Logları
+              </button>
+            )}
+            {isOwner && (
+              <button
+                onClick={() => navigateTo('/admin/settings')}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-left',
+                  pathname === '/admin/settings'
+                    ? 'bg-discord-accent/20 text-discord-accent'
+                    : 'text-discord-muted hover:bg-discord-light hover:text-discord-text'
+                )}
+              >
+                <Settings className="h-5 w-5" />
+                Ayarlar
+              </button>
+            )}
           </nav>
 
           {/* Footer */}
@@ -131,7 +174,7 @@ export default function AdminLayout({
                   {user.username}
                 </p>
                 <p className="truncate text-xs text-discord-muted capitalize">
-                  {user.role === 'ust_yetkili' ? 'Üst Yetkili' : user.role}
+                  {({ none: 'Kullanıcı', reg: 'Reg', op: 'Operatör', gatekeeper: 'GateKeeper', council: 'Council', gm: 'GM', ust_yetkili: 'Üst Yetkili', owner: 'Owner' } as Record<string, string>)[user.role] || user.role}
                 </p>
               </div>
               <button
@@ -147,7 +190,9 @@ export default function AdminLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto flex flex-col">
+        {/* Breadcrumb bar */}
+        <AdminBreadcrumb pathname={pathname} />
         {children}
       </main>
     </div>

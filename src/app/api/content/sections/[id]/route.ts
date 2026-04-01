@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, withSuperAdmin } from '@/lib/api-auth';
 import { loadGuideContent, getGuideBySlug, loadPenalties, loadCommands, loadProcedures, clearContentCache } from '@/lib/content';
 import { logContentChange } from '@/lib/logging';
+import { notifyAllUstYetkili } from '@/lib/notifications';
 import type { GuideContent } from '@/types/content';
 import fs from 'fs';
 import path from 'path';
@@ -231,6 +232,13 @@ export const PUT = withSuperAdmin<UpdateContentResponse>(
         contentTitle,
         previousContent,
         updatedItem as Record<string, unknown>
+      );
+
+      // Requirement 9.2: İçerik değişikliği bildirimini ust_yetkili kullanıcılara gönder
+      void notifyAllUstYetkili(
+        'content_change',
+        'İçerik Güncellendi',
+        `"${contentTitle}" içeriği ${user.username} tarafından güncellendi.`
       );
 
       return NextResponse.json(

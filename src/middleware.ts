@@ -151,8 +151,8 @@ const ROUTE_RULES: RouteRule[] = [
   // Beklemede sayfası - sadece pending kullanıcılar
   { pattern: /^\/pending$/, allowedStatuses: ['pending'] },
   
-  // Admin rotaları - admin ve üstü
-  { pattern: /^\/admin(\/.*)?$/, requiredRole: 'admin' },
+  // Admin rotaları - ust_yetkili ve üstü
+  { pattern: /^\/admin(\/.*)?$/, requiredRole: 'ust_yetkili' },
 ];
 
 /**
@@ -196,7 +196,7 @@ function checkAccess(pathname: string, user: MiddlewareUser | null): AccessResul
     if (user.role === 'none') {
       return { allowed: false, redirect: '/unauthorized', reason: 'no_role' };
     }
-    if (!hasRole(user.role, 'mod')) {
+    if (!hasRole(user.role, 'reg')) {
       return { allowed: false, redirect: '/unauthorized', reason: 'insufficient_role' };
     }
     return { allowed: true };
@@ -204,8 +204,8 @@ function checkAccess(pathname: string, user: MiddlewareUser | null): AccessResul
 
   // Public rota
   if (rule.isPublic) {
-    // Giriş yapmış onaylı kullanıcıları yönlendir
-    if (rule.redirectIfAuthenticated && user && user.status === 'approved') {
+    // Giriş yapmış onaylı kullanıcıları yönlendir (sadece gerçek rol sahibi olanları)
+    if (rule.redirectIfAuthenticated && user && user.status === 'approved' && user.role !== 'none') {
       return { 
         allowed: false, 
         redirect: rule.redirectIfAuthenticated, 
@@ -244,7 +244,7 @@ function checkAccess(pathname: string, user: MiddlewareUser | null): AccessResul
   }
 
   // Rol kontrolü
-  const requiredRole = rule.requiredRole || 'mod';
+  const requiredRole = rule.requiredRole || 'reg';
   if (user.role === 'none') {
     return { allowed: false, redirect: '/unauthorized', reason: 'no_role' };
   }

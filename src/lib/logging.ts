@@ -470,6 +470,60 @@ export async function getRoleChangeLogs(
 }
 
 /**
+ * CSV değerini escape eder (tırnak, virgül, yeni satır karakterleri)
+ * @param value - Escape edilecek değer
+ * @returns Escape edilmiş değer
+ */
+function escapeCSVValue(value: string | number | null | undefined): string {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  
+  const stringValue = String(value);
+  
+  // Eğer değer virgül, tırnak veya yeni satır içeriyorsa, tırnak içine al
+  if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\r')) {
+    // Tırnakları çift tırnak ile escape et
+    const escaped = stringValue.replace(/"/g, '""');
+    return `"${escaped}"`;
+  }
+  
+  return stringValue;
+}
+
+/**
+ * Log kayıtlarını CSV veya JSON formatında export eder
+ * Requirement 7.4: CSV ve JSON format desteği
+ * @param filters - Log filtreleme seçenekleri
+ * @param format - Export formatı ('csv' veya 'json')
+ * @returns Formatlanmış string
+ */
+export async function exportLogs(
+  filters: LogFilters,
+  format: 'csv' | 'json'
+): Promise<string> {
+  // Büyük veri setleri için pageSize'ı artır
+  const { logs } = await getActivityLogs({ ...filters, pageSize: 10000 });
+  
+  if (format === 'json') {
+    return JSON.stringify(logs, null, 2);
+  }
+  
+  // CSV format
+  const headers = ['ID', 'Kullanıcı', 'İşlem', 'Detay', 'IP', 'Tarih'];
+  const rows = logs.map(log => [
+    escapeCSVValue(log.id),
+    escapeCSVValue(log.userId),
+    escapeCSVValue(log.action),
+    escapeCSVValue(JSON.stringify(log.details)),
+    escapeCSVValue(log.ipAddress),
+    escapeCSVValue(log.timestamp.toISOString())
+  ]);
+  
+  return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+}
+
+/**
  * İçerik değişikliği logunu kaydeder
  * Requirement 11.6: Tüm içerik değişikliklerini loglamalı (kim, ne zaman, ne değişti)
  * @param userId - İşlemi yapan kullanıcı ID'si

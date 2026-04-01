@@ -24,7 +24,7 @@ import type { GuideContent } from '@/types/content';
 import { Book, Shield, Gavel, Terminal, FileText, Bot } from 'lucide-react';
 
 // Hoşgeldin kartı bileşeni
-function WelcomeCard(): React.ReactElement {
+function WelcomeCard({ onChatOpen }: { onChatOpen?: () => void }): React.ReactElement {
   const { user } = useAuth();
   
   return (
@@ -73,7 +73,7 @@ function WelcomeCard(): React.ReactElement {
           icon={<Bot className="h-6 w-6" />}
           title="AI Danışman"
           description="Ceza önerileri ve rehberlik"
-          onClick={() => {}}
+          onClick={onChatOpen}
           color="accent"
           isAI
         />
@@ -106,9 +106,13 @@ function WelcomeCard(): React.ReactElement {
 function getRoleLabel(role?: string): string {
   const labels: Record<string, string> = {
     none: 'Kullanıcı',
-    mod: 'Moderatör',
-    admin: 'Admin',
+    reg: 'Reg',
+    op: 'Operatör',
+    gatekeeper: 'GateKeeper',
+    council: 'Council',
+    gm: 'GM',
     ust_yetkili: 'Üst Yetkili',
+    owner: 'Owner',
   };
   return labels[role || 'none'] || 'Kullanıcı';
 }
@@ -187,9 +191,17 @@ export default function HomePage(): React.ReactElement {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   
-  // AI Chat state
+  // AI Chat state - sessionStorage ile kalıcı geçmiş
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = sessionStorage.getItem('ai_chat_history');
+      if (!saved) return [];
+      const parsed = JSON.parse(saved) as Array<{ id: string; role: 'user' | 'assistant'; content: string; timestamp: string }>;
+      return parsed.map(m => ({ ...m, timestamp: new Date(m.timestamp) }));
+    } catch { return []; }
+  });
   const [isChatLoading, setIsChatLoading] = useState(false);
   
   // Seçili içerik state
@@ -197,6 +209,14 @@ export default function HomePage(): React.ReactElement {
 
   // Kılavuz içeriğini yükle
   const guideContent = useMemo(() => loadGuideContent(), []);
+
+  // sessionStorage'a kaydet
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      sessionStorage.setItem('ai_chat_history', JSON.stringify(chatMessages.slice(-30)));
+    } catch { /* ignore */ }
+  }, [chatMessages]);
 
   // Chat toggle
   const toggleChat = useCallback(() => {
@@ -216,10 +236,13 @@ export default function HomePage(): React.ReactElement {
     setIsChatLoading(true);
 
     try {
+      // Son 10 mesajı geçmiş olarak gönder (mock yanıtlarda kullanılabilir)
+      const history = chatMessages.slice(-10).map(m => ({ role: m.role, content: m.content }));
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
+        credentials: 'include',
+        body: JSON.stringify({ message, conversationHistory: history }),
       });
 
       const data = await response.json();
@@ -243,6 +266,7 @@ export default function HomePage(): React.ReactElement {
           content: data.response,
           timestamp: new Date(),
           penaltyRecord,
+          noAnswer: data.noAnswer === true,
         };
         setChatMessages((prev) => [...prev, assistantMessage]);
       } else {
@@ -374,7 +398,7 @@ export default function HomePage(): React.ReactElement {
             }}
           />
         ) : (
-          <WelcomeCard />
+          <WelcomeCard onChatOpen={toggleChat} />
         )}
       </MainLayout>
 

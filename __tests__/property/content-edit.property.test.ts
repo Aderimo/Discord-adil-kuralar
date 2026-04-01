@@ -13,7 +13,7 @@
  */
 import * as fc from 'fast-check';
 import { PrismaClient } from '@prisma/client';
-import { hashPassword, createToken } from '@/lib/auth';
+import { hashPassword } from '@/lib/auth';
 import { hasRole, ROLE_HIERARCHY } from '@/lib/rbac';
 import type { UserRole } from '@/types';
 
@@ -24,8 +24,8 @@ const prisma = new PrismaClient();
 const testRunId = Date.now().toString(36);
 
 // Geçerli roller
-const ALL_ROLES: UserRole[] = ['none', 'mod', 'admin', 'ust_yetkili'];
-const NON_SUPER_ADMIN_ROLES: UserRole[] = ['none', 'mod', 'admin'];
+const ALL_ROLES: UserRole[] = ['none', 'reg', 'gm', 'ust_yetkili'];
+const NON_SUPER_ADMIN_ROLES: UserRole[] = ['none', 'reg', 'gm'];
 
 // Test öncesi ve sonrası temizlik
 beforeAll(async () => {
@@ -92,12 +92,12 @@ const validPasswordArbitrary = fc.stringOf(
 /**
  * Üst yetkili olmayan roller için arbitrary
  */
-const nonSuperAdminRoleArbitrary = fc.constantFrom<UserRole>('none', 'mod', 'admin');
+const nonSuperAdminRoleArbitrary = fc.constantFrom<UserRole>('none', 'reg', 'gm');
 
 /**
  * Tüm roller için arbitrary
  */
-const allRolesArbitrary = fc.constantFrom<UserRole>('none', 'mod', 'admin', 'ust_yetkili');
+const allRolesArbitrary = fc.constantFrom<UserRole>('none', 'reg', 'gm', 'ust_yetkili');
 
 /**
  * İçerik tipi arbitrary
@@ -467,7 +467,7 @@ describe('Property Tests: Rol Hiyerarşisi ve İçerik Düzenleme', () => {
             expect(role).toBe('ust_yetkili');
           } else {
             expect(canEdit).toBe(false);
-            expect(['none', 'mod', 'admin']).toContain(role);
+            expect(['none', 'reg', 'gm']).toContain(role);
           }
 
           return true;
@@ -493,9 +493,9 @@ describe('Property Tests: Rol Hiyerarşisi ve İçerik Düzenleme', () => {
     'Property 12g: Admin mod yetkilerine sahip ama içerik düzenleme yetkisine sahip değil',
     async () => {
       await fc.assert(
-        fc.property(fc.constant('admin'), (role) => {
+        fc.property(fc.constant<UserRole>('gm'), (role) => {
           // Admin, mod yetkilerine sahip
-          expect(hasRole(role, 'mod')).toBe(true);
+          expect(hasRole(role, 'reg')).toBe(true);
           expect(hasRole(role, 'none')).toBe(true);
 
           // Ama ust_yetkili yetkisine sahip değil

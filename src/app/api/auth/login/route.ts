@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSession, isValidEmail } from '@/lib/auth';
+import type { UserRole } from '@/types';
 
 interface LoginRequest {
   email: string;
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     // Oturum oluştur - kullanıcı bilgileriyle birlikte (RBAC middleware için)
     const session = await createSession(
       user.id, 
-      user.role as 'none' | 'mod' | 'admin' | 'ust_yetkili',
+      user.role as UserRole,
       user.status as 'pending' | 'approved' | 'rejected'
     );
 

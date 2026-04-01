@@ -1,59 +1,80 @@
 // RBAC (Role-Based Access Control) - Rol tabanlı erişim kontrolü
-// Requirement 2.1: Onaylanmamış veya yetkisiz kullanıcılar sadece engelleme mesajını görmeli
-// Requirement 2.2: Onaylı yetkili yetki seviyesine göre uygun içeriği görmeli
-// Requirement 2.3: "Beklemede" durumundaki kullanıcılar ana içeriğe erişememeli
-// Requirement 2.4: Her sayfa isteğinde kullanıcının yetki durumunu doğrulamalı
 
 import type { UserRole, UserStatus, User } from '@/types';
 
 /**
  * Yetki seviyesi hiyerarşisi
  * Daha yüksek sayı = daha yüksek yetki
+ *
+ * Sıralama (düşükten yükseğe):
+ * none < reg < op < gatekeeper < council < gm < ust_yetkili < owner
  */
 export const ROLE_HIERARCHY: Record<UserRole, number> = {
   none: 0,
-  mod: 1,
-  admin: 2,
-  ust_yetkili: 3,
+  reg: 1,           // Regulatör
+  op: 2,            // Operatör
+  gatekeeper: 3,    // GateKeeper
+  council: 4,       // Council
+  gm: 5,            // GM (General Manager)
+  ust_yetkili: 10,  // Üst Yetkili
+  owner: 11,        // Owner (en yüksek - sadece owner)
 } as const;
 
 /**
- * Kullanıcının belirli bir role sahip olup olmadığını kontrol eder
+ * İzin tanımları - her izin için gerekli minimum rol
+ *
+ * VIEW_CONTENT:       reg+         (tüm yetkililer)
+ * VIEW_USERS:         council+     (yönetim kadrosu)
+ * VIEW_LOGS:          owner        (sadece owner)
+ * VIEW_NOTIFICATIONS: ust_yetkili+ (üst yetkililer)
+ * EDIT_CONTENT:       gm+          (GM ve üstü)
+ * EDIT_USERS:         ust_yetkili+ (üst yetkililer)
+ * EDIT_TEMPLATES:     owner        (sadece owner)
+ * DELETE_CONTENT:     owner        (sadece owner)
+ * DELETE_USERS:       owner        (sadece owner)
+ */
+export const PERMISSIONS: Record<string, UserRole> = {
+  VIEW_CONTENT: 'reg',
+  VIEW_USERS: 'council',
+  VIEW_LOGS: 'owner',
+  VIEW_NOTIFICATIONS: 'ust_yetkili',
+  EDIT_CONTENT: 'gm',
+  EDIT_USERS: 'ust_yetkili',
+  EDIT_TEMPLATES: 'owner',
+  DELETE_CONTENT: 'owner',
+  DELETE_USERS: 'owner',
+} as const;
+
+export type Permission = keyof typeof PERMISSIONS;
+
+/**
+ * Kullanıcının belirli bir izne sahip olup olmadığını kontrol eder
  * Hiyerarşik kontrol yapar - üst roller alt rollerin yetkilerine sahiptir
- * 
- * @param userRole - Kullanıcının mevcut rolü
- * @param requiredRole - Gerekli minimum rol
- * @returns Kullanıcının gerekli role sahip olup olmadığı
- * 
- * @example
- * hasRole('admin', 'mod') // true - admin, mod yetkisine sahip
- * hasRole('mod', 'admin') // false - mod, admin yetkisine sahip değil
+ */
+export function hasPermission(userRole: UserRole, permission: Permission): boolean {
+  const minRole = PERMISSIONS[permission] as UserRole;
+  return (ROLE_HIERARCHY[userRole] ?? 0) >= (ROLE_HIERARCHY[minRole] ?? 0);
+}
+
+/**
+ * Kullanıcının belirli bir role sahip olup olmadığını kontrol eder
+ * Hiyerarşik kontrol yapar
  */
 export function hasRole(userRole: UserRole, requiredRole: UserRole): boolean {
-  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+  return (ROLE_HIERARCHY[userRole] ?? 0) >= (ROLE_HIERARCHY[requiredRole] ?? 0);
 }
 
 /**
  * Kullanıcının bir kaynağa erişip erişemeyeceğini kontrol eder
- * Hem durum (status) hem de rol kontrolü yapar
- * 
- * @param user - Kullanıcı objesi (null olabilir)
- * @param requiredRole - Gerekli minimum rol (varsayılan: 'mod')
- * @returns Erişim izni sonucu
- * 
- * @example
- * canAccess(user, 'admin') // { allowed: true/false, reason: '...' }
  */
 export function canAccess(
   user: User | null,
-  requiredRole: UserRole = 'mod'
+  requiredRole: UserRole = 'reg'
 ): { allowed: boolean; reason: AccessDeniedReason | null } {
-  // Kullanıcı yok - giriş yapılmamış
   if (!user) {
     return { allowed: false, reason: 'not_authenticated' };
   }
 
-  // Kullanıcı durumu kontrolü
   if (user.status === 'pending') {
     return { allowed: false, reason: 'pending_approval' };
   }
@@ -62,29 +83,21 @@ export function canAccess(
     return { allowed: false, reason: 'rejected' };
   }
 
-  // Onaylı kullanıcı için rol kontrolü
   if (user.status === 'approved') {
-    // Rol 'none' ise erişim yok
     if (user.role === 'none') {
       return { allowed: false, reason: 'no_role' };
     }
 
-    // Gerekli role sahip mi?
     if (!hasRole(user.role, requiredRole)) {
       return { allowed: false, reason: 'insufficient_role' };
     }
 
-    // Tüm kontroller geçti
     return { allowed: true, reason: null };
   }
 
-  // Bilinmeyen durum - güvenlik için reddet
   return { allowed: false, reason: 'unknown_status' };
 }
 
-/**
- * Erişim reddedilme nedenleri
- */
 export type AccessDeniedReason =
   | 'not_authenticated'
   | 'pending_approval'
@@ -93,9 +106,6 @@ export type AccessDeniedReason =
   | 'insufficient_role'
   | 'unknown_status';
 
-/**
- * Erişim reddedilme nedenine göre yönlendirme URL'i döndürür
- */
 export function getRedirectUrl(reason: AccessDeniedReason): string {
   switch (reason) {
     case 'not_authenticated':
@@ -111,9 +121,6 @@ export function getRedirectUrl(reason: AccessDeniedReason): string {
   }
 }
 
-/**
- * Erişim reddedilme nedenine göre hata mesajı döndürür
- */
 export function getAccessDeniedMessage(reason: AccessDeniedReason): string {
   switch (reason) {
     case 'not_authenticated':
@@ -132,53 +139,25 @@ export function getAccessDeniedMessage(reason: AccessDeniedReason): string {
   }
 }
 
-/**
- * Rota koruma kuralları
- */
 export interface RouteProtection {
-  /** Rota pattern'i (regex veya string) */
   pattern: string | RegExp;
-  /** Gerekli minimum rol (undefined = sadece giriş gerekli) */
   requiredRole?: UserRole;
-  /** Public rota mı? (giriş gerektirmez) */
   isPublic?: boolean;
-  /** Giriş yapmış kullanıcıları yönlendir */
   redirectIfAuthenticated?: string;
-  /** Sadece belirli durumlar için */
   allowedStatuses?: UserStatus[];
 }
 
-/**
- * Varsayılan rota koruma kuralları
- */
 export const DEFAULT_ROUTE_RULES: RouteProtection[] = [
-  // Public rotalar - giriş yapmış kullanıcıları ana sayfaya yönlendir
   { pattern: '/login', isPublic: true, redirectIfAuthenticated: '/' },
   { pattern: '/register', isPublic: true, redirectIfAuthenticated: '/' },
-  
-  // Yetkisiz erişim sayfası - herkese açık
   { pattern: '/unauthorized', isPublic: true },
-  
-  // Beklemede sayfası - sadece pending kullanıcılar için
   { pattern: '/pending', isPublic: false, allowedStatuses: ['pending'] },
-  
-  // Admin rotaları - sadece admin ve üstü
-  { pattern: /^\/admin(\/.*)?$/, requiredRole: 'admin' },
-  
-  // API rotaları - middleware tarafından işlenmez (API kendi auth'unu yapar)
+  { pattern: /^\/admin(\/.*)?$/, requiredRole: 'ust_yetkili' },
   { pattern: /^\/api\//, isPublic: true },
-  
-  // Statik dosyalar
   { pattern: /^\/_next\//, isPublic: true },
   { pattern: /^\/favicon\.ico$/, isPublic: true },
-  
-  // Diğer tüm rotalar - onaylı mod+ kullanıcılar için
-  // Bu kural en sonda olmalı (catch-all)
 ];
 
-/**
- * Bir rota için koruma kuralını bulur
- */
 export function findRouteRule(pathname: string): RouteProtection | null {
   for (const rule of DEFAULT_ROUTE_RULES) {
     if (typeof rule.pattern === 'string') {
@@ -194,27 +173,20 @@ export function findRouteRule(pathname: string): RouteProtection | null {
   return null;
 }
 
-/**
- * Rota erişim kontrolü sonucu
- */
 export interface RouteAccessResult {
   allowed: boolean;
   redirect?: string;
   reason?: AccessDeniedReason | 'redirect_authenticated';
 }
 
-/**
- * Bir rota için erişim kontrolü yapar
- */
 export function checkRouteAccess(
   pathname: string,
   user: User | null
 ): RouteAccessResult {
   const rule = findRouteRule(pathname);
 
-  // Kural bulunamadı - varsayılan olarak mod+ gerekli
   if (!rule) {
-    const access = canAccess(user, 'mod');
+    const access = canAccess(user, 'reg');
     if (!access.allowed && access.reason) {
       return {
         allowed: false,
@@ -225,10 +197,8 @@ export function checkRouteAccess(
     return { allowed: true };
   }
 
-  // Public rota
   if (rule.isPublic) {
-    // Giriş yapmış kullanıcıları yönlendir
-    if (rule.redirectIfAuthenticated && user && user.status === 'approved') {
+    if (rule.redirectIfAuthenticated && user && user.status === 'approved' && user.role !== 'none') {
       return {
         allowed: false,
         redirect: rule.redirectIfAuthenticated,
@@ -238,21 +208,14 @@ export function checkRouteAccess(
     return { allowed: true };
   }
 
-  // Kullanıcı giriş yapmamış
   if (!user) {
-    return {
-      allowed: false,
-      redirect: '/login',
-      reason: 'not_authenticated',
-    };
+    return { allowed: false, redirect: '/login', reason: 'not_authenticated' };
   }
 
-  // Belirli durumlar için izin verilen rotalar (örn: /pending)
   if (rule.allowedStatuses) {
     if (rule.allowedStatuses.includes(user.status)) {
       return { allowed: true };
     }
-    // Durum uyuşmuyor - uygun sayfaya yönlendir
     if (user.status === 'approved') {
       return { allowed: false, redirect: '/' };
     }
@@ -262,10 +225,9 @@ export function checkRouteAccess(
     return { allowed: false, redirect: '/login' };
   }
 
-  // Standart erişim kontrolü
-  const requiredRole = rule.requiredRole || 'mod';
+  const requiredRole = rule.requiredRole || 'reg';
   const access = canAccess(user, requiredRole);
-  
+
   if (!access.allowed && access.reason) {
     return {
       allowed: false,

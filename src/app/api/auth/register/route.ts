@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, isValidEmail, isValidPassword } from '@/lib/auth';
+import { notifyAllUstYetkili } from '@/lib/notifications';
 
 interface RegisterRequest {
   username: string;
@@ -98,6 +99,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<RegisterR
         role: 'none', // Varsayılan yetki yok
       },
     });
+
+    // Requirement 9.2: Yeni kayıt bildirimini ust_yetkili kullanıcılara gönder
+    void notifyAllUstYetkili(
+      'new_user',
+      'Yeni Kullanıcı Kaydı',
+      `${username} (${email}) hesap oluşturdu. Onay bekliyor.`
+    );
 
     return NextResponse.json(
       {

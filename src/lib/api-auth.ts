@@ -95,7 +95,7 @@ export function withAuth<T = unknown>(
   handler: AuthenticatedApiHandler<T>,
   options: WithAuthOptions = {}
 ): ApiHandler<T> {
-  const { requiredRole = 'mod', requireApproved = true } = options;
+  const { requiredRole = 'reg', requireApproved = true } = options;
 
   return async (request: NextRequest, context: { params: Record<string, string> }) => {
     // Token'ı çıkar
@@ -161,21 +161,21 @@ export function withRole<T = unknown>(
 }
 
 /**
- * Sadece admin ve üstü için API handler wrapper'ı
+ * Üst Yetkili ve üstü için API handler wrapper'ı (yönetim işlemleri)
  */
 export function withAdmin<T = unknown>(
   handler: AuthenticatedApiHandler<T>
 ): ApiHandler<T> {
-  return withRole('admin', handler);
+  return withRole('ust_yetkili', handler);
 }
 
 /**
- * Sadece üst yetkili için API handler wrapper'ı
+ * Sadece owner için API handler wrapper'ı
  */
 export function withSuperAdmin<T = unknown>(
   handler: AuthenticatedApiHandler<T>
 ): ApiHandler<T> {
-  return withRole('ust_yetkili', handler);
+  return withRole('owner', handler);
 }
 
 /**

@@ -4,9 +4,22 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { withAdmin } from '@/lib/api-auth';
+import { withSuperAdmin } from '@/lib/api-auth';
 import { getActivityLogs, type LogFilters } from '@/lib/logging';
 import type { ActivityAction } from '@/types';
+
+// DELETE /api/admin/logs - Tüm logları temizle (sadece owner)
+export const DELETE = withSuperAdmin<{ success: boolean; deleted?: number; error?: string }>(
+  async () => {
+    try {
+      const result = await prisma.activityLog.deleteMany({});
+      return NextResponse.json({ success: true, deleted: result.count }, { status: 200 });
+    } catch (error) {
+      console.error('Logs clear error:', error);
+      return NextResponse.json({ success: false, error: 'Loglar temizlenirken hata oluştu' }, { status: 500 });
+    }
+  }
+);
 
 interface LogEntryWithUser {
   id: string;
@@ -30,7 +43,7 @@ interface LogsResponse {
   error?: string;
 }
 
-export const GET = withAdmin<LogsResponse>(async (request: NextRequest): Promise<NextResponse<LogsResponse>> => {
+export const GET = withSuperAdmin<LogsResponse>(async (request: NextRequest): Promise<NextResponse<LogsResponse>> => {
   try {
     // Query parametrelerini al
     const { searchParams } = new URL(request.url);

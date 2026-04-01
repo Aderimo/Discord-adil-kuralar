@@ -3,7 +3,18 @@
 // İçerik tiplerini re-export et
 export * from './content';
 
-export type UserRole = 'none' | 'mod' | 'admin' | 'ust_yetkili';
+// Şablon tiplerini re-export et
+export * from './templates';
+
+export type UserRole =
+  | 'none'         // Rol yok
+  | 'reg'          // Regulatör
+  | 'op'           // Operatör
+  | 'gatekeeper'   // GateKeeper
+  | 'council'      // Council
+  | 'gm'           // GM (General Manager)
+  | 'ust_yetkili'  // Üst Yetkili
+  | 'owner';       // Owner (en yüksek)
 
 export type UserStatus = 'pending' | 'approved' | 'rejected';
 

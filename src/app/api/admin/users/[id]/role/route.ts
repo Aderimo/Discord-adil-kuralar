@@ -6,7 +6,7 @@ import { withAdmin, type AuthenticatedApiHandler } from '@/lib/api-auth';
 import type { UserRole } from '@/types';
 
 interface RoleChangeRequest {
-  role: 'mod' | 'admin' | 'ust_yetkili';
+  role: UserRole;
 }
 
 interface RoleChangeResponse {
@@ -23,7 +23,7 @@ interface RoleChangeResponse {
 }
 
 // Geçerli roller
-const VALID_ROLES: UserRole[] = ['mod', 'admin', 'ust_yetkili'];
+const VALID_ROLES: UserRole[] = ['reg', 'op', 'gatekeeper', 'council', 'gm', 'ust_yetkili', 'owner'];
 
 const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
   request: NextRequest,
@@ -64,7 +64,7 @@ const handler: AuthenticatedApiHandler<RoleChangeResponse> = async (
       return NextResponse.json(
         {
           success: false,
-          error: 'Geçerli bir yetki seviyesi belirtilmelidir (mod, admin, ust_yetkili)',
+          error: 'Geçerli bir yetki seviyesi belirtilmelidir',
         },
         { status: 400 }
       );

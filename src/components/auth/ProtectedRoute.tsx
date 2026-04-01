@@ -25,12 +25,16 @@ interface ProtectedRouteProps {
   pendingRedirect?: string;
 }
 
-// Yetki seviyesi hiyerarşisi
+// Yetki seviyesi hiyerarşisi - rbac.ts ile senkronize
 const ROLE_HIERARCHY: Record<UserRole, number> = {
   none: 0,
-  mod: 1,
-  admin: 2,
-  ust_yetkili: 3,
+  reg: 1,
+  op: 2,
+  gatekeeper: 3,
+  council: 4,
+  gm: 5,
+  ust_yetkili: 10,
+  owner: 10,
 };
 
 /**

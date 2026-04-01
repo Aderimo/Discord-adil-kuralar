@@ -13,6 +13,7 @@
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { hasRole } from '@/lib/rbac';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -30,6 +31,7 @@ import {
   Shield,
   ChevronDown,
 } from 'lucide-react';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 // Props interface
 export interface MainLayoutProps {
@@ -40,17 +42,25 @@ export interface MainLayoutProps {
 // Rol etiketleri
 const roleLabels: Record<string, string> = {
   none: 'Kullanıcı',
-  mod: 'Moderatör',
-  admin: 'Admin',
+  reg: 'Reg',
+  op: 'Operatör',
+  gatekeeper: 'GateKeeper',
+  council: 'Council',
+  gm: 'GM',
   ust_yetkili: 'Üst Yetkili',
+  owner: 'Owner',
 };
 
 // Rol renkleri
 const roleColors: Record<string, string> = {
   none: 'text-discord-muted',
-  mod: 'text-discord-green',
-  admin: 'text-discord-accent',
+  reg: 'text-discord-muted',
+  op: 'text-discord-green',
+  gatekeeper: 'text-discord-green',
+  council: 'text-discord-accent',
+  gm: 'text-discord-accent',
   ust_yetkili: 'text-discord-yellow',
+  owner: 'text-discord-yellow',
 };
 
 export function MainLayout({ children, sidebar }: MainLayoutProps): React.ReactElement {
@@ -118,8 +128,12 @@ export function MainLayout({ children, sidebar }: MainLayoutProps): React.ReactE
           </Link>
         </div>
 
-        {/* Sağ taraf - Kullanıcı bilgisi */}
+        {/* Sağ taraf - Bildirimler ve Kullanıcı bilgisi */}
         <div className="flex items-center gap-2">
+          {/* Bildirim zili - sadece ust_yetkili ve üstü için (Requirement 9.6) */}
+          {user && hasRole(user.role, 'ust_yetkili') && (
+            <NotificationBell />
+          )}
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

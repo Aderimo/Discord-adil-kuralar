@@ -40,6 +40,8 @@ describe('Database Setup', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         lastLoginAt: null,
+        resetToken: null,
+        resetTokenExpiry: null,
       };
 
       const appUser = toAppUser(prismaUser);

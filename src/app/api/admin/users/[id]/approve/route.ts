@@ -6,7 +6,7 @@ import { withAdmin, type AuthenticatedApiHandler } from '@/lib/api-auth';
 import type { UserRole } from '@/types';
 
 interface ApproveRequest {
-  role: 'mod' | 'admin' | 'ust_yetkili';
+  role: UserRole;
 }
 
 interface ApproveResponse {
@@ -23,7 +23,7 @@ interface ApproveResponse {
 }
 
 // Geçerli roller
-const VALID_ROLES: UserRole[] = ['mod', 'admin', 'ust_yetkili'];
+const VALID_ROLES: UserRole[] = ['reg', 'op', 'gatekeeper', 'council', 'gm', 'ust_yetkili', 'owner'];
 
 const handler: AuthenticatedApiHandler<ApproveResponse> = async (
   request: NextRequest,
@@ -64,7 +64,7 @@ const handler: AuthenticatedApiHandler<ApproveResponse> = async (
       return NextResponse.json(
         {
           success: false,
-          error: 'Geçerli bir yetki seviyesi belirtilmelidir (mod, admin, ust_yetkili)',
+          error: 'Geçerli bir yetki seviyesi belirtilmelidir',
         },
         { status: 400 }
       );
@@ -82,17 +82,6 @@ const handler: AuthenticatedApiHandler<ApproveResponse> = async (
           error: 'Kullanıcı bulunamadı',
         },
         { status: 404 }
-      );
-    }
-
-    // Zaten onaylı mı kontrol et
-    if (targetUser.status === 'approved') {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Kullanıcı zaten onaylı durumda',
-        },
-        { status: 400 }
       );
     }
 

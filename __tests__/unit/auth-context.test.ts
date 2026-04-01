@@ -85,7 +85,7 @@ describe('Auth Context', () => {
         username: 'testuser',
         email: 'test@example.com',
         status: 'approved',
-        role: 'mod',
+        role: 'reg',
       };
 
       // Token yok
@@ -164,7 +164,7 @@ describe('Auth Context', () => {
         username: 'testuser',
         email: 'test@example.com',
         status: 'approved',
-        role: 'mod',
+        role: 'reg',
       };
 
       // Token var, /api/auth/me başarılı
@@ -247,7 +247,7 @@ describe('Auth Context', () => {
         username: 'testuser',
         email: 'test@example.com',
         status: 'approved',
-        role: 'mod',
+        role: 'reg',
       };
 
       // İlk yükleme - token yok
