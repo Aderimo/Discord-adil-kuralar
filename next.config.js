@@ -10,7 +10,8 @@ const nextConfig = {
   },
   experimental: {
     typedRoutes: true,
-    // Prisma native binaries'i serverless bundle'a dahil et (Netlify/Lambda için gerekli)
+    // Prisma ve bcryptjs'i bundle etme, runtime'da node_modules'tan al (Netlify Lambda için)
+    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
     outputFileTracingIncludes: {
       '/api/**': [
         './node_modules/@prisma/client/**/*',
