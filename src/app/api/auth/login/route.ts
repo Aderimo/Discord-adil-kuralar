@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSession, isValidEmail } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 import type { UserRole } from '@/types';
 
 interface LoginRequest {
@@ -28,6 +29,16 @@ interface LoginResponse {
 
 export async function POST(request: NextRequest): Promise<NextResponse<LoginResponse>> {
   try {
+    // Rate limiting: IP başına 10 deneme / 15 dakika
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
+    const rateLimit = checkRateLimit(`login:${ip}`, 10, 15 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Çok fazla deneme. 15 dakika sonra tekrar deneyin.' },
+        { status: 429 }
+      );
+    }
+
     const body = (await request.json()) as LoginRequest;
     const { email, password } = body;
 
@@ -118,7 +129,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     expires.setDate(expires.getDate() + 7); // 7 gün
     
     response.cookies.set('auth_token', session.token, {
-      httpOnly: false, // Client-side erişim için false
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       expires: expires,

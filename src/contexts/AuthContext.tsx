@@ -45,20 +45,12 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 const TOKEN_KEY = 'auth_token';
 
 // Token yönetimi yardımcı fonksiyonları
+// Cookie httpOnly olduğu için sadece localStorage kullanılır (client-side API çağrıları için)
+// Middleware server-side httpOnly cookie'yi okur
 function getStoredToken(): string | null {
   if (typeof window === 'undefined') {
     return null;
   }
-  // Önce cookie'den dene, sonra localStorage'dan
-  const cookieToken = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('auth_token='))
-    ?.split('=')[1];
-  
-  if (cookieToken) {
-    return cookieToken;
-  }
-  
   return localStorage.getItem(TOKEN_KEY);
 }
 
@@ -66,12 +58,6 @@ function setStoredToken(token: string): void {
   if (typeof window === 'undefined') {
     return;
   }
-  // Hem cookie'ye hem localStorage'a kaydet
-  // Cookie: 7 gün geçerli, path=/, SameSite=Lax
-  const expires = new Date();
-  expires.setDate(expires.getDate() + 7);
-  document.cookie = `auth_token=${token}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
-  
   localStorage.setItem(TOKEN_KEY, token);
 }
 
@@ -79,9 +65,6 @@ function removeStoredToken(): void {
   if (typeof window === 'undefined') {
     return;
   }
-  // Cookie'yi sil (geçmiş tarih vererek)
-  document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  
   localStorage.removeItem(TOKEN_KEY);
 }
 

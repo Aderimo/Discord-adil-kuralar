@@ -5,8 +5,11 @@ import { prisma } from './prisma';
 import type { Session } from '@prisma/client';
 import type { User, UserRole, UserStatus } from '@/types';
 
-// JWT secret - production'da environment variable kullanılmalı
-const JWT_SECRET = process.env.JWT_SECRET || 'yetkili-kilavuzu-secret-key-change-in-production';
+// JWT secret - environment variable zorunlu
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable tanımlı değil');
+}
 const JWT_EXPIRES_IN = '7d'; // Token 7 gün geçerli
 const SALT_ROUNDS = 10;
 

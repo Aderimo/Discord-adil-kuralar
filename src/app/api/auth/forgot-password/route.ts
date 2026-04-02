@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isValidEmail } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 import crypto from 'crypto';
 
 // Şifre sıfırlama token'ı oluştur
@@ -10,6 +11,16 @@ function generateResetToken(): string {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    // Rate limiting: IP başına 3 deneme / 1 saat
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
+    const rateLimit = checkRateLimit(`forgot:${ip}`, 3, 60 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, message: 'Çok fazla deneme. 1 saat sonra tekrar deneyin.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { email } = body;
 

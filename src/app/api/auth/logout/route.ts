@@ -51,10 +51,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<LogoutRes
 
     // Cookie'yi sil
     response.cookies.set('auth_token', '', {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      expires: new Date(0), // Geçmiş tarih = cookie silinir
+      expires: new Date(0),
       path: '/',
     });
 

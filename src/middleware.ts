@@ -361,7 +361,8 @@ async function sendLogAsync(request: NextRequest, logData: LogData): Promise<voi
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-internal-request': 'true', // Internal request marker
+        'x-internal-request': 'true',
+        'x-internal-secret': process.env.INTERNAL_API_SECRET ?? '',
       },
       body: JSON.stringify(logData),
     });

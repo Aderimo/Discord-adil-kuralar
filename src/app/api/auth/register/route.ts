@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, isValidEmail, isValidPassword } from '@/lib/auth';
 import { notifyAllUstYetkili } from '@/lib/notifications';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 interface RegisterRequest {
   username: string;
@@ -21,6 +22,16 @@ interface RegisterResponse {
 
 export async function POST(request: NextRequest): Promise<NextResponse<RegisterResponse>> {
   try {
+    // Rate limiting: IP başına 5 kayıt / 1 saat
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
+    const rateLimit = checkRateLimit(`register:${ip}`, 5, 60 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, message: 'Çok fazla deneme. 1 saat sonra tekrar deneyin.' },
+        { status: 429 }
+      );
+    }
+
     const body = (await request.json()) as RegisterRequest;
     const { username, email, password } = body;
 

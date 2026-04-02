@@ -71,22 +71,23 @@ function determineActivityAction(path: string, _method: string): ActivityAction 
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    // Internal request kontrolü
-    const isInternal = request.headers.get('x-internal-request') === 'true';
-    
-    // Güvenlik: Sadece localhost veya internal istekleri kabul et
-    const host = request.headers.get('host') || '';
-    const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
-    
-    if (!isInternal && !isLocalhost) {
-      // Production'da sadece internal istekleri kabul et
-      // Development'ta localhost'tan gelen istekleri de kabul et
-      if (process.env.NODE_ENV === 'production') {
-        return NextResponse.json(
-          { success: false, error: 'Unauthorized' },
-          { status: 403 }
-        );
-      }
+    // Internal request kontrolü - secret ile doğrula
+    const internalSecret = process.env.INTERNAL_API_SECRET;
+    const requestSecret = request.headers.get('x-internal-secret');
+
+    if (internalSecret && requestSecret !== internalSecret) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 403 }
+      );
+    }
+
+    // Secret tanımlı değilse sadece development'ta izin ver
+    if (!internalSecret && process.env.NODE_ENV === 'production') {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 403 }
+      );
     }
 
     const data: InternalLogData = await request.json();
