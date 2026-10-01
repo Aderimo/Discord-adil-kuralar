@@ -1,61 +1,89 @@
-# Discord Yetkili Kılavuzu ve Ceza Danışman Sistemi
+<div align="center">
 
-SANIYE MODLARI Discord sunucusu için özel Yetkili Kılavuzu ve AI destekli Ceza Danışman Sistemi.
+# Moderator Guide & Penalty Advisor
 
-## Özellikler
+**Your staff handbook, searchable — with an AI advisor for fair penalties.**
 
-- 🔐 Rol tabanlı erişim kontrolü (Mod, Admin, Üst Yetkili)
-- 📚 Yetkili Kılavuzu içerik yönetimi
-- ⚖️ Ceza tanımları ve kategorileri
-- 🤖 AI destekli ceza danışmanı (RAG tabanlı)
-- 🔍 Gelişmiş arama sistemi
-- 📝 İçerik düzenleme (sadece Üst Yetkili)
-- 📊 Aktivite loglama
+[![License](https://img.shields.io/badge/license-MIT-4ADE80)](LICENSE)
+[![Stack](https://img.shields.io/badge/Next.js_14_%2B_Prisma_%2B_OpenAI-6B7280)](#tech-stack)
 
-## Teknolojiler
+A custom moderator guide and AI-assisted penalty advisor built for the
+SANIYE MODLARI Discord server: every rule and penalty definition in one place,
+with role-based access and a RAG-powered assistant that suggests consistent penalties.
 
-- Next.js 14
-- TypeScript
-- Prisma ORM
-- Tailwind CSS
-- Shadcn/ui
-- OpenAI API
+**English** · [Türkçe](README.tr.md)
 
-## Kurulum
+</div>
 
-1. Repo'yu klonla:
+---
+
+## Why
+
+Moderation teams drift: rules live in pinned messages, penalty memory lives in
+people's heads, and two mods give two different punishments for the same offence.
+This app puts the whole staff handbook behind a login and lets an AI advisor quote
+the actual guide when recommending a penalty — so decisions stay consistent.
+
+## Features
+
+- 🔐 **Role-based access control** — Mod, Admin, Senior Staff
+- 📚 **Guide content management** — the moderator handbook, editable in-app
+- ⚖️ **Penalty definitions & categories**
+- 🤖 **AI penalty advisor** — RAG-based, answers grounded in the guide's own content
+- 🔍 **Advanced search** across rules and penalties
+- 📝 **Content editing** — restricted to Senior Staff
+- 📊 **Activity logging** — who changed what, who asked what
+
+## Tech stack
+
+| Layer | Choice |
+| --- | --- |
+| Framework | Next.js 14 |
+| Language | TypeScript |
+| Database | Prisma ORM |
+| UI | Tailwind CSS + shadcn/ui |
+| AI | OpenAI API (RAG over guide content) |
+
+## Setup
+
+1. Clone the repo:
+
 ```bash
 git clone https://github.com/Aderimo/Discord-adil-kuralar.git
 cd Discord-adil-kuralar
 ```
 
-2. Bağımlılıkları yükle:
+2. Install dependencies:
+
 ```bash
 npm install
 ```
 
-3. `.env.example` dosyasını `.env` olarak kopyala ve değerleri doldur:
+3. Copy `.env.example` to `.env` and fill in the values:
+
 ```bash
 cp .env.example .env
 ```
 
-4. Veritabanını oluştur:
+4. Create the database:
+
 ```bash
 npx prisma db push
 ```
 
-5. Geliştirme sunucusunu başlat:
+5. Start the dev server:
+
 ```bash
 npm run dev
 ```
 
-## Environment Variables
+## Environment variables
 
-| Değişken | Açıklama |
-|----------|----------|
-| `DATABASE_URL` | Veritabanı bağlantı URL'i |
-| `OPENAI_API_KEY` | OpenAI API anahtarı (AI asistan için) |
+| Variable | Description |
+| --- | --- |
+| `DATABASE_URL` | Database connection URL |
+| `OPENAI_API_KEY` | OpenAI API key (for the AI advisor) |
 
-## Lisans
+## License
 
-MIT
+[MIT](LICENSE)
